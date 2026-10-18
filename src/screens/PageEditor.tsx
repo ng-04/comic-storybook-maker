@@ -78,7 +78,7 @@ export function PageEditor({ st }: { st: Story }) {
             <textarea className="input" id="ed-caption" rows={3} value={p.caption}
               onChange={(e) => { const val = e.target.value; updatePage(st.id, p.id, { caption: val }); if (p.kind === 'cover') updateStory(st.id, (x) => ({ ...x, title: val })); }} />
           </div>
-          {isMid && (
+          {isMid && st.mode !== 'simple' && (
             <fieldset className="fieldset">
               <legend className="label">Format</legend>
               <div className="row gap-8">{layouts.map(([l, t]) => <Chip key={l} pressed={p.layout === l} onClick={() => setLayout(st.id, p.id, l)}>{t}</Chip>)}</div>

@@ -15,7 +15,7 @@ const sample = (() => {
 export function Landing() {
   const nav = useNavigate();
   // /library redirects to Unlock (site has shared keys) or Settings (it doesn't) when no keys are set.
-  const start = () => nav('/library');
+  const start = () => nav('/new');
   const demo = () => { updateSettings({ demo: true }); nav('/library'); };
   const steps = [
     ['Desh & Kaal', 'Where and when: a forest by the Narmada, a kingdom in the Treta Yuga, a village at Diwali.'],
@@ -27,7 +27,7 @@ export function Landing() {
     <>
       <header className="appheader" style={{ justifyContent: 'space-between' }}>
         <span style={{ fontFamily: "'Bangers', Impact, sans-serif", fontSize: 28, letterSpacing: '.04em' }}>Comic Storybook Maker</span>
-        <button className="btn btn-sm" onClick={start}>Open my storybooks</button>
+        <button className="btn btn-sm" onClick={() => nav('/library')}>Open my storybooks</button>
       </header>
       <main>
         <section style={{ maxWidth: 1160, margin: '0 auto', padding: '48px 20px 40px', display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'center' }}>

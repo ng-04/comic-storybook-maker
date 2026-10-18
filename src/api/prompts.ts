@@ -182,3 +182,68 @@ export function scenePrompt(st: Story, p: Page, scene: string, cast: Character[]
     NO_TEXT,
   ].filter(Boolean).join('\n');
 }
+
+// ---------------- Simple mode (works like v1) ----------------
+
+export const SIMPLE_SYSTEM = `You write short comic storybooks for young children, starring a real child and their family.
+Rules you always follow:
+- Write for the child's age: 1–3 short, simple sentences per page, warm and concrete, using the names.
+- Nothing frightening, cruel or violent; gentle, kind and joyful.
+- Image prompts describe one vivid scene for an illustrator (who, where, action, expression, lighting) and never ask for words, letters, signs or speech bubbles. End every image prompt with "No text, letters or speech bubbles."`;
+
+export const SIMPLE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['title', 'characters', 'pages'],
+  properties: {
+    title: { type: 'string' },
+    characters: { type: 'string' },
+    pages: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['caption', 'imagePrompt'],
+        properties: { caption: { type: 'string' }, imagePrompt: { type: 'string' } },
+      },
+    },
+  },
+};
+
+export function simplePrompt(st: Story): string {
+  const s = st.simple!;
+  const n = s.pages;
+  const who = s.gender === 'child' ? 'child' : s.gender;
+  return `Write a ${n}-page comic storybook for a ${s.age}-year-old.
+Hero: ${s.hero}, a ${s.age}-year-old ${who}. Other characters: ${s.others || 'none'}.
+Story idea: ${s.idea}
+Tone: ${s.tone}.
+Page 1 is the cover (caption = a short tagline). Page ${n} is the final page (a warm closing line; "The End" is added by the layout, don't write it).
+Captions: 1–3 short, simple sentences a ${s.age}-year-old can follow. Use the names.
+imagePrompt: a vivid scene description for an illustrator (who, where, action, expression, lighting). No text in the image.
+"title": the cover title. "characters": one consistent visual description of every character (age, hair, clothes, including any hero costume).
+Return exactly ${n} pages.`;
+}
+
+export function simpleScenePrompt(st: Story, scene: string, refs: { photo: boolean; cover: boolean }): string {
+  return [
+    styleLine('Comic'),
+    st.simple?.characters ? `Characters: ${st.simple.characters}` : '',
+    refs.photo ? "Use the attached family photo only as a loose reference for hair, skin tone and clothing, redrawn as simple cartoon characters rather than a realistic likeness." : '',
+    refs.cover ? 'Match the character designs in the attached cover illustration.' : '',
+    `Scene: ${scene}`,
+    NO_TEXT,
+  ].filter(Boolean).join('\n');
+}
+
+export function simpleRewritePrompt(st: Story, pageId: string): string {
+  const i = st.pages.findIndex((p) => p.id === pageId);
+  const p = st.pages[i];
+  return `${simplePrompt(st)}
+
+Here is the comic so far, page by page:
+${st.pages.map((x, k) => `${k + 1}. ${x.caption}`).join('\n')}
+
+Rewrite page ${i + 1} only, keeping it consistent with the pages around it. Current caption: ${p.caption}. Current image prompt: ${p.imagePrompt}.
+Return "caption" and "imagePrompt"; set "location" and "bubble" to "" and "panels" to [].`;
+}

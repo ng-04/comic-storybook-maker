@@ -11,6 +11,11 @@ A parent builds a *katha* in five steps (Desh, Kaal, Paatra, Paristhiti, Katha) 
 | **1 (this)** | GitHub Pages | From the browser, with each user's own Anthropic and Gemini keys (kept in that browser's localStorage) | IndexedDB in the browser |
 | 2 | AWS (S3 + CloudFront, API Gateway + Lambda, Cognito) | From Lambda workers; keys in Secrets Manager | DynamoDB + S3 |
 
+Every new book starts with a choice of two modes:
+
+- **Simple:** one form like the first version (hero, age, other characters, story idea, tone, pages, family photo). Claude writes the story and every page is drawn straight away, cover first, the rest matching the cover. No character sheets or outline review.
+- **Advanced:** the five-step katha builder below.
+
 The specs in `docs/` describe the Phase 2 product. Phase 1 builds the same screens and flow, with these differences:
 
 - No sign-in. Settings asks for the user's own API keys (with Show/Hide and Test key) and an optional Anthropic workspace ID.

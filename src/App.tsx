@@ -14,6 +14,8 @@ import { PageEditor } from './screens/PageEditor';
 import { Reader } from './screens/Reader';
 import { Settings } from './screens/Settings';
 import { Unlock } from './screens/Unlock';
+import { NewBook } from './screens/NewBook';
+import { SimpleForm } from './screens/SimpleForm';
 import { loadBundle } from './state/vault';
 import { Writing } from './screens/Writing';
 import { Katha } from './screens/setup/Katha';
@@ -56,6 +58,7 @@ function RequireSetup({ children }: { children: ReactNode }) {
 }
 
 const SCREENS: Record<string, { step: StepKey; render: (st: Story) => ReactNode }> = {
+  simple: { step: 'simple', render: (st) => <SimpleForm st={st} /> },
   desh: { step: 'desh', render: (st) => <Desh st={st} /> },
   kaal: { step: 'kaal', render: (st) => <Kaal st={st} /> },
   paatra: { step: 'paatra', render: (st) => <Paatra st={st} /> },
@@ -107,6 +110,7 @@ export default function App() {
           <Route path="/unlock" element={<Unlock />} />
           <Route path="/settings" element={<AppShell><Settings /></AppShell>} />
           <Route path="/library" element={inShell(<Library />)} />
+          <Route path="/new" element={inShell(<main className="wrap"><NewBook /></main>)} />
           {Object.keys(SCREENS).filter((k) => k !== 'pages').map((k) => (
             <Route key={k} path={`/s/:storyId/${k}`} element={inShell(<StoryRoute screen={k} />)} />
           ))}

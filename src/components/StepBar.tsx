@@ -1,13 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import type { Story } from '../domain/types';
 
-export type StepKey = 'desh' | 'kaal' | 'paatra' | 'paristhiti' | 'katha' | 'outline' | 'pictures' | 'read';
+export type StepKey = 'simple' | 'desh' | 'kaal' | 'paatra' | 'paristhiti' | 'katha' | 'outline' | 'pictures' | 'read';
 
 /** 1 Desh · 2 Kaal · 3 Paatra · 4 Paristhiti · 5 Katha · 6 Outline · 7 Pictures · 8 Read (frontend-spec §2). */
 export function StepBar({ story, current }: { story: Story; current: StepKey }) {
   const nav = useNavigate();
   const anyDrawn = story.pages.some((p) => p.versions.length);
-  const steps: [StepKey, string, boolean][] = [
+  const steps: [StepKey, string, boolean][] = story.mode === 'simple' ? [
+    ['simple', 'Story', true],
+    ['pictures', 'Pictures', story.pages.length > 0],
+    ['read', 'Read', anyDrawn],
+  ] : [
     ['desh', 'Desh', true], ['kaal', 'Kaal', true], ['paatra', 'Paatra', true], ['paristhiti', 'Paristhiti', true], ['katha', 'Katha', true],
     ['outline', 'Outline', story.pages.length > 0],
     ['pictures', 'Pictures', story.status === 'illustrating' || story.status === 'done' || anyDrawn],

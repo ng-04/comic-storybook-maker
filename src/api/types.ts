@@ -20,6 +20,8 @@ export interface OutlineResult {
   title: string;
   formatReason: string;
   pages: OutlinePage[];
+  /** Simple mode: Claude's visual description of every character, reused in image prompts. */
+  characterNotes?: string;
 }
 
 export interface RewriteResult {

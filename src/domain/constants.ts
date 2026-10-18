@@ -10,6 +10,7 @@ export const COUNTS = [6, 8, 12];
 export const STYLES = ['Comic', 'Watercolour', 'Crayon', 'Madhubani-inspired'];
 export const COLORS = ['#1F4FB8', '#8A4FD1', '#2E9C5A', '#C98A4B', '#F28C28', '#D6457A'];
 export const MAX_SUBLOCATIONS = 6;
+export const SIMPLE_TONES = ['Superhero action', 'Funny', 'Heartwarming', 'Adventurous', 'Gentle bedtime'];
 export const MAX_PAGES = 14;
 
 export const ROLE_LABELS: Record<Role, string> = {

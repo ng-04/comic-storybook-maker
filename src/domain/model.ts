@@ -1,5 +1,5 @@
 import { COLORS, PURUSHARTHAS } from './constants';
-import type { Character, Layout, Page, PageKind, Panel, PurusharthaKey, Role, Setup, Story } from './types';
+import type { Character, Layout, Page, PageKind, Panel, PurusharthaKey, Role, Setup, SimpleInput, Story } from './types';
 
 export function uid(prefix: string): string {
   const rnd = typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -83,6 +83,39 @@ export function newStory(): Story {
   };
 }
 
+export const isSimple = (st: Story) => st.mode === 'simple';
+
+export function blankSimple(): SimpleInput {
+  return {
+    hero: 'Avyay',
+    age: '4',
+    gender: 'boy',
+    others: 'baby brother Rudrav (newborn), Mama, Papa',
+    idea: 'A new baby brother is born. Avyay is excited and becomes Super Big Brother with a cape and super powers: hugging, singing, protecting.',
+    tone: 'Superhero action',
+    pages: 12,
+    photo: null,
+    characters: '',
+  };
+}
+
+export function newSimpleStory(): Story {
+  const st = newStory();
+  return { ...st, mode: 'simple', title: 'Untitled comic', simple: blankSimple(), characters: [] };
+}
+
+/** Characters for a simple book: the hero, plus each comma-separated "other character". */
+export function simpleCharacters(s: SimpleInput): Character[] {
+  const hero = newCharacter('nayak', 0, {
+    name: s.hero.trim() || 'Our hero',
+    age: s.age.replace(/[^0-9]/g, ''),
+    gender: s.gender === 'girl' ? 'female' : 'male',
+  });
+  const others = s.others.split(',').map((x) => x.replace(/\([^)]*\)/g, '').trim()).filter(Boolean)
+    .map((name, i) => newCharacter('parivaar', i + 1, { name, isKey: false }));
+  return [hero, ...others];
+}
+
 /** A sequel keeps desh, kaal, paatra and approved sheets, and clears the plot (backend-spec §4.7). */
 export function sequelOf(base: Story): Story {
   const now = Date.now();
@@ -90,6 +123,7 @@ export function sequelOf(base: Story): Story {
     ...base,
     id: uid('st'),
     title: `${base.title}: Part 2`,
+    simple: base.simple ? { ...base.simple, idea: '' } : undefined,
     status: 'draft',
     setup: { ...base.setup, paristhiti: '', stakes: '', katha: '', lesson: '' },
     characters: base.characters.map((c) => ({ ...c, id: uid('c') })),

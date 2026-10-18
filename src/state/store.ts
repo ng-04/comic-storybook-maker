@@ -4,8 +4,8 @@
 import { useSyncExternalStore } from 'react';
 import { api, asApiError, type ApiError } from '../api';
 import { MAX_PAGES } from '../domain/constants';
-import { blankPanels, chooseFormat, newCharacter, newPage, newStory, sequelOf, uid } from '../domain/model';
-import type { Character, Layout, Page, RefImage, Role, Story } from '../domain/types';
+import { blankPanels, chooseFormat, isSimple, newCharacter, newPage, newSimpleStory, newStory, sequelOf, simpleCharacters, uid } from '../domain/model';
+import type { Character, Layout, Mode, Page, RefImage, Role, SimpleInput, Story } from '../domain/types';
 import { db, forgetBlobUrl, type BlobKind } from './db';
 import { prepareImage } from './images';
 
@@ -141,8 +141,8 @@ export function closeConfirm() {
 
 // ---------------- library ----------------
 
-export function createStory(): Story {
-  const st = newStory();
+export function createStory(mode: Mode = 'advanced'): Story {
+  const st = mode === 'simple' ? newSimpleStory() : newStory();
   set((s) => ({ stories: [st, ...s.stories] }));
   scheduleSave(st.id);
   return st;
@@ -154,13 +154,14 @@ export function createSequel(baseId: string): Story | undefined {
   const st = sequelOf(base);
   set((s) => ({ stories: [st, ...s.stories] }));
   scheduleSave(st.id);
-  toast('Sequel started: same desh, kaal and paatra. Set the new paristhiti.');
+  toast(isSimple(st) ? 'Sequel started with the same characters. Write a new story idea.' : 'Sequel started: same desh, kaal and paatra. Set the new paristhiti.');
   return st;
 }
 
 function blobIdsOf(st: Story): string[] {
   return [
     ...st.setup.placeRefs.map((r) => r.blobId),
+    st.simple?.photo?.blobId || '',
     ...st.characters.flatMap((c) => [...c.refs.map((r) => r.blobId), ...c.sheet.versions.map((v) => v.blobId)]),
     ...st.pages.flatMap((p) => p.versions.flatMap((v) => [v.blobId, ...v.panelBlobIds])),
   ].filter(Boolean);
@@ -219,9 +220,47 @@ export async function deleteAllReferenceImages() {
   const ids = (await db.blobIdsOfKind('reference')) as string[];
   for (const id of ids) { forgetBlobUrl(id); await db.deleteBlob(id); }
   for (const st of state.stories) {
-    updateStory(st.id, (x) => ({ ...x, setup: { ...x.setup, placeRefs: [] }, characters: x.characters.map((c) => ({ ...c, refs: [] })) }));
+    updateStory(st.id, (x) => ({
+      ...x,
+      setup: { ...x.setup, placeRefs: [] },
+      characters: x.characters.map((c) => ({ ...c, refs: [] })),
+      simple: x.simple ? { ...x.simple, photo: null } : undefined,
+    }));
   }
   toast('All reference images deleted.');
+}
+
+// ---------------- simple mode ----------------
+
+export function updateSimple(storyId: string, patch: Partial<SimpleInput>) {
+  updateStory(storyId, (st) => ({ ...st, simple: { ...(st.simple as SimpleInput), ...patch } }));
+}
+
+export async function setSimplePhoto(storyId: string, file: File) {
+  if (file.size > 10 * 1048576) { toast(`${file.name} is over 10 MB. Try a smaller one.`, 'warn'); return; }
+  const old = storyById(storyId)?.simple?.photo;
+  try {
+    const blob = await prepareImage(file);
+    const blobId = uid('img');
+    await db.putBlob(blobId, 'reference', blob);
+    updateSimple(storyId, { photo: { id: uid('r'), name: file.name, size: blob.size, blobId, mime: blob.type } });
+    if (old) await removeOrphan(old.blobId);
+  } catch {
+    toast(`Couldn't add ${file.name}.`, 'warn');
+  }
+}
+
+export async function removeSimplePhoto(storyId: string) {
+  const old = storyById(storyId)?.simple?.photo;
+  updateSimple(storyId, { photo: null });
+  if (old) await removeOrphan(old.blobId);
+}
+
+async function removeOrphan(blobId: string) {
+  if (!state.stories.some((x) => blobIdsOf(x).includes(blobId))) {
+    forgetBlobUrl(blobId);
+    await db.deleteBlob(blobId);
+  }
 }
 
 // ---------------- paatra ----------------
@@ -299,6 +338,7 @@ export async function writeOutline(storyId: string): Promise<boolean> {
     stopIllustrating(storyId);
     updateStory(storyId, (x) => ({
       ...x,
+      ...(isSimple(x) ? { characters: simpleCharacters(x.simple!), simple: { ...x.simple!, characters: res.characterNotes || '' } } : {}),
       title: res.title,
       status: 'outline',
       formatReason: res.formatReason,
@@ -385,6 +425,7 @@ const drawControllers = new Map<string, AbortController>();
 const PAGE_CONCURRENCY = 3;
 
 export function pendingSheets(st: Story): Character[] {
+  if (isSimple(st)) return [];
   return st.characters.filter((c) => c.name.trim() && c.sheet.status !== 'approved');
 }
 

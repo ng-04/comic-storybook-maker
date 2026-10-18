@@ -103,8 +103,27 @@ export interface Page {
   error: { code: string; message: string } | null;
 }
 
+export type Mode = 'simple' | 'advanced';
+
+/** Inputs of the Simple mode form (works like v1: one form, then straight to pictures). */
+export interface SimpleInput {
+  hero: string;
+  age: string;
+  gender: 'boy' | 'girl' | 'child';
+  others: string;
+  idea: string;
+  tone: string;
+  pages: number;
+  photo: RefImage | null;
+  /** Claude's consistent visual description of every character, used in each image prompt. */
+  characters: string;
+}
+
 export interface Story {
   id: string;
+  /** Missing on books made before modes existed: those are advanced. */
+  mode?: Mode;
+  simple?: SimpleInput;
   title: string;
   status: StoryStatus;
   setup: Setup;

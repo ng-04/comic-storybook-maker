@@ -1,12 +1,12 @@
 // Phase 1 client: the browser calls Claude and Gemini directly with the user's own keys.
 
 import { FALLBACK_NOTES } from '../domain/constants';
-import { blankPanels, kindAt, uid } from '../domain/model';
+import { blankPanels, isSimple, kindAt, uid } from '../domain/model';
 import type { Character, Panel, Story } from '../domain/types';
 import { db } from '../state/db';
 import { claudeJson } from './claude';
 import { blobToInline, drawWithLadder, type Aspect, type InlineImage, type Rung } from './gemini';
-import { charactersOnPage, OUTLINE_SCHEMA, outlinePrompt, REWRITE_SCHEMA, rewritePrompt, scenePrompt, sheetPrompt, STORY_SYSTEM } from './prompts';
+import { charactersOnPage, OUTLINE_SCHEMA, outlinePrompt, REWRITE_SCHEMA, rewritePrompt, scenePrompt, sheetPrompt, SIMPLE_SCHEMA, SIMPLE_SYSTEM, simplePrompt, simpleRewritePrompt, simpleScenePrompt, STORY_SYSTEM } from './prompts';
 import { ApiError, type ImageResult, type OutlinePage, type OutlineResult, type PageImageResult, type RewriteResult, type StoryApi } from './types';
 
 interface RawPanel { prompt: string; bubble: string; speaker: string }
@@ -34,10 +34,48 @@ function approvedSheet(c: Character): string | null {
   return c.sheet.status === 'approved' && v ? v.blobId : null;
 }
 
+// ---------------- Simple mode (like v1) ----------------
+
+async function writeSimple(st: Story, signal?: AbortSignal): Promise<OutlineResult> {
+  const n = st.simple!.pages;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const raw = await claudeJson<{ title: string; characters: string; pages: { caption: string; imagePrompt: string }[] }>({
+      system: SIMPLE_SYSTEM, prompt: simplePrompt(st), schema: SIMPLE_SCHEMA, maxTokens: 16000, signal,
+    });
+    if ((raw.pages || []).length >= n) {
+      return {
+        title: raw.title || 'My comic',
+        formatReason: '',
+        characterNotes: raw.characters || '',
+        pages: raw.pages.slice(0, n).map((p, i) => ({
+          kind: kindAt(i, n), caption: i === 0 ? raw.title || p.caption : p.caption, imagePrompt: p.imagePrompt,
+          layout: 'caption', location: '', bubble: '', panels: [],
+        })),
+      };
+    }
+  }
+  throw new ApiError('GENERATION_INVALID', `The story came back with the wrong number of pages. Try again.`);
+}
+
+/** v1's approach: family photo + the drawn cover as references, stepping down if refused. */
+async function drawSimplePage(st: Story, pageId: string, signal?: AbortSignal): Promise<PageImageResult> {
+  const p = st.pages.find((x) => x.id === pageId)!;
+  const photo = st.simple?.photo ? await loadImages([st.simple.photo.blobId]) : [];
+  const coverV = st.pages[0] !== p ? st.pages[0]?.versions.find((v) => v.id === st.pages[0].activeVersionId) || st.pages[0]?.versions.at(-1) : undefined;
+  const cover = coverV?.blobId ? await loadImages([coverV.blobId]) : [];
+  const rungs: Rung[] = [];
+  if (photo.length) rungs.push({ text: simpleScenePrompt(st, p.imagePrompt, { photo: true, cover: cover.length > 0 }), images: [...photo, ...cover], note: '', step: 1 });
+  if (cover.length) rungs.push({ text: simpleScenePrompt(st, p.imagePrompt, { photo: false, cover: true }), images: cover, note: photo.length ? FALLBACK_NOTES.pageNoPhoto.replace('using the approved character sheets', 'matching the cover') : '', step: photo.length ? 2 : 1 });
+  rungs.push({ text: simpleScenePrompt(st, p.imagePrompt, { photo: false, cover: false }), images: [], note: rungs.length ? FALLBACK_NOTES.textOnly : '', step: rungs.length ? 3 : 1 });
+  const image = await drawWithLadder(rungs, p.layout === 'full' ? '3:4' : '4:5', signal);
+  return { image, panels: [], note: image.note, step: image.step };
+}
+
 export const directApi: StoryApi = {
   mode: 'direct',
 
   async writeOutline(st, signal): Promise<OutlineResult> {
+    if (isSimple(st)) return writeSimple(st, signal);
     const { text, layout, reason } = outlinePrompt(st);
     const n = st.setup.pageCount;
     let lastErr: ApiError | null = null;
@@ -69,7 +107,9 @@ export const directApi: StoryApi = {
   async rewritePage(st, pageId, signal): Promise<RewriteResult> {
     const p = st.pages.find((x) => x.id === pageId);
     if (!p) throw new ApiError('INTERNAL', 'That page no longer exists.');
-    const raw = await claudeJson<RawPage>({ system: STORY_SYSTEM, prompt: rewritePrompt(st, pageId), schema: REWRITE_SCHEMA, maxTokens: 8000, signal });
+    const raw = isSimple(st)
+      ? await claudeJson<RawPage>({ system: SIMPLE_SYSTEM, prompt: simpleRewritePrompt(st, pageId), schema: REWRITE_SCHEMA, maxTokens: 8000, signal })
+      : await claudeJson<RawPage>({ system: STORY_SYSTEM, prompt: rewritePrompt(st, pageId), schema: REWRITE_SCHEMA, maxTokens: 8000, signal });
     const isGrid = p.kind === 'middle' && p.layout === 'grid';
     let panels = isGrid ? toPanels(raw.panels || [], st) : [];
     if (isGrid && panels.length < 6) panels = panels.concat(blankPanels(st, p.location).slice(panels.length));
@@ -92,6 +132,7 @@ export const directApi: StoryApi = {
   async drawPage(st, pageId, signal): Promise<PageImageResult> {
     const p = st.pages.find((x) => x.id === pageId);
     if (!p) throw new ApiError('INTERNAL', 'That page no longer exists.');
+    if (isSimple(st)) return drawSimplePage(st, pageId, signal);
     const cast = charactersOnPage(st, p);
     const withSheets = cast.filter((c) => approvedSheet(c)).slice(0, MAX_REF_IMAGES);
     const sheetImgs = await loadImages(withSheets.map((c) => approvedSheet(c)!));

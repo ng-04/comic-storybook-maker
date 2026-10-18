@@ -3,10 +3,12 @@ import { IconPlus } from '../components/Icons';
 import { PagePanel } from '../components/PagePanel';
 import { ago, clean, newPage } from '../domain/model';
 import type { Story } from '../domain/types';
-import { askConfirm, createSequel, createStory, deleteStory, loadLibrary, useStore } from '../state/store';
+import { askConfirm, createSequel, deleteStory, loadLibrary, useStore } from '../state/store';
 
 export function openPath(st: Story): string {
-  const screen = st.status === 'done' ? 'read' : st.status === 'illustrating' ? 'pictures' : st.status === 'outline' ? 'outline' : 'desh';
+  const simple = st.mode === 'simple';
+  const screen = st.status === 'done' ? 'read' : st.status === 'illustrating' ? 'pictures'
+    : st.status === 'outline' ? (simple ? 'pictures' : 'outline') : (simple ? 'simple' : 'desh');
   return `/s/${st.id}/${screen}`;
 }
 
@@ -18,7 +20,7 @@ function statusLabel(b: Story) {
 export function Library() {
   const { loaded, loadError, stories } = useStore();
   const nav = useNavigate();
-  const startNew = () => nav(`/s/${createStory().id}/desh`);
+  const startNew = () => nav('/new');
   const askDelete = (st: Story) => askConfirm({
     title: 'Delete this storybook?',
     body: `“${st.title}” and all its pictures will be removed from this browser. This can't be undone.`,
@@ -77,13 +79,13 @@ export function Library() {
                 </button>
                 <div className="stack gap-6">
                   <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.25 }}>{b.title}</p>
-                  <p className="muted" style={{ margin: 0, fontSize: 14 }}>{[b.setup.inspiration[0], clean(b.setup.desh.main)].filter(Boolean).join(' · ')}</p>
+                  <p className="muted" style={{ margin: 0, fontSize: 14 }}>{b.mode === 'simple' ? `Simple · starring ${b.simple?.hero || 'your hero'}` : [b.setup.inspiration[0], clean(b.setup.desh.main)].filter(Boolean).join(' · ')}</p>
                   <div className="row gap-6">
                     <span className={`badge ${badge}`}>{statusLabel(b)}</span>
                     <span className="muted" style={{ fontSize: 14 }}>{ago(b.updatedAt)}</span>
                   </div>
                   <div className="row" style={{ gap: 4 }}>
-                    <button className="linkbtn" style={{ fontSize: 15 }} onClick={() => { const s = createSequel(b.id); if (s) nav(`/s/${s.id}/paristhiti`); }}>Make a sequel</button>
+                    <button className="linkbtn" style={{ fontSize: 15 }} onClick={() => { const s = createSequel(b.id); if (s) nav(`/s/${s.id}/${s.mode === 'simple' ? 'simple' : 'paristhiti'}`); }}>Make a sequel</button>
                     <span aria-hidden="true">·</span>
                     <button className="linkbtn" style={{ fontSize: 15, color: '#B3261E' }} onClick={() => askDelete(b)}>Delete</button>
                   </div>

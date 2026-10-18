@@ -5,9 +5,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IconCheck } from '../components/Icons';
 import type { Story } from '../domain/types';
 import { api } from '../api';
-import { cancelWriting, toast, useStore, writeOutline } from '../state/store';
+import { cancelWriting, startIllustrating, toast, useStore, writeOutline } from '../state/store';
 
 const STAGES = ['Reading the desh and kaal', 'Placing your paatra', 'Weaving in the paristhiti', 'Writing the katha, page by page', 'Laying out panels and bubbles', 'Checking the seekh and reading level'];
+const SIMPLE_STAGES = ['Meeting the hero', 'Thinking up the adventure', 'Writing the story, page by page', 'Describing each picture', 'Checking it reads well', 'Getting the pencils ready'];
 const THRESHOLDS = [0, 0.1, 0.25, 0.45, 0.7, 0.88];
 
 export function Writing({ st }: { st: Story }) {
@@ -19,7 +20,15 @@ export function Writing({ st }: { st: Story }) {
 
   const start = () => {
     void writeOutline(st.id).then((ok) => {
-      if (ok) { toast('Your katha is ready to review.'); nav(`/s/${st.id}/outline`, { replace: true }); }
+      if (!ok) return;
+      if (st.mode === 'simple') {
+        // Simple mode skips the outline review, like the first version: draw straight away.
+        startIllustrating(st.id);
+        nav(`/s/${st.id}/pictures`, { replace: true });
+      } else {
+        toast('Your katha is ready to review.');
+        nav(`/s/${st.id}/outline`, { replace: true });
+      }
     });
   };
 
@@ -42,7 +51,7 @@ export function Writing({ st }: { st: Story }) {
       <div className="panel stack gap-14" style={{ maxWidth: 720, margin: '24px auto 0', padding: 28, alignItems: 'flex-start' }}>
         <h1 className="h1">Nothing is being written right now</h1>
         <p className="m0">{st.pages.length ? 'Your outline is ready.' : 'Set up the katha, then press Write my katha.'}</p>
-        <button className="btn btn-primary" onClick={() => nav(`/s/${st.id}/${st.pages.length ? 'outline' : 'katha'}`)}>{st.pages.length ? 'Review the outline' : 'Go to Katha'}</button>
+        <button className="btn btn-primary" onClick={() => nav(`/s/${st.id}/${st.pages.length ? (st.mode === 'simple' ? 'pictures' : 'outline') : (st.mode === 'simple' ? 'simple' : 'katha')}`)}>{st.pages.length ? 'See the pages' : 'Back to the story'}</button>
       </div>
     );
   }
@@ -54,7 +63,7 @@ export function Writing({ st }: { st: Story }) {
         <p className="m0">{job.error} No pictures were drawn, and everything you set up is saved.</p>
         <div className="row gap-10">
           <button className="btn btn-primary" onClick={start}>Try again</button>
-          <button className="btn" onClick={() => { cancelWriting(st.id); nav(`/s/${st.id}/katha`); }}>Change the katha</button>
+          <button className="btn" onClick={() => { cancelWriting(st.id); nav(`/s/${st.id}/${st.mode === 'simple' ? 'simple' : 'katha'}`); }}>{st.mode === 'simple' ? 'Change the story' : 'Change the katha'}</button>
         </div>
       </div>
     );
@@ -67,10 +76,10 @@ export function Writing({ st }: { st: Story }) {
   return (
     <div style={{ maxWidth: 720, margin: '24px auto 0' }}>
       <div className="panel stack gap-20" style={{ padding: 28 }} role="status" aria-live="polite">
-        <h1 className="display" style={{ fontSize: 54 }}>Writing your katha<span className="bounce" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h1>
+        <h1 className="display" style={{ fontSize: 54 }}>{st.mode === 'simple' ? 'Writing your story' : 'Writing your katha'}<span className="bounce" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h1>
         <div className="progress" aria-hidden="true"><span style={{ width: `${Math.round(frac * 100)}%` }} /></div>
         <ol className="stack gap-10" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {STAGES.map((label, i) => {
+          {(st.mode === 'simple' ? SIMPLE_STAGES : STAGES).map((label, i) => {
             const done = frac >= (THRESHOLDS[i + 1] ?? 1.01);
             const active = !done && frac >= THRESHOLDS[i];
             return (
@@ -84,7 +93,7 @@ export function Writing({ st }: { st: Story }) {
           })}
         </ol>
         <p className="muted m0">{Math.floor(secs / 60)}:{String(secs % 60).padStart(2, '0')} elapsed · usually 30 to 90 seconds. Keep this tab open; you can look at other steps meanwhile.</p>
-        <button className="btn" style={{ alignSelf: 'flex-start' }} onClick={() => { cancelWriting(st.id); nav(`/s/${st.id}/katha`); }}>Cancel</button>
+        <button className="btn" style={{ alignSelf: 'flex-start' }} onClick={() => { cancelWriting(st.id); nav(`/s/${st.id}/${st.mode === 'simple' ? 'simple' : 'katha'}`); }}>Cancel</button>
       </div>
     </div>
   );

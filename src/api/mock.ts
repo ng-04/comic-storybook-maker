@@ -2,7 +2,7 @@
 // refusals and fallback notes. Also what the tests run against.
 
 import { FALLBACK_NOTES } from '../domain/constants';
-import { blankPanels, chooseFormat, clean, heroOf, kaalPhrase, kindAt, lowerFirst, styleWord, uid } from '../domain/model';
+import { blankPanels, chooseFormat, clean, heroOf, isSimple, kaalPhrase, kindAt, lowerFirst, styleWord, uid } from '../domain/model';
 import type { Character, Story } from '../domain/types';
 import { ApiError, type ImageResult, type OutlinePage, type OutlineResult, type PageImageResult, type RewriteResult, type StoryApi } from './types';
 
@@ -98,12 +98,41 @@ function mockOutline(st: Story): OutlineResult {
   return { title, formatReason: fmt.reason, pages };
 }
 
+function mockSimple(st: Story): OutlineResult {
+  const s = st.simple!;
+  const H = s.hero.trim() || 'Our hero';
+  const lines = [
+    `${H} woke up with a big smile.`,
+    `Something exciting was about to happen!`,
+    `${H} put on a bright red cape.`,
+    `"I can help!" said ${H}.`,
+    `${H} gave the biggest, warmest hug.`,
+    `Everyone laughed and sang together.`,
+    `${H} was brave, kind and strong.`,
+    `It was the best day ever.`,
+    `${H} looked at the stars and smiled.`,
+    `Tomorrow would be another adventure.`,
+  ];
+  const n = s.pages;
+  return {
+    title: `${H} Saves the Day`,
+    formatReason: '',
+    characterNotes: `${H}, age ${s.age}, with a red cape.`,
+    pages: Array.from({ length: n }, (_, i) => ({
+      kind: kindAt(i, n),
+      caption: i === 0 ? `${H} Saves the Day` : i === n - 1 ? `And ${H} went to sleep, happy and proud.` : lines[(i - 1) % lines.length],
+      imagePrompt: `Children's comic illustration of ${H}. ${i === 0 ? 'Cover scene' : `Scene ${i + 1}`}. No text, letters or speech bubbles.`,
+      layout: 'caption' as const, location: '', bubble: '', panels: [],
+    })),
+  };
+}
+
 export const mockApi: StoryApi = {
   mode: 'mock',
   async writeOutline(st, signal) {
     await wait(9000, signal);
     if (mockConfig.storyFails) throw new ApiError('GENERATION_INVALID', 'The story writer took too long to answer.', true);
-    return mockOutline(st);
+    return isSimple(st) ? mockSimple(st) : mockOutline(st);
   },
   async rewritePage(st, pageId, signal): Promise<RewriteResult> {
     await wait(2600, signal);
