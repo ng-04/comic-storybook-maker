@@ -1,5 +1,5 @@
-import { useEffect, type ReactNode } from 'react';
-import { HashRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ConfirmDialog, Toasts } from './components/Dialogs';
 import { AppShell } from './components/Shell';
 import { StepBar, type StepKey } from './components/StepBar';
@@ -13,6 +13,8 @@ import { Outline } from './screens/Outline';
 import { PageEditor } from './screens/PageEditor';
 import { Reader } from './screens/Reader';
 import { Settings } from './screens/Settings';
+import { Unlock } from './screens/Unlock';
+import { loadBundle } from './state/vault';
 import { Writing } from './screens/Writing';
 import { Katha } from './screens/setup/Katha';
 import { Paatra } from './screens/setup/Paatra';
@@ -24,9 +26,33 @@ function ScrollTop() {
   return null;
 }
 
+/** Whether the site publishes passkey-protected keys (null while checking). */
+function useHasBundle(): boolean | null {
+  const [has, setHas] = useState<boolean | null>(null);
+  useEffect(() => { void loadBundle().then((b) => setHas(!!b)); }, []);
+  return has;
+}
+
+/** On page load, ask for the passkey when the site has shared keys and this browser has none. */
+function PasskeyGate() {
+  const s = useSettings();
+  const has = useHasBundle();
+  const nav = useNavigate();
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (has && !isConfigured(s) && pathname !== '/unlock' && pathname !== '/settings') nav('/unlock', { replace: true });
+    // Only on load: after that, people can still reach Settings or the demo from the Unlock screen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [has]);
+  return null;
+}
+
 function RequireSetup({ children }: { children: ReactNode }) {
   const s = useSettings();
-  return isConfigured(s) ? <>{children}</> : <Navigate to="/settings?first=1" replace />;
+  const has = useHasBundle();
+  if (isConfigured(s)) return <>{children}</>;
+  if (has === null) return <main className="wrap"><p role="status">Loading…</p></main>;
+  return <Navigate to={has ? '/unlock' : '/settings?first=1'} replace />;
 }
 
 const SCREENS: Record<string, { step: StepKey; render: (st: Story) => ReactNode }> = {
@@ -74,9 +100,11 @@ export default function App() {
   return (
     <HashRouter>
       <ScrollTop />
+      <PasskeyGate />
       <div className="app">
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/unlock" element={<Unlock />} />
           <Route path="/settings" element={<AppShell><Settings /></AppShell>} />
           <Route path="/library" element={inShell(<Library />)} />
           {Object.keys(SCREENS).filter((k) => k !== 'pages').map((k) => (

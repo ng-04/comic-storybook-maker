@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconShield } from '../components/Icons';
 import { PagePanel } from '../components/PagePanel';
 import { newCharacter, newPage, newStory } from '../domain/model';
-import { isConfigured, updateSettings } from '../state/settings';
+import { updateSettings } from '../state/settings';
 
 // A sample cover for the hero: a real PagePanel with no picture drawn, so it shows the layout.
 const sample = (() => {
@@ -14,7 +14,8 @@ const sample = (() => {
 
 export function Landing() {
   const nav = useNavigate();
-  const start = () => nav(isConfigured() ? '/library' : '/settings?first=1');
+  // /library redirects to Unlock (site has shared keys) or Settings (it doesn't) when no keys are set.
+  const start = () => nav('/library');
   const demo = () => { updateSettings({ demo: true }); nav('/library'); };
   const steps = [
     ['Desh & Kaal', 'Where and when: a forest by the Narmada, a kingdom in the Treta Yuga, a village at Diwali.'],

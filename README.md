@@ -19,6 +19,7 @@ The specs in `docs/` describe the Phase 2 product. Phase 1 builds the same scree
 - No share links (they need a server). The reader offers PDF export and print instead.
 - PDF export runs in the browser (html-to-image + jsPDF) from the same `PagePanel` the reader shows.
 - Demo mode (`Try the demo`) runs the whole app with simulated stories and pictures: no keys, no cost.
+- Optional shared keys: the owner creates `keys.enc.json` in Settings (API keys encrypted with a passkey: PBKDF2-SHA256 600k rounds + AES-256-GCM) and publishes it in `public/`. On load, visitors without keys are asked for the passkey; the right one unlocks the keys into their browser. The file is public, so the passkey must be long (12+ characters, enforced). Replace or delete the file to rotate or revoke.
 
 ## Code map
 

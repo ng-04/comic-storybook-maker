@@ -17,12 +17,14 @@ export interface Settings {
   imageModel: string;
   /** Demo mode swaps in the mock API: no keys, simulated stories and pictures. */
   demo: boolean;
+  /** Keys came from the site's passkey-protected bundle rather than being typed in. */
+  fromPasskey: boolean;
 }
 
 const KEY = 'csm2-settings';
 const DEFAULTS: Settings = {
   anthropicKey: '', workspaceId: '', geminiKey: '',
-  storyModel: STORY_MODELS[0].id, imageModel: DEFAULT_IMAGE_MODEL, demo: false,
+  storyModel: STORY_MODELS[0].id, imageModel: DEFAULT_IMAGE_MODEL, demo: false, fromPasskey: false,
 };
 
 // v1 (ng-04.github.io/comic/) runs on the same origin and saved its keys under these names.
@@ -56,6 +58,11 @@ export function updateSettings(patch: Partial<Settings>) {
 
 export function useSettings(): Settings {
   return useSyncExternalStore((l) => { listeners.add(l); return () => listeners.delete(l); }, getSettings);
+}
+
+/** Forget the API keys in this browser (e.g. after unlocking with a passkey on a shared computer). */
+export function forgetKeys() {
+  updateSettings({ anthropicKey: '', workspaceId: '', geminiKey: '', fromPasskey: false });
 }
 
 /** Ready to make real books, or running the demo. */
