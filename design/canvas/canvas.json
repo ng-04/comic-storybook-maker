@@ -1,0 +1,19 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-17T12:40:00Z"},
+  "title": "Comic Storybook Maker v2",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1280, "h": 1180, "title": "Prototype (mock mode) — click Play", "expand": "fill", "is_interactive": true},
+    "PagePanel.dc.html": {"x": 1360, "y": 0, "w": 420, "h": 594, "title": "Component: page panel"},
+    "States.dc.html": {"x": 1860, "y": 0, "w": 1280, "h": 1900, "title": "Edge states at a glance", "expand": "fill"},
+    "DesignSystem.dc.html": {"x": 0, "y": 1300, "w": 1280, "h": 2900, "title": "Design system", "expand": "fill"},
+    "Readme.dc.html": {"x": 1360, "y": 2020, "w": 1280, "h": 3600, "title": "README: screen map, API contract, files", "expand": "fill"}
+  },
+  "order": ["Main.dc.html", "PagePanel.dc.html", "States.dc.html", "DesignSystem.dc.html", "Readme.dc.html"],
+  "notes": {
+    "t1": {"x": 0, "y": -300, "text": "Comic Storybook Maker v2", "kind": "title1", "maxW": 3140}
+  },
+  "designSystems": []
+}

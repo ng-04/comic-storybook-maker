@@ -1,0 +1,2478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Comic Storybook Maker v2 prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#1F4FB8}a:hover{color:#141414}
+.app{font-family:'Comic Neue','Comic Sans MS','Chalkboard SE',sans-serif;color:#141414;background-color:#F3EEE4;background-image:radial-gradient(rgba(20,20,20,.10) 1.2px,transparent 1.7px);background-size:14px 14px;min-height:100vh;font-size:17px;line-height:1.45}
+.app *{box-sizing:border-box}
+.display{font-family:'Bangers',Impact,'Arial Black',sans-serif;font-weight:400;letter-spacing:.02em;line-height:.95;margin:0;color:#FFD93B;-webkit-text-stroke:3px #141414;paint-order:stroke fill;text-shadow:5px 5px 0 #141414;text-wrap:balance}
+.h1{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.03em;font-size:40px;line-height:1;margin:0;text-wrap:balance}
+.h2{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.04em;font-size:26px;line-height:1.05;margin:0}
+.kicker{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.08em;font-size:20px;color:#1F4FB8;margin:0}
+.muted{color:#4A4A4A}
+.panel{background:#FFFFFF;border:5px solid #141414;box-shadow:6px 6px 0 #141414;border-radius:6px}
+.btn{font-family:'Bangers',Impact,sans-serif;font-weight:400;font-size:20px;letter-spacing:.05em;min-height:48px;padding:0 20px;border:4px solid #141414;border-radius:10px;box-shadow:4px 4px 0 #141414;background:#FFFFFF;color:#141414;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:transform .08s,box-shadow .08s;white-space:nowrap}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #141414;color:#141414}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #141414}
+.btn:focus-visible,.chip:focus-visible,.input:focus-visible,.linkbtn:focus-visible,.tile:focus-visible,.pa:focus-visible,.gtog:focus-visible{outline:4px solid #1F4FB8;outline-offset:3px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:2px 2px 0 #141414}
+.btn-primary{background:#FFD93B}
+.btn-blue{background:#1F4FB8;color:#FFFFFF}.btn-blue:hover{color:#FFFFFF}
+.btn-red{background:#FF4A3D}
+.btn-sm{min-height:44px;font-size:17px;padding:0 14px;border-width:3px;box-shadow:3px 3px 0 #141414}
+.btn-lg{min-height:60px;font-size:26px;padding:0 28px}
+.btn-quiet{background:transparent;box-shadow:none;border-color:transparent;text-decoration:underline;text-underline-offset:4px}
+.btn-quiet:hover{box-shadow:none;transform:none;background:rgba(20,20,20,.06)}
+.linkbtn{background:none;border:0;padding:0;font:inherit;color:#1F4FB8;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px}
+.input{font:inherit;font-size:17px;color:#141414;border:3px solid #141414;border-radius:8px;padding:10px 12px;background:#FFFFFF;width:100%;min-height:48px}
+textarea.input{resize:vertical;line-height:1.4}
+.mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:14px}
+.label{display:block;font-weight:700;margin:0 0 6px}
+.hint{font-size:15px;color:#4A4A4A;margin:6px 0 0}
+.err{font-size:15px;font-weight:700;color:#B3261E;margin:6px 0 0}
+.chip{font:inherit;font-weight:700;font-size:16px;min-height:44px;padding:0 14px;border:3px solid #141414;border-radius:999px;background:#FFFFFF;color:#141414;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.chip[aria-pressed="true"]{background:#FFD93B;box-shadow:3px 3px 0 #141414}
+.chip-sm{min-height:40px;font-size:14px;padding:0 10px}
+.gtog{font:inherit;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px;min-width:84px;border:3px solid #141414;border-radius:10px;background:#FFFFFF;color:#141414;cursor:pointer}
+.gtog[aria-pressed="true"]{background:#FFD93B;box-shadow:3px 3px 0 #141414}
+.pa{font:inherit;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;min-height:64px;border:3px solid #141414;border-radius:10px;background:#FFFFFF;color:#141414;cursor:pointer;width:100%}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;line-height:1;padding:6px 10px;border:3px solid #141414;border-radius:999px;background:#FFFFFF;white-space:nowrap}
+.b-queued{background:#FFFFFF;border-style:dashed}
+.b-drawing{background:#1F4FB8;color:#FFFFFF}
+.b-done{background:#FFD93B}
+.b-failed{background:#FFD3CE}
+.b-note{background:#E6EEFF}
+.dot{width:10px;height:10px;border-radius:50%;background:currentColor;display:inline-block}
+.pulse{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.spin{width:22px;height:22px;border:4px solid #141414;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex:0 0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{height:30px;border:4px solid #141414;border-radius:999px;background:#FFFFFF;overflow:hidden;box-shadow:3px 3px 0 #141414}
+.progress > span{display:block;height:100%;background:repeating-linear-gradient(45deg,#FFD93B 0 14px,#FFE77A 14px 28px);border-right:4px solid #141414;transition:width .4s}
+.bounce span{display:inline-block;animation:bounce 1s infinite}
+.bounce span:nth-child(2){animation-delay:.15s}.bounce span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{40%{transform:translateY(-10px)}}
+.tile{display:block;width:100%;padding:0;border:0;background:none;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.tile:hover .lift{transform:translate(-2px,-2px)}
+.lift{transition:transform .1s}
+.toast{background:#141414;color:#FFFFFF;border:4px solid #141414;border-radius:10px;box-shadow:5px 5px 0 #FFD93B;padding:12px 16px;display:flex;gap:12px;align-items:center;font-weight:700;max-width:420px}
+.toast.t-warn{background:#FFFFFF;color:#141414;box-shadow:5px 5px 0 #FF4A3D}
+.toast .linkbtn{color:#FFD93B;min-height:auto}
+.toast.t-warn .linkbtn{color:#1F4FB8}
+.note{border:3px solid #141414;border-radius:10px;background:#E6EEFF;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.note-err{background:#FFE7E3}
+.note-warn{background:#FFF4C2}
+.reftile{display:flex;gap:8px;align-items:center;border:3px solid #141414;border-radius:8px;background:#FFFFFF;padding:6px 6px 6px 10px;font-size:15px;max-width:100%}
+details > summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
+details > summary::-webkit-details-marker{display:none}
+details > summary::before{content:'+';font-family:'Bangers',Impact,sans-serif;font-size:22px;width:28px;height:28px;border:3px solid #141414;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:#FFD93B}
+details[open] > summary::before{content:'–'}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.file-in:focus-visible + label{outline:4px solid #1F4FB8;outline-offset:3px}
+.print-only{display:none}
+@media (prefers-reduced-motion: reduce){.app *{animation:none !important;transition:none !important}}
+@media print{
+  .no-print{display:none !important}
+  .print-only{display:block !important}
+  body,.app{background:#FFFFFF !important;background-image:none !important}
+  .print-page{break-after:page;page-break-after:always;display:flex;align-items:center;justify-content:center;height:100vh}
+  .print-page:last-child{break-after:auto;page-break-after:auto}
+  .print-a4 .print-page > div{width:190mm}
+  .print-letter .print-page > div{width:7.2in}
+}
+</style>
+</helmet>
+
+<div class="app">
+
+<sc-if value="{{isA4}}" hint-placeholder-val="{{ true }}"><style>@page{size:A4;margin:10mm}</style></sc-if>
+<sc-if value="{{isLetter}}" hint-placeholder-val="{{ false }}"><style>@page{size:letter;margin:0.4in}</style></sc-if>
+
+<div class="no-print">
+
+<!-- ============ SIGNED-OUT LANDING ============ -->
+<sc-if value="{{is.landing}}" hint-placeholder-val="{{ true }}">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 5px solid #141414; background: #FFD93B">
+    <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 28px; letter-spacing: 0.04em">Comic Storybook Maker</span>
+    <button class="btn btn-sm" onClick="{{goSignin}}">Sign in</button>
+  </header>
+  <main>
+    <section style="max-width: 1160px; margin: 0 auto; padding: 48px 20px 40px; display: flex; flex-wrap: wrap; gap: 40px; align-items: center">
+      <div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <p class="kicker">Panchatantra · Jataka · Itihasa</p>
+        <h1 class="display" style="font-size: clamp(52px, 9vw, 92px)">Comic books with a lesson at heart</h1>
+        <p style="margin: 0; font-size: 21px; max-width: 40ch; text-wrap: pretty">Build a katha the way the old storytellers did: choose the desh and kaal, bring in your paatra, set the paristhiti, and turn it into a comic your children can read, print and remember.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center">
+          <button class="btn btn-primary btn-lg" onClick="{{goSignin}}">Start a katha</button>
+          <a class="btn btn-quiet" href="#how">How it works</a>
+        </div>
+      </div>
+      <div style="flex: 1 1 280px; max-width: 360px; margin: 0 auto; transform: rotate(2deg)">
+        <dc-import name="PagePanel" page="{{landingCover}}" title="Chiku and the River Promise" starring="Starring Chiku, Neela &amp; Kurma Dada" hint-size="100%,500px"></dc-import>
+      </div>
+    </section>
+    <section id="how" style="max-width: 1160px; margin: 0 auto; padding: 8px 20px 40px">
+      <h2 class="h1" style="margin-bottom: 20px">How a katha comes together</h2>
+      <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 24px">
+        <li class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span class="h2" style="font-size: 40px; color: #1F4FB8">1</span>
+          <h3 class="h2">Desh &amp; Kaal</h3>
+          <p style="margin: 0">Where and when: a forest by the Narmada, a kingdom in the Treta Yuga, a village at Diwali.</p>
+        </li>
+        <li class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span class="h2" style="font-size: 40px; color: #1F4FB8">2</span>
+          <h3 class="h2">Paatra</h3>
+          <p style="margin: 0">The characters, human or animal, and what drives each one: dharma, artha, kaam or moksh.</p>
+        </li>
+        <li class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span class="h2" style="font-size: 40px; color: #1F4FB8">3</span>
+          <h3 class="h2">Paristhiti &amp; Katha</h3>
+          <p style="margin: 0">The situation, the plot and the lesson. Review every page before any picture is drawn.</p>
+        </li>
+        <li class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span class="h2" style="font-size: 40px; color: #1F4FB8">4</span>
+          <h3 class="h2">Read &amp; print</h3>
+          <p style="margin: 0">Single scenes for simple tales, six-panel comic pages for richer ones. Read aloud, print, or share.</p>
+        </li>
+      </ol>
+    </section>
+    <section style="max-width: 1160px; margin: 0 auto; padding: 0 20px 64px">
+      <div class="panel" style="padding: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: #E6EEFF">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+        <p style="margin: 0; flex: 1 1 300px">Reference images are optional. They're only used to guide the drawings, never appear in shared links, and you can delete them at any time.</p>
+      </div>
+    </section>
+  </main>
+</sc-if>
+
+<!-- ============ SIGN IN ============ -->
+<sc-if value="{{is.signin}}" hint-placeholder-val="{{ false }}">
+  <main style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px">
+    <div class="panel" style="width: 100%; max-width: 440px; padding: 28px; display: flex; flex-direction: column; gap: 18px">
+      <button class="linkbtn" style="align-self: flex-start" onClick="{{goLanding}}">Back</button>
+      <h1 class="display" style="font-size: 48px">{{authTitle}}</h1>
+      <button class="btn btn-blue" onClick="{{googleSignin}}" disabled="{{authBusy}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 12h-8"></path></svg>
+        Continue with Google
+      </button>
+      <div style="display: flex; align-items: center; gap: 12px; font-weight: 700" aria-hidden="true"><span style="flex: 1; height: 3px; background: #141414"></span>or with email<span style="flex: 1; height: 3px; background: #141414"></span></div>
+      <form style="display: flex; flex-direction: column; gap: 14px" onSubmit="{{emailSignin}}">
+        <div>
+          <label class="label" for="auth-email">Email</label>
+          <input class="input" id="auth-email" type="email" autocomplete="email" value="{{email}}" onChange="{{onEmail}}">
+        </div>
+        <div>
+          <label class="label" for="auth-pass">Password</label>
+          <input class="input" id="auth-pass" type="password" autocomplete="current-password" value="{{password}}" onChange="{{onPassword}}">
+        </div>
+        <sc-if value="{{authError}}" hint-placeholder-val="{{ false }}"><p class="err" role="alert" style="margin: 0">{{authError}}</p></sc-if>
+        <button class="btn btn-primary" type="submit" disabled="{{authBusy}}">
+          <sc-if value="{{authBusy}}" hint-placeholder-val="{{ false }}"><span class="spin" aria-hidden="true"></span></sc-if>
+          {{authCta}}
+        </button>
+      </form>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px">
+        <button class="linkbtn" onClick="{{toggleAuthMode}}">{{authSwitch}}</button>
+        <button class="linkbtn" onClick="{{forgot}}">Forgot password?</button>
+      </div>
+      <p class="hint" style="margin: 0">Sign-in is handled by Amazon Cognito. In mock mode any email works; type a password of "wrong" to see the error state.</p>
+    </div>
+  </main>
+</sc-if>
+
+<!-- ============ APP SHELL (signed in) ============ -->
+<sc-if value="{{showShell}}" hint-placeholder-val="{{ false }}">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 20px; border-bottom: 5px solid #141414; background: #FFD93B">
+    <button class="tile" style="width: auto; font-family: 'Bangers', Impact, sans-serif; font-size: 26px; letter-spacing: 0.04em; min-height: 44px" onClick="{{goLibrary}}">Comic Storybook Maker</button>
+    <nav aria-label="Main" style="flex: 1 1 auto; display: flex; gap: 8px">
+      <button class="btn btn-sm {{libNavClass}}" onClick="{{goLibrary}}">My storybooks</button>
+    </nav>
+    <span class="badge" role="status" style="background: {{saveBg}}">
+      <sc-if value="{{saving}}" hint-placeholder-val="{{ false }}"><span class="dot pulse" aria-hidden="true"></span></sc-if>
+      {{saveLabel}}
+    </span>
+    <div style="position: relative">
+      <button class="btn btn-sm" style="width: 48px; padding: 0; border-radius: 999px" aria-label="Account menu" aria-expanded="{{menuOpen}}" onClick="{{toggleMenu}}">{{userInitial}}</button>
+      <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+        <div class="panel" style="position: absolute; right: 0; top: 58px; z-index: 30; width: 260px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+          <p style="margin: 0 0 6px; font-weight: 700; overflow-wrap: anywhere">{{userEmail}}</p>
+          <button class="btn btn-sm" onClick="{{askDeletePhotos}}">Delete my images</button>
+          <button class="btn btn-sm btn-quiet" onClick="{{signOut}}">Sign out</button>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+
+  <sc-if value="{{offline}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="background: #141414; color: #FFFFFF; padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-weight: 700">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFD93B" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0"></path><path d="M5.5 12a10 10 0 0 1 13 0"></path><path d="M9 15.5a5 5 0 0 1 6 0"></path><path d="M3 3l18 18"></path></svg>
+      You're offline. Your edits are kept on this device and will sync when you're back. Drawing is paused.
+    </div>
+  </sc-if>
+
+  <sc-if value="{{inStory}}" hint-placeholder-val="{{ false }}">
+    <div style="border-bottom: 4px solid #141414; background: #FFFFFF">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center">
+        <p style="margin: 0; font-weight: 700; flex: 1 1 200px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{storyTitle}}</p>
+        <nav aria-label="Storybook steps">
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{steps}}" as="sp" hint-placeholder-count="8">
+              <li><button class="chip chip-sm" aria-pressed="{{sp.current}}" aria-current="{{sp.ariaCurrent}}" disabled="{{sp.locked}}" style="opacity: {{sp.opacity}}" onClick="{{sp.go}}"><span style="font-family: 'Bangers', Impact, sans-serif; font-size: 16px">{{sp.n}}</span>{{sp.label}}</button></li>
+            </sc-for>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </sc-if>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 28px 20px 120px">
+
+    <!-- ============ LIBRARY ============ -->
+    <sc-if value="{{is.library}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px">
+        <h1 class="display" style="font-size: clamp(44px, 7vw, 68px)">My storybooks</h1>
+        <button class="btn btn-primary" onClick="{{newStory}}">New katha</button>
+      </div>
+      <sc-if value="{{lib.loading}}" hint-placeholder-val="{{ false }}">
+        <div role="status" aria-label="Loading your storybooks" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 28px">
+          <sc-for list="{{skeletons}}" as="k" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div class="pulse" style="aspect-ratio: 210 / 297; border: 5px solid #141414; background: #E4DDCF; border-radius: 4px"></div>
+              <div class="pulse" style="height: 18px; width: 70%; background: #D9D1C1; border-radius: 6px"></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{lib.error}}" hint-placeholder-val="{{ false }}">
+        <div class="panel" role="alert" style="padding: 28px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; max-width: 560px">
+          <h2 class="h2">We couldn't load your storybooks</h2>
+          <p style="margin: 0">Your books are safe. This is usually a connection hiccup.</p>
+          <button class="btn btn-primary" onClick="{{loadLibrary}}">Try again</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{lib.empty}}" hint-placeholder-val="{{ false }}">
+        <div class="panel" style="padding: 40px 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; background-color: #1F4FB8; color: #FFFFFF; background-image: radial-gradient(rgba(20,20,20,.3) 1.2px, transparent 1.8px); background-size: 14px 14px">
+          <h2 class="display" style="font-size: 52px">Your shelf is empty</h2>
+          <p style="margin: 0; font-size: 19px; max-width: 46ch">Every katha starts with a place. Pick a desh, add your paatra, and the rest follows.</p>
+          <button class="btn btn-primary btn-lg" onClick="{{newStory}}">Start your first katha</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{lib.ready}}" hint-placeholder-val="{{ true }}">
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 32px 28px">
+          <li>
+            <button class="tile" style="height: 100%" onClick="{{newStory}}" aria-label="New katha">
+              <div class="lift" style="aspect-ratio: 210 / 297; border: 5px dashed #141414; border-radius: 4px; background: #FFFDF8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+                <span style="width: 64px; height: 64px; border: 4px solid #141414; border-radius: 50%; background: #FFD93B; display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 #141414">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                </span>
+                <span class="h2">New katha</span>
+              </div>
+            </button>
+          </li>
+          <sc-for list="{{books}}" as="bk" hint-placeholder-count="2">
+            <li style="display: flex; flex-direction: column; gap: 10px">
+              <button class="tile" onClick="{{bk.open}}" aria-label="Open {{bk.title}}">
+                <div class="lift" style="box-shadow: 6px 6px 0 #141414">
+                  <dc-import name="PagePanel" page="{{bk.cover}}" title="{{bk.title}}" starring="{{bk.starring}}" hint-size="100%,300px"></dc-import>
+                </div>
+              </button>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <p style="margin: 0; font-weight: 700; line-height: 1.25">{{bk.title}}</p>
+                <p class="muted" style="margin: 0; font-size: 14px">{{bk.meta}}</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+                  <span class="badge {{bk.badgeClass}}">{{bk.statusLabel}}</span>
+                  <span class="muted" style="font-size: 14px">{{bk.updated}}</span>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px">
+                  <button class="linkbtn" style="font-size: 15px" onClick="{{bk.sequel}}">Make a sequel</button>
+                  <span aria-hidden="true" style="align-self: center">·</span>
+                  <button class="linkbtn" style="font-size: 15px; color: #B3261E" onClick="{{bk.del}}">Delete</button>
+                </div>
+              </div>
+            </li>
+          </sc-for>
+        </ul>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ 1 · DESH ============ -->
+    <sc-if value="{{is.desh}}" hint-placeholder-val="{{ false }}">
+      <div style="max-width: 860px; display: flex; flex-direction: column; gap: 26px">
+        <div>
+          <p class="kicker">Step 1 · Desh</p>
+          <h1 class="h1">Where does the story happen?</h1>
+          <p class="muted" style="margin: 8px 0 0; max-width: 62ch">Name the main place, then the smaller spots where scenes unfold. Each page of the comic is set in one of these.</p>
+        </div>
+        <div>
+          <label class="label" for="desh-main">Main place (desh)</label>
+          <input class="input" id="desh-main" value="{{setup.desh.main}}" onChange="{{onDeshMain}}" placeholder="e.g. A forest on the banks of the Narmada">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px">
+            <span class="hint" style="margin: 0; align-self: center">Ideas:</span>
+            <sc-for list="{{deshIdeas}}" as="di" hint-placeholder-count="5"><button class="chip chip-sm" style="font-weight: 400" onClick="{{di.use}}">{{di.label}}</button></sc-for>
+          </div>
+        </div>
+        <div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 14px">
+          <h2 class="h2">Sublocations</h2>
+          <p class="muted" style="margin: 0">The banyan tree, the river ghat, the palace courtyard… Up to 6.</p>
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{subs}}" as="sb" hint-placeholder-count="2">
+              <li style="display: flex; gap: 10px; align-items: center">
+                <span aria-hidden="true" style="flex: 0 0 auto; width: 36px; height: 36px; border: 3px solid #141414; border-radius: 50%; background: #FFD93B; display: flex; align-items: center; justify-content: center; font-family: 'Bangers', Impact, sans-serif; font-size: 18px">{{sb.n}}</span>
+                <label class="sr-only" for="{{sb.id}}">Sublocation {{sb.n}}</label>
+                <input class="input" id="{{sb.id}}" value="{{sb.value}}" onChange="{{sb.onChange}}">
+                <button class="btn btn-sm" style="width: 44px; padding: 0; flex: 0 0 auto" aria-label="Remove sublocation {{sb.n}}" onClick="{{sb.remove}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+              </li>
+            </sc-for>
+          </ol>
+          <sc-if value="{{noSubs}}" hint-placeholder-val="{{ false }}"><p class="hint" style="margin: 0">No sublocations yet. One is enough for a short tale.</p></sc-if>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <button class="btn btn-sm btn-primary" onClick="{{addSub}}" disabled="{{subsFull}}">+ Add a sublocation</button>
+            <sc-for list="{{subIdeas}}" as="si" hint-placeholder-count="6"><button class="chip chip-sm" style="font-weight: 400" onClick="{{si.use}}" disabled="{{subsFull}}">{{si.label}}</button></sc-for>
+          </div>
+        </div>
+        <div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 12px; background: #FFFDF8">
+          <h2 class="h2">Reference images for places <span class="muted" style="font-family: 'Comic Neue', sans-serif; font-size: 15px; letter-spacing: 0">(optional)</span></h2>
+          <p class="muted" style="margin: 0">A temple you visited, a painting style you like, a photo of your village. Add several if you like.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{placeRefs}}" as="rf" hint-placeholder-count="0">
+              <span class="reftile">
+                <sc-if value="{{rf.uploading}}" hint-placeholder-val="{{ false }}"><span class="spin" aria-hidden="true" style="width: 18px; height: 18px; border-width: 3px"></span></sc-if>
+                <sc-if value="{{rf.done}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M21 17l-5-5-8 7"></path></svg></sc-if>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px">{{rf.name}}</span>
+                <span class="muted" style="font-size: 13px">{{rf.size}}</span>
+                <button class="btn btn-sm" style="min-height: 36px; width: 36px; padding: 0; box-shadow: none" aria-label="Remove {{rf.name}}" onClick="{{rf.remove}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+              </span>
+            </sc-for>
+          </div>
+          <div>
+            <input class="sr-only file-in" id="place-refs" type="file" multiple="{{ true }}" accept="image/jpeg,image/png,image/webp" onChange="{{onPlaceRefs}}">
+            <label class="btn btn-sm" for="place-refs">Add images</label>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end">
+          <button class="btn btn-primary btn-lg" onClick="{{goKaal}}">Next: Kaal</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ 2 · KAAL ============ -->
+    <sc-if value="{{is.kaal}}" hint-placeholder-val="{{ false }}">
+      <div style="max-width: 860px; display: flex; flex-direction: column; gap: 26px">
+        <div>
+          <p class="kicker">Step 2 · Kaal</p>
+          <h1 class="h1">When does it happen?</h1>
+          <p class="muted" style="margin: 8px 0 0; max-width: 62ch">The time period shapes clothes, buildings and how people speak. "Long, long ago" works perfectly for fables.</p>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Time period</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-for list="{{eras}}" as="t" hint-placeholder-count="8"><button class="chip" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+          </div>
+        </fieldset>
+        <div>
+          <label class="label" for="kaal-custom">Or describe it in your words <span class="muted" style="font-weight: 400">(optional)</span></label>
+          <input class="input" id="kaal-custom" value="{{setup.kaal.custom}}" onChange="{{onKaalCustom}}" placeholder="e.g. The year the great banyan was planted, when kings still travelled by elephant">
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Season (ritu) <span class="muted" style="font-weight: 400">(optional)</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-for list="{{ritus}}" as="t" hint-placeholder-count="6"><button class="chip" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+          </div>
+        </fieldset>
+        <div class="note"><span><strong>So far:</strong> {{settingLine}}</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between">
+          <button class="btn" onClick="{{goDesh}}">Back</button>
+          <button class="btn btn-primary btn-lg" onClick="{{goPaatra}}">Next: Paatra</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ 3 · PAATRA ============ -->
+    <sc-if value="{{is.paatra}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+          <div>
+            <p class="kicker">Step 3 · Paatra</p>
+            <h1 class="h1">Who's in the story?</h1>
+            <p class="muted" style="margin: 8px 0 0; max-width: 64ch">Every katha needs a nayak. For key characters, choose what drives them: the four purusharthas. Approve each cartoon sheet; it's the reference for every page.</p>
+          </div>
+          <sc-if value="{{heroMissing}}" hint-placeholder-val="{{ false }}">
+            <div class="note note-warn" role="status"><strong>Give your nayak a name to continue.</strong></div>
+          </sc-if>
+
+          <sc-for list="{{chars}}" as="c" hint-placeholder-count="2">
+            <article class="panel" style="padding: 0; overflow: hidden">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px; border-bottom: 4px solid #141414; background: {{c.stripe}}">
+                <div style="display: flex; gap: 12px; align-items: center; min-width: 0">
+                  <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden="true" style="flex: 0 0 auto">
+                    <circle cx="32" cy="32" r="30" fill="#FFFDF8" stroke="#141414" stroke-width="3"></circle>
+                    <circle cx="32" cy="26" r="17" fill="none" stroke="#FFD93B" stroke-width="4" opacity="{{c.icon.halo}}"></circle>
+                    <g opacity="{{c.icon.human}}">
+                      <path d="M11 60c2-11 10-16 21-16s19 5 21 16z" fill="{{c.color}}" stroke="#141414" stroke-width="3"></path>
+                      <circle cx="32" cy="12" r="5.5" fill="#141414" opacity="{{c.icon.female}}"></circle>
+                      <circle cx="32" cy="27" r="11" fill="#F2CFAE" stroke="#141414" stroke-width="3"></circle>
+                      <path d="M21 26c0-8 5-12 11-12s11 4 11 12c-3-4-7-5-11-5s-8 1-11 5z" fill="#141414"></path>
+                      <path d="M20 27c-1 6 0 12 3 16" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round" opacity="{{c.icon.female}}"></path>
+                      <circle cx="32" cy="24" r="1.7" fill="#FF4A3D" opacity="{{c.icon.female}}"></circle>
+                    </g>
+                    <g opacity="{{c.icon.animal}}">
+                      <path d="M17 24l4-12 9 8z M47 24l-4-12-9 8z" fill="{{c.color}}" stroke="#141414" stroke-width="3" stroke-linejoin="round"></path>
+                      <circle cx="32" cy="34" r="16" fill="{{c.color}}" stroke="#141414" stroke-width="3"></circle>
+                      <ellipse cx="32" cy="41" rx="7" ry="5" fill="#F2CFAE" stroke="#141414" stroke-width="2.5"></ellipse>
+                      <circle cx="26" cy="31" r="2.2" fill="#141414"></circle><circle cx="38" cy="31" r="2.2" fill="#141414"></circle>
+                    </g>
+                    <g opacity="{{c.icon.bird}}">
+                      <path d="M28 18l4-9 4 9" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round"></path>
+                      <circle cx="30" cy="33" r="15" fill="{{c.color}}" stroke="#141414" stroke-width="3"></circle>
+                      <path d="M43 30l13 4-13 4z" fill="#FFD93B" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"></path>
+                      <circle cx="34" cy="30" r="2.4" fill="#141414"></circle>
+                    </g>
+                  </svg>
+                  <div style="min-width: 0">
+                    <h2 class="h2" style="color: {{c.stripeInk}}; overflow-wrap: anywhere">{{c.heading}}</h2>
+                    <p style="margin: 0; font-size: 14px; font-weight: 700; color: {{c.stripeInk}}">{{c.subheading}}</p>
+                  </div>
+                </div>
+                <sc-if value="{{c.canRemove}}" hint-placeholder-val="{{ true }}">
+                  <button class="btn btn-sm" onClick="{{c.remove}}">Remove</button>
+                </sc-if>
+              </div>
+              <div style="padding: 18px; display: flex; flex-direction: column; gap: 18px">
+                <div style="display: flex; flex-wrap: wrap; gap: 20px">
+                  <div style="flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+                    <fieldset style="border: 0; margin: 0; padding: 0">
+                      <legend class="label">Male or female</legend>
+                      <div style="display: flex; gap: 10px">
+                        <button class="gtog" aria-pressed="{{c.isMale}}" onClick="{{c.setMale}}">
+                          <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#E6EEFF" stroke="#141414" stroke-width="3"></circle><path d="M11 60c2-11 10-16 21-16s19 5 21 16z" fill="#1F4FB8" stroke="#141414" stroke-width="3"></path><circle cx="32" cy="27" r="11" fill="#F2CFAE" stroke="#141414" stroke-width="3"></circle><path d="M21 26c0-8 5-12 11-12s11 4 11 12c-3-4-7-5-11-5s-8 1-11 5z" fill="#141414"></path></svg>
+                          Male
+                        </button>
+                        <button class="gtog" aria-pressed="{{c.isFemale}}" onClick="{{c.setFemale}}">
+                          <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FFE7E3" stroke="#141414" stroke-width="3"></circle><path d="M11 60c2-11 10-16 21-16s19 5 21 16z" fill="#FF4A3D" stroke="#141414" stroke-width="3"></path><circle cx="32" cy="12" r="5.5" fill="#141414"></circle><circle cx="32" cy="27" r="11" fill="#F2CFAE" stroke="#141414" stroke-width="3"></circle><path d="M21 26c0-8 5-12 11-12s11 4 11 12c-3-4-7-5-11-5s-8 1-11 5z" fill="#141414"></path><path d="M20 27c-1 6 0 12 3 16" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round"></path><circle cx="32" cy="24" r="1.7" fill="#FF4A3D"></circle></svg>
+                          Female
+                        </button>
+                      </div>
+                    </fieldset>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 14px">
+                      <div>
+                        <label class="label" for="{{c.nameId}}">Name</label>
+                        <input class="input" id="{{c.nameId}}" value="{{c.name}}" onChange="{{c.onName}}" placeholder="e.g. Chiku">
+                      </div>
+                      <div>
+                        <label class="label" for="{{c.formId}}">Form</label>
+                        <select class="input" id="{{c.formId}}" value="{{c.form}}" onChange="{{c.onForm}}">
+                          <option value="Human">Human</option>
+                          <option value="Animal">Animal</option>
+                          <option value="Bird">Bird</option>
+                          <option value="Divine being">Divine being</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="label" for="{{c.roleId}}">Role</label>
+                        <select class="input" id="{{c.roleId}}" value="{{c.role}}" onChange="{{c.onRole}}">
+                          <option value="nayak">Nayak (hero)</option>
+                          <option value="sahayak">Sahayak (helper)</option>
+                          <option value="mitra">Mitra (friend)</option>
+                          <option value="guru">Guru (mentor)</option>
+                          <option value="parivaar">Parivaar (family)</option>
+                          <option value="pratinayak">Pratinayak (rival)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="label" for="{{c.ageId}}">Age</label>
+                        <input class="input" id="{{c.ageId}}" inputMode="numeric" value="{{c.age}}" onChange="{{c.onAge}}" placeholder="Optional">
+                      </div>
+                    </div>
+                    <div>
+                      <label class="label" for="{{c.appId}}">What do they look like?</label>
+                      <textarea class="input" id="{{c.appId}}" rows="2" value="{{c.appearance}}" onChange="{{c.onAppearance}}" placeholder="e.g. A small grey monkey with a red thread tied on one wrist"></textarea>
+                    </div>
+                    <label style="display: flex; gap: 10px; align-items: center; font-weight: 700; min-height: 44px; cursor: pointer">
+                      <input type="checkbox" style="width: 22px; height: 22px; accent-color: #1F4FB8" checked="{{c.isKey}}" disabled="{{c.keyLocked}}" onChange="{{c.onKey}}">
+                      Key character (shapes the plot)
+                    </label>
+                  </div>
+
+                  <div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+                    <span class="label" style="margin: 0">Character sheet</span>
+                    <div style="aspect-ratio: 4 / 3; border: 4px solid #141414; border-radius: 6px; background: #FFFDF8; overflow: hidden; position: relative">
+                      <sc-if value="{{c.sheetHasArt}}" hint-placeholder-val="{{ false }}">
+                        <svg viewBox="0 0 400 300" style="display: block; width: 100%; height: 100%" role="img" aria-label="Cartoon character sheet for {{c.displayName}}">
+                          <rect width="400" height="300" fill="#FFFDF8"></rect>
+                          <path d="M0 250 H400" stroke="#141414" stroke-width="3" stroke-dasharray="6 8"></path>
+                          <g transform="translate(100 250) scale(1.3)">
+                            <g opacity="{{c.art.personOp}}">
+                              <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="#141414" stroke-width="4" opacity="{{c.art.capeOp}}"></path>
+                              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></path>
+                              <circle cy="-100" r="9" fill="#141414" opacity="{{c.art.bunOp}}"></circle>
+                              <circle cy="-80" r="21" fill="#F2CFAE" stroke="#141414" stroke-width="4"></circle>
+                              <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle><circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+                              <path d="M-7 -72 Q0 -66 7 -72" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+                            </g>
+                            <g opacity="{{c.art.petOp}}">
+                              <ellipse cy="-18" rx="30" ry="17" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></ellipse>
+                              <path d="M16 -50 L20 -66 L30 -52 Z" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></path>
+                              <circle cx="26" cy="-40" r="15" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></circle>
+                              <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+                            </g>
+                          </g>
+                          <g transform="translate(290 250) scale(-1.3 1.3)">
+                            <g opacity="{{c.art.personOp}}">
+                              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></path>
+                              <circle cy="-100" r="9" fill="#141414" opacity="{{c.art.bunOp}}"></circle>
+                              <circle cy="-80" r="21" fill="#F2CFAE" stroke="#141414" stroke-width="4"></circle>
+                              <circle cx="8" cy="-82" r="2.8" fill="#141414"></circle>
+                            </g>
+                            <g opacity="{{c.art.petOp}}">
+                              <ellipse cy="-18" rx="30" ry="17" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></ellipse>
+                              <circle cx="26" cy="-40" r="15" fill="{{c.art.color}}" stroke="#141414" stroke-width="4"></circle>
+                              <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+                            </g>
+                          </g>
+                        </svg>
+                      </sc-if>
+                      <sc-if value="{{c.sheetNone}}" hint-placeholder-val="{{ true }}">
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; text-align: center; font-weight: 700; color: #4A4A4A">No sheet yet. Describe them, then draw one.</div>
+                      </sc-if>
+                      <sc-if value="{{c.sheetDrawing}}" hint-placeholder-val="{{ false }}">
+                        <div role="status" style="position: absolute; inset: 0; display: flex; gap: 10px; align-items: center; justify-content: center; background: repeating-linear-gradient(45deg, #FFD93B 0 14px, #FFF3B8 14px 28px)">
+                          <span style="background: #FFFFFF; border: 3px solid #141414; padding: 6px 12px; display: flex; gap: 8px; align-items: center; font-weight: 700"><span class="spin" aria-hidden="true"></span>Drawing sheet…</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{c.sheetApproved}}" hint-placeholder-val="{{ false }}">
+                        <span class="badge b-done" style="position: absolute; top: 8px; left: 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Approved</span>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{c.hasSheetNote}}" hint-placeholder-val="{{ false }}">
+                      <div class="note" style="font-size: 15px"><span>{{c.sheetNote}}</span></div>
+                    </sc-if>
+                    <sc-if value="{{c.sheetFailed}}" hint-placeholder-val="{{ false }}">
+                      <div class="note note-err" role="alert" style="font-size: 15px"><span><strong>We couldn't draw this sheet.</strong> {{c.sheetError}}</span></div>
+                    </sc-if>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                      <sc-if value="{{c.showDraw}}" hint-placeholder-val="{{ true }}">
+                        <button class="btn btn-sm btn-blue" onClick="{{c.draw}}">{{c.drawLabel}}</button>
+                      </sc-if>
+                      <sc-if value="{{c.sheetReview}}" hint-placeholder-val="{{ false }}">
+                        <button class="btn btn-sm btn-primary" onClick="{{c.approve}}">Approve</button>
+                        <button class="btn btn-sm" onClick="{{c.draw}}">Regenerate</button>
+                      </sc-if>
+                      <sc-if value="{{c.sheetApproved}}" hint-placeholder-val="{{ false }}">
+                        <button class="btn btn-sm" onClick="{{c.draw}}">Regenerate</button>
+                      </sc-if>
+                    </div>
+                  </div>
+                </div>
+
+                <sc-if value="{{c.isKey}}" hint-placeholder-val="{{ true }}">
+                  <fieldset style="border: 3px dashed #141414; border-radius: 10px; margin: 0; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+                    <legend class="label" style="padding: 0 6px; margin: 0">What drives {{c.displayName}}? <span class="muted" style="font-weight: 400">Choose one or more purusharthas</span></legend>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 10px">
+                      <sc-for list="{{c.pa}}" as="pa" hint-placeholder-count="4">
+                        <div style="display: flex; flex-direction: column; gap: 8px">
+                          <button class="pa" aria-pressed="{{pa.on}}" style="background: {{pa.bg}}; color: {{pa.ink}}; box-shadow: {{pa.shadow}}" onClick="{{pa.toggle}}">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{pa.ink}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto; margin-top: 2px"><path d="{{pa.icon}}"></path></svg>
+                            <span><span style="display: block; font-family: 'Bangers', Impact, sans-serif; font-size: 20px; letter-spacing: 0.04em">{{pa.k}}</span><span style="font-size: 14px; font-weight: 700">{{pa.hint}}</span></span>
+                          </button>
+                          <sc-if value="{{pa.on}}" hint-placeholder-val="{{ false }}">
+                            <div>
+                              <label class="label" style="font-size: 15px" for="{{pa.noteId}}">{{pa.question}}</label>
+                              <input class="input" style="font-size: 15px; min-height: 44px" id="{{pa.noteId}}" value="{{pa.note}}" onChange="{{pa.onNote}}" placeholder="{{pa.placeholder}}">
+                            </div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </fieldset>
+                </sc-if>
+
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span class="label" style="margin: 0">Reference images <span class="muted" style="font-weight: 400">(optional, add several)</span></span>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <sc-for list="{{c.refs}}" as="rf" hint-placeholder-count="0">
+                      <span class="reftile">
+                        <sc-if value="{{rf.uploading}}" hint-placeholder-val="{{ false }}"><span class="spin" aria-hidden="true" style="width: 18px; height: 18px; border-width: 3px"></span></sc-if>
+                        <sc-if value="{{rf.done}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M21 17l-5-5-8 7"></path></svg></sc-if>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px">{{rf.name}}</span>
+                        <span class="muted" style="font-size: 13px">{{rf.size}}</span>
+                        <button class="btn btn-sm" style="min-height: 36px; width: 36px; padding: 0; box-shadow: none" aria-label="Delete {{rf.name}}" onClick="{{rf.remove}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+                      </span>
+                    </sc-for>
+                  </div>
+                  <div>
+                    <input class="sr-only file-in" id="{{c.fileId}}" type="file" multiple="{{ true }}" accept="image/jpeg,image/png,image/webp,image/heic" onChange="{{c.onRefs}}">
+                    <label class="btn btn-sm" for="{{c.fileId}}">Add images</label>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+
+          <div class="panel" style="padding: 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; box-shadow: none; border-style: dashed">
+            <span style="font-weight: 700; margin-right: 6px">Add a paatra:</span>
+            <sc-for list="{{addRoles}}" as="ar" hint-placeholder-count="5">
+              <button class="chip" onClick="{{ar.add}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>{{ar.label}}</button>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+            <button class="btn" onClick="{{goKaal}}">Back</button>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+              <span class="muted" style="font-size: 15px">{{sheetSummary}}</span>
+              <button class="btn" onClick="{{drawAllSheets}}" disabled="{{noSheetsToDraw}}">Draw all sheets</button>
+              <button class="btn btn-primary" onClick="{{goParisthiti}}" disabled="{{heroMissing}}">Next: Paristhiti</button>
+            </div>
+          </div>
+        </div>
+
+        <aside style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+          <div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 10px">
+            <h2 class="h2">The four purusharthas</h2>
+            <sc-for list="{{paGuide}}" as="g" hint-placeholder-count="4">
+              <div style="display: flex; gap: 10px; align-items: flex-start">
+                <span style="flex: 0 0 auto; width: 36px; height: 36px; border: 3px solid #141414; border-radius: 8px; background: {{g.bg}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{g.ink}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{g.icon}}"></path></svg></span>
+                <span><strong>{{g.k}}</strong> · {{g.hint}}</span>
+              </div>
+            </sc-for>
+            <p class="hint" style="margin: 0">Kaam is always written in a child-friendly way: wishes, ambition and love for family and friends.</p>
+          </div>
+          <div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 10px; background: #E6EEFF">
+            <h2 class="h2">About your images</h2>
+            <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+              <li>Images only guide the cartoon sheets and pictures. They never appear in shared links or printed books.</li>
+              <li>Photos of children are sometimes declined by the image service. If so, we draw from your description and tell you.</li>
+              <li>[YOUR RETENTION POLICY]</li>
+            </ul>
+            <p style="margin: 0; font-weight: 700">Uploaded in this katha: {{photoCount}}</p>
+            <button class="btn btn-sm" style="align-self: flex-start" onClick="{{askDeletePhotos}}" disabled="{{noPhotosAnywhere}}">Delete my images</button>
+          </div>
+        </aside>
+      </div>
+    </sc-if>
+
+    <!-- ============ 4 · PARISTHITI ============ -->
+    <sc-if value="{{is.paristhiti}}" hint-placeholder-val="{{ false }}">
+      <div style="max-width: 860px; display: flex; flex-direction: column; gap: 26px">
+        <div>
+          <p class="kicker">Step 4 · Paristhiti</p>
+          <h1 class="h1">What led to this moment?</h1>
+          <p class="muted" style="margin: 8px 0 0; max-width: 62ch">The circumstances before the story begins: what happened, what changed, and what's now at stake for {{heroName}}.</p>
+        </div>
+        <div>
+          <label class="label" for="paristhiti">The situation</label>
+          <textarea class="input" id="paristhiti" rows="6" value="{{setup.paristhiti}}" onChange="{{onParisthiti}}" placeholder="e.g. The monsoon came early. The river flooded the crocodile's home, and the only safe place left is the monkey's island, which the other monkeys refuse to share."></textarea>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px">
+            <span class="hint" style="margin: 0; align-self: center">Think about:</span>
+            <sc-for list="{{parPrompts}}" as="pp" hint-placeholder-count="4"><button class="chip chip-sm" style="font-weight: 400" onClick="{{pp.use}}">{{pp.label}}</button></sc-for>
+          </div>
+        </div>
+        <div>
+          <label class="label" for="stakes">What's at stake? <span class="muted" style="font-weight: 400">(one line, optional)</span></label>
+          <input class="input" id="stakes" value="{{setup.stakes}}" onChange="{{onStakes}}" placeholder="e.g. A friendship, and a promise made long ago">
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between">
+          <button class="btn" onClick="{{goPaatra}}">Back</button>
+          <button class="btn btn-primary btn-lg" onClick="{{goKatha}}">Next: Katha</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ 5 · KATHA ============ -->
+    <sc-if value="{{is.katha}}" hint-placeholder-val="{{ false }}">
+      <div style="max-width: 900px; display: flex; flex-direction: column; gap: 26px">
+        <div>
+          <p class="kicker">Step 5 · Katha</p>
+          <h1 class="h1">The story and its lesson</h1>
+          <p class="muted" style="margin: 8px 0 0; max-width: 62ch">Claude writes a page-by-page outline from everything you've set up. You can change any page before pictures are drawn.</p>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Inspired by <span class="muted" style="font-weight: 400">(choose any)</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-for list="{{inspirations}}" as="t" hint-placeholder-count="7"><button class="chip" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+          </div>
+        </fieldset>
+        <div>
+          <label class="label" for="katha">Main story or plot</label>
+          <textarea class="input" id="katha" rows="6" value="{{setup.katha}}" onChange="{{onKatha}}" placeholder="e.g. Chiku promised Neela she could always shelter on his island. When the other monkeys object, Chiku must choose between fitting in and keeping his word."></textarea>
+          <sc-if value="{{kathaError}}" hint-placeholder-val="{{ false }}"><p class="err" role="alert">Add a few sentences about the plot first.</p></sc-if>
+        </div>
+        <div>
+          <label class="label" for="lesson">Life lesson (seekh)</label>
+          <input class="input" id="lesson" value="{{setup.lesson}}" onChange="{{onLesson}}" placeholder="e.g. A promise is a small piece of dharma we carry with us">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px">
+            <sc-for list="{{lessonIdeas}}" as="li" hint-placeholder-count="4"><button class="chip chip-sm" style="font-weight: 400" onClick="{{li.use}}">{{li.label}}</button></sc-for>
+          </div>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Darshan lens <span class="muted" style="font-weight: 400">(optional: the philosophical thread under the story)</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-for list="{{darshans}}" as="t" hint-placeholder-count="7"><button class="chip" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+          </div>
+        </fieldset>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 24px">
+          <fieldset style="border: 0; margin: 0; padding: 0">
+            <legend class="label">Tone</legend>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{tones}}" as="t" hint-placeholder-count="5"><button class="chip chip-sm" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div>
+          </fieldset>
+          <fieldset style="border: 0; margin: 0; padding: 0">
+            <legend class="label">Reading age</legend>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{ages}}" as="t" hint-placeholder-count="3"><button class="chip chip-sm" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div>
+          </fieldset>
+          <fieldset style="border: 0; margin: 0; padding: 0">
+            <legend class="label">Pages (with cover and ending)</legend>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{counts}}" as="t" hint-placeholder-count="3"><button class="chip chip-sm" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div>
+          </fieldset>
+          <fieldset style="border: 0; margin: 0; padding: 0">
+            <legend class="label">Art style</legend>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px"><sc-for list="{{styles}}" as="t" hint-placeholder-count="4"><button class="chip chip-sm" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div>
+          </fieldset>
+        </div>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+          <legend class="label">Page format</legend>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px">
+            <sc-for list="{{formats}}" as="f" hint-placeholder-count="3">
+              <button class="pa" aria-pressed="{{f.pressed}}" style="background: {{f.bg}}; box-shadow: {{f.shadow}}; flex-direction: column; gap: 8px" onClick="{{f.pick}}">
+                <span style="display: flex; gap: 10px; align-items: center">
+                  <svg width="40" height="54" viewBox="0 0 40 54" aria-hidden="true"><rect x="2" y="2" width="36" height="50" fill="#FFFFFF" stroke="#141414" stroke-width="2.5"></rect><g opacity="{{f.singleOp}}"><rect x="6" y="6" width="28" height="30" fill="#7FB2FF" stroke="#141414" stroke-width="2"></rect><rect x="6" y="40" width="28" height="8" fill="#FFD93B" stroke="#141414" stroke-width="2"></rect></g><g opacity="{{f.gridOp}}"><rect x="6" y="6" width="13" height="12" fill="#7FB2FF" stroke="#141414" stroke-width="1.8"></rect><rect x="21" y="6" width="13" height="12" fill="#8FD3A8" stroke="#141414" stroke-width="1.8"></rect><rect x="6" y="20" width="13" height="12" fill="#8FD3A8" stroke="#141414" stroke-width="1.8"></rect><rect x="21" y="20" width="13" height="12" fill="#7FB2FF" stroke="#141414" stroke-width="1.8"></rect><rect x="6" y="34" width="13" height="12" fill="#7FB2FF" stroke="#141414" stroke-width="1.8"></rect><rect x="21" y="34" width="13" height="12" fill="#8FD3A8" stroke="#141414" stroke-width="1.8"></rect></g><g opacity="{{f.autoOp}}"><path d="M20 12l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#FFD93B" stroke="#141414" stroke-width="2" stroke-linejoin="round"></path><rect x="8" y="38" width="24" height="8" fill="#FF4A3D" stroke="#141414" stroke-width="2"></rect></g></svg>
+                  <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 20px; letter-spacing: 0.04em">{{f.label}}</span>
+                </span>
+                <span style="font-size: 14px; font-weight: 700">{{f.desc}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div class="note"><span>{{formatReason}}</span></div>
+        </fieldset>
+
+        <div class="panel" style="padding: 18px; display: flex; flex-direction: column; gap: 10px; background: #FFFDF8">
+          <h2 class="h2">Your katha at a glance</h2>
+          <dl style="margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px">
+            <dt style="font-weight: 700">Desh</dt><dd style="margin: 0">{{glance.desh}} <button class="linkbtn" style="min-height: auto; font-size: 15px" onClick="{{goDesh}}">edit</button></dd>
+            <dt style="font-weight: 700">Kaal</dt><dd style="margin: 0">{{glance.kaal}} <button class="linkbtn" style="min-height: auto; font-size: 15px" onClick="{{goKaal}}">edit</button></dd>
+            <dt style="font-weight: 700">Paatra</dt><dd style="margin: 0">{{glance.paatra}} <button class="linkbtn" style="min-height: auto; font-size: 15px" onClick="{{goPaatra}}">edit</button></dd>
+            <dt style="font-weight: 700">Paristhiti</dt><dd style="margin: 0">{{glance.paristhiti}} <button class="linkbtn" style="min-height: auto; font-size: 15px" onClick="{{goParisthiti}}">edit</button></dd>
+          </dl>
+        </div>
+        <sc-if value="{{hasMissing}}" hint-placeholder-val="{{ false }}">
+          <div class="note note-warn" role="status"><span><strong>Before writing:</strong> {{missingText}}</span></div>
+        </sc-if>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center">
+          <button class="btn" onClick="{{goParisthiti}}">Back</button>
+          <button class="btn btn-primary btn-lg" onClick="{{writeStory}}" disabled="{{hasMissing}}">{{writeCta}}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ WRITING ============ -->
+    <sc-if value="{{is.writing}}" hint-placeholder-val="{{ false }}">
+      <div style="max-width: 720px; margin: 24px auto 0">
+        <sc-if value="{{writingOk}}" hint-placeholder-val="{{ true }}">
+          <div class="panel" style="padding: 28px; display: flex; flex-direction: column; gap: 20px" role="status" aria-live="polite">
+            <h1 class="display" style="font-size: 54px">Writing your katha<span class="bounce" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h1>
+            <div class="progress" aria-hidden="true"><span style="width: {{writingPct}}"></span></div>
+            <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+              <sc-for list="{{writingSteps}}" as="ws" hint-placeholder-count="6">
+                <li style="display: flex; gap: 12px; align-items: center; font-weight: 700; opacity: {{ws.opacity}}">
+                  <span style="width: 30px; height: 30px; border: 3px solid #141414; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {{ws.bg}}; flex: 0 0 auto">
+                    <sc-if value="{{ws.done}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+                    <sc-if value="{{ws.active}}" hint-placeholder-val="{{ false }}"><span class="dot pulse" aria-hidden="true"></span></sc-if>
+                  </span>
+                  {{ws.label}}
+                </li>
+              </sc-for>
+            </ol>
+            <p class="muted" style="margin: 0">{{writingElapsed}} · usually 30 to 60 seconds. You can leave this page; we'll keep writing.</p>
+            <button class="btn" style="align-self: flex-start" onClick="{{cancelWriting}}">Cancel</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{writingFailed}}" hint-placeholder-val="{{ false }}">
+          <div class="panel" role="alert" style="padding: 28px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start">
+            <h1 class="h1">The katha didn't come together</h1>
+            <p style="margin: 0">{{writingError}} No pictures were drawn, and everything you set up is saved.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px">
+              <button class="btn btn-primary" onClick="{{retryWrite}}">Try again</button>
+              <button class="btn" onClick="{{goKatha}}">Change the katha</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ OUTLINE ============ -->
+    <sc-if value="{{is.outline}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+          <div style="flex: 1 1 420px; min-width: 0">
+            <h1 class="h1">Review the katha</h1>
+            <p class="muted" style="margin: 8px 0 0; max-width: 64ch">No pictures have been drawn yet. Edit captions, speech bubbles and prompts; reorder, rewrite or switch a page between a single scene and a six-panel grid.</p>
+          </div>
+          <button class="btn btn-sm" onClick="{{rewriteAll}}">Write a new draft</button>
+        </div>
+        <div style="max-width: 640px">
+          <label class="label" for="story-title">Book title</label>
+          <input class="input" id="story-title" style="font-family: 'Bangers', Impact, sans-serif; font-size: 26px; letter-spacing: 0.03em" value="{{storyTitle}}" onChange="{{onTitle}}">
+        </div>
+        <div class="note"><span><strong>Seekh:</strong> {{lessonLine}}</span></div>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px">
+          <sc-for list="{{outline}}" as="o" hint-placeholder-count="4">
+            <li class="panel" style="padding: 0; overflow: hidden">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 4px solid #141414; background: {{o.stripe}}">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+                  <h2 class="h2" style="font-size: 22px; color: {{o.stripeInk}}">{{o.label}}</h2>
+                  <sc-if value="{{o.hasLoc}}" hint-placeholder-val="{{ false }}"><span class="badge">At: {{o.loc}}</span></sc-if>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                  <sc-if value="{{o.isMiddle}}" hint-placeholder-val="{{ true }}">
+                    <button class="btn btn-sm" style="width: 44px; padding: 0" aria-label="Move {{o.label}} up" onClick="{{o.up}}" disabled="{{o.cantUp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+                    <button class="btn btn-sm" style="width: 44px; padding: 0" aria-label="Move {{o.label}} down" onClick="{{o.down}}" disabled="{{o.cantDown}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></button>
+                  </sc-if>
+                  <button class="btn btn-sm" onClick="{{o.rewrite}}" disabled="{{o.rewriting}}">
+                    <sc-if value="{{o.rewriting}}" hint-placeholder-val="{{ false }}"><span class="spin" aria-hidden="true" style="width: 16px; height: 16px; border-width: 3px"></span></sc-if>
+                    {{o.rewriteLabel}}</button>
+                  <sc-if value="{{o.isMiddle}}" hint-placeholder-val="{{ true }}">
+                    <button class="btn btn-sm" onClick="{{o.del}}" disabled="{{o.cantDelete}}" aria-label="Delete {{o.label}}">Delete</button>
+                  </sc-if>
+                </div>
+              </div>
+              <div style="padding: 14px; display: flex; flex-direction: column; gap: 14px; opacity: {{o.bodyOpacity}}">
+                <sc-if value="{{o.isMiddle}}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+                    <span class="label" style="margin: 0">Format:</span>
+                    <sc-for list="{{o.layouts}}" as="ly" hint-placeholder-count="2"><button class="chip chip-sm" aria-pressed="{{ly.pressed}}" onClick="{{ly.pick}}">{{ly.label}}</button></sc-for>
+                  </div>
+                </sc-if>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px">
+                  <div>
+                    <label class="label" for="{{o.capId}}">{{o.captionLabel}}</label>
+                    <textarea class="input" id="{{o.capId}}" rows="3" value="{{o.caption}}" onChange="{{o.onCaption}}" disabled="{{o.rewriting}}"></textarea>
+                  </div>
+                  <sc-if value="{{o.notGrid}}" hint-placeholder-val="{{ true }}">
+                    <div>
+                      <label class="label" for="{{o.promptId}}">Picture prompt</label>
+                      <textarea class="input mono" id="{{o.promptId}}" rows="4" value="{{o.prompt}}" onChange="{{o.onPrompt}}" disabled="{{o.rewriting}}"></textarea>
+                    </div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{o.isGrid}}" hint-placeholder-val="{{ false }}">
+                  <details>
+                    <summary>6 panels with speech bubbles</summary>
+                    <ol style="list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 12px">
+                      <sc-for list="{{o.panels}}" as="pn" hint-placeholder-count="6">
+                        <li style="border: 3px solid #141414; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: #FFFDF8">
+                          <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 18px; letter-spacing: 0.04em">Panel {{pn.n}}</span>
+                          <div>
+                            <label class="label" style="font-size: 15px" for="{{pn.bId}}">Speech bubble</label>
+                            <input class="input" style="font-size: 15px; min-height: 44px" id="{{pn.bId}}" value="{{pn.bubble}}" onChange="{{pn.onBubble}}" placeholder="Leave empty for no bubble">
+                          </div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+                            <span style="font-size: 14px; font-weight: 700">Said by:</span>
+                            <sc-for list="{{pn.speakers}}" as="spk" hint-placeholder-count="3"><button class="chip chip-sm" style="min-height: 36px; font-size: 13px" aria-pressed="{{spk.pressed}}" onClick="{{spk.pick}}">{{spk.name}}</button></sc-for>
+                          </div>
+                          <div>
+                            <label class="label" style="font-size: 15px" for="{{pn.pId}}">Panel prompt</label>
+                            <textarea class="input mono" style="font-size: 13px" id="{{pn.pId}}" rows="2" value="{{pn.prompt}}" onChange="{{pn.onPrompt}}"></textarea>
+                          </div>
+                        </li>
+                      </sc-for>
+                    </ol>
+                  </details>
+                </sc-if>
+              </div>
+              <sc-if value="{{o.canAdd}}" hint-placeholder-val="{{ true }}">
+                <div style="border-top: 3px dashed #141414; padding: 6px 14px">
+                  <button class="linkbtn" onClick="{{o.addAfter}}">+ Add a page after this one</button>
+                </div>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ol>
+        <div class="panel" style="padding: 18px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; background: #FFFDF8">
+          <div style="flex: 1 1 320px">
+            <p style="margin: 0; font-weight: 700">{{illustrateSummary}}</p>
+            <sc-if value="{{sheetsPending}}" hint-placeholder-val="{{ false }}">
+              <p class="err" style="margin: 4px 0 0">Approve every character sheet first: {{pendingNames}}. <button class="linkbtn" style="min-height: auto" onClick="{{goPaatra}}">Go to paatra</button></p>
+            </sc-if>
+          </div>
+          <button class="btn btn-primary btn-lg" onClick="{{startIllustrating}}" disabled="{{sheetsPending}}">Draw the pictures</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ ILLUSTRATE ============ -->
+    <sc-if value="{{is.illustrate}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+          <div style="flex: 1 1 380px">
+            <h1 class="h1">{{illHeading}}</h1>
+            <p class="muted" style="margin: 8px 0 0">Cover first, then three pages at a time. Grid pages draw all six panels together. Click any page to edit or redraw it.</p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-if value="{{ill.hasFailed}}" hint-placeholder-val="{{ false }}"><button class="btn" onClick="{{retryFailed}}">Retry failed pages</button></sc-if>
+            <sc-if value="{{ill.allDone}}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" onClick="{{goReader}}">Read the book</button></sc-if>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; justify-content: space-between; font-weight: 700"><span>{{ill.countLabel}}</span><span>{{ill.pctLabel}}</span></div>
+          <div class="progress" role="progressbar" aria-label="Pictures drawn" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ill.pct}}"><span style="width: {{ill.pctLabel}}"></span></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <span class="badge b-done">{{ill.nDone}} done</span>
+            <span class="badge b-drawing">{{ill.nDrawing}} drawing</span>
+            <span class="badge b-queued">{{ill.nQueued}} queued</span>
+            <span class="badge b-failed">{{ill.nFailed}} failed</span>
+          </div>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 30px 24px">
+          <sc-for list="{{thumbs}}" as="t" hint-placeholder-count="6">
+            <li style="display: flex; flex-direction: column; gap: 8px">
+              <button class="tile" onClick="{{t.open}}" aria-label="Edit {{t.label}}, {{t.statusLabel}}">
+                <div class="lift" style="box-shadow: 5px 5px 0 #141414">
+                  <dc-import name="PagePanel" page="{{t.page}}" title="{{storyTitle}}" starring="{{starring}}" page-no="{{t.pageNo}}" hint-size="100%,280px"></dc-import>
+                </div>
+              </button>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between">
+                <span style="font-weight: 700">{{t.label}}</span>
+                <span class="badge {{t.badgeClass}}">
+                  <sc-if value="{{t.isDrawing}}" hint-placeholder-val="{{ false }}"><span class="dot pulse" aria-hidden="true"></span></sc-if>
+                  {{t.statusLabel}}</span>
+              </div>
+              <sc-if value="{{t.hasNote}}" hint-placeholder-val="{{ false }}">
+                <span class="badge b-note" style="align-self: flex-start" title="{{t.note}}">Fallback used</span>
+              </sc-if>
+              <sc-if value="{{t.failed}}" hint-placeholder-val="{{ false }}">
+                <button class="btn btn-sm" onClick="{{t.open}}">Edit prompt &amp; redraw</button>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+    </sc-if>
+
+    <!-- ============ PAGE EDITOR ============ -->
+    <sc-if value="{{is.editor}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between">
+          <button class="btn btn-sm" onClick="{{goIllustrate}}">All pages</button>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <button class="btn btn-sm" style="width: 44px; padding: 0" aria-label="Previous page" onClick="{{ed.prev}}" disabled="{{ed.atFirst}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+            <span style="font-weight: 700; min-width: 110px; text-align: center">{{ed.label}}</span>
+            <button class="btn btn-sm" style="width: 44px; padding: 0" aria-label="Next page" onClick="{{ed.next}}" disabled="{{ed.atLast}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+          <div style="flex: 1 1 320px; max-width: 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+            <div style="box-shadow: 7px 7px 0 #141414">
+              <dc-import name="PagePanel" page="{{ed.panel}}" title="{{storyTitle}}" starring="{{starring}}" page-no="{{ed.pageNo}}" hint-size="100%,560px"></dc-import>
+            </div>
+            <sc-if value="{{ed.hasVersions}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <h2 class="label">Versions</h2>
+                <div style="display: flex; gap: 12px; overflow-x: auto; padding: 4px 4px 10px">
+                  <sc-for list="{{ed.versions}}" as="vv" hint-placeholder-count="2">
+                    <button class="tile" style="width: 86px; flex: 0 0 auto" aria-pressed="{{vv.active}}" aria-label="Use version {{vv.n}}" onClick="{{vv.pick}}">
+                      <div style="outline: {{vv.ring}}; outline-offset: 3px">
+                        <dc-import name="PagePanel" page="{{vv.panel}}" title="{{storyTitle}}" starring="{{starring}}" hint-size="86px,122px"></dc-import>
+                      </div>
+                      <span style="display: block; text-align: center; font-weight: 700; font-size: 14px; margin-top: 6px">v{{vv.n}}{{vv.suffix}}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="flex: 999 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+            <sc-if value="{{ed.isDrawing}}" hint-placeholder-val="{{ false }}">
+              <div class="note" role="status"><span class="spin" aria-hidden="true"></span><strong>Drawing a new version…</strong></div>
+            </sc-if>
+            <sc-if value="{{ed.hasNote}}" hint-placeholder-val="{{ false }}">
+              <div class="note" role="status"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 auto"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path></svg><span><strong>Heads up:</strong> {{ed.note}}</span></div>
+            </sc-if>
+            <sc-if value="{{ed.failed}}" hint-placeholder-val="{{ false }}">
+              <div class="note note-err" role="alert" style="flex-direction: column; gap: 6px">
+                <strong>We couldn't draw this page.</strong>
+                <span>The image service declined it every way we tried: with the reference images, without them, and from text only ({{ed.errorCode}}). Simplifying the prompt usually fixes it: describe the scene plainly and remove anything that could read as unsafe.</span>
+                <button class="linkbtn" style="align-self: flex-start" onClick="{{ed.focusPrompt}}">Edit the prompt below, then redraw</button>
+              </div>
+            </sc-if>
+            <div>
+              <label class="label" for="ed-caption">{{ed.captionLabel}}</label>
+              <textarea class="input" id="ed-caption" rows="3" value="{{ed.caption}}" onChange="{{ed.onCaption}}"></textarea>
+            </div>
+            <sc-if value="{{ed.isMiddle}}" hint-placeholder-val="{{ true }}">
+              <fieldset style="border: 0; margin: 0; padding: 0">
+                <legend class="label">Format</legend>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                  <sc-for list="{{ed.layouts}}" as="ly" hint-placeholder-count="3"><button class="chip" aria-pressed="{{ly.pressed}}" onClick="{{ly.pick}}">{{ly.label}}</button></sc-for>
+                </div>
+              </fieldset>
+            </sc-if>
+            <sc-if value="{{ed.showBubble}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <label class="label" for="ed-bubble">Speech bubble <span class="muted" style="font-weight: 400">(optional, real text over the picture)</span></label>
+                <input class="input" id="ed-bubble" value="{{ed.bubble}}" onChange="{{ed.onBubble}}" placeholder="e.g. &quot;I gave my word, Neela.&quot;">
+              </div>
+            </sc-if>
+            <sc-if value="{{ed.isGrid}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <h2 class="label" style="margin: 0">Panels</h2>
+                <sc-for list="{{ed.panels}}" as="pn" hint-placeholder-count="6">
+                  <div style="border: 3px solid #141414; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: #FFFFFF">
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+                      <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 18px; letter-spacing: 0.04em; margin-right: 6px">Panel {{pn.n}}</span>
+                      <sc-for list="{{pn.speakers}}" as="spk" hint-placeholder-count="3"><button class="chip chip-sm" style="min-height: 36px; font-size: 13px" aria-pressed="{{spk.pressed}}" onClick="{{spk.pick}}">{{spk.name}}</button></sc-for>
+                    </div>
+                    <label class="sr-only" for="{{pn.bId}}">Panel {{pn.n}} speech bubble</label>
+                    <input class="input" style="font-size: 15px; min-height: 44px" id="{{pn.bId}}" value="{{pn.bubble}}" onChange="{{pn.onBubble}}" placeholder="Speech bubble (optional)">
+                    <label class="sr-only" for="{{pn.pId}}">Panel {{pn.n}} prompt</label>
+                    <textarea class="input mono" style="font-size: 13px" id="{{pn.pId}}" rows="2" value="{{pn.prompt}}" onChange="{{pn.onPrompt}}" onKeyDown="{{ed.onPromptKey}}"></textarea>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ed.notGrid}}" hint-placeholder-val="{{ true }}">
+              <div>
+                <label class="label" for="ed-prompt">Picture prompt</label>
+                <textarea class="input mono" id="ed-prompt" rows="6" value="{{ed.prompt}}" onChange="{{ed.onPrompt}}" onKeyDown="{{ed.onPromptKey}}" ref="{{promptRef}}"></textarea>
+              </div>
+            </sc-if>
+            <p class="hint" style="margin: 0">Pictures never include words; captions and bubbles are added as text. Press Ctrl + Enter in a prompt to redraw.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+              <button class="btn btn-primary btn-lg" onClick="{{ed.redraw}}" disabled="{{ed.isDrawing}}">{{ed.redrawLabel}}</button>
+              <span class="hint" style="margin: 0">Earlier versions are kept below the page.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ READER ============ -->
+    <sc-if value="{{is.reader}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 18px; align-items: center" onKeyDown="{{readerKey}}">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center">
+          <button class="btn btn-sm" aria-pressed="{{speaking}}" onClick="{{readAloud}}">{{readAloudLabel}}</button>
+          <button class="btn btn-sm" onClick="{{openExport}}">Export PDF</button>
+          <button class="btn btn-sm btn-blue" onClick="{{openShare}}">Share link</button>
+          <button class="btn btn-sm btn-quiet" onClick="{{goIllustrate}}">Edit pages</button>
+        </div>
+        <div style="width: 100%; max-width: 540px">
+          <div style="box-shadow: 8px 8px 0 #141414">
+            <dc-import name="PagePanel" page="{{rd.panel}}" title="{{storyTitle}}" starring="{{starring}}" page-no="{{rd.pageNo}}" hint-size="100%,720px"></dc-import>
+          </div>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: center">
+          <button class="btn btn-lg" aria-label="Previous page" onClick="{{rd.prev}}" disabled="{{rd.atFirst}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <span role="status" style="font-weight: 700; min-width: 110px; text-align: center">{{rd.label}}</span>
+          <button class="btn btn-lg btn-primary" aria-label="Next page" onClick="{{rd.next}}" disabled="{{rd.atLast}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+        <p class="hint" style="margin: 0">Tip: use the left and right arrow keys while a button is focused.</p>
+      </div>
+    </sc-if>
+
+  </main>
+</sc-if>
+
+<!-- ============ SHARED READ-ONLY VIEW ============ -->
+<sc-if value="{{is.shared}}" hint-placeholder-val="{{ false }}">
+  <div style="background: #1F4FB8; color: #FFFFFF; border-bottom: 5px solid #141414; padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between">
+    <span style="font-weight: 700">A storybook shared with you · read-only</span>
+    <button class="btn btn-sm" onClick="{{exitShared}}">Back to my library (owner preview)</button>
+  </div>
+  <main style="max-width: 640px; margin: 0 auto; padding: 28px 20px 80px; display: flex; flex-direction: column; gap: 18px; align-items: center" onKeyDown="{{readerKey}}">
+    <h1 class="h1" style="text-align: center">{{storyTitle}}</h1>
+    <div style="width: 100%; max-width: 540px; box-shadow: 8px 8px 0 #141414">
+      <dc-import name="PagePanel" page="{{rd.panel}}" title="{{storyTitle}}" starring="{{starring}}" page-no="{{rd.pageNo}}" hint-size="100%,720px"></dc-import>
+    </div>
+    <div style="display: flex; gap: 14px; align-items: center">
+      <button class="btn btn-lg" aria-label="Previous page" onClick="{{rd.prev}}" disabled="{{rd.atFirst}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <span role="status" style="font-weight: 700; min-width: 110px; text-align: center">{{rd.label}}</span>
+      <button class="btn btn-lg btn-primary" aria-label="Next page" onClick="{{rd.next}}" disabled="{{rd.atLast}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+    </div>
+    <button class="btn btn-sm" aria-pressed="{{speaking}}" onClick="{{readAloud}}">{{readAloudLabel}}</button>
+  </main>
+</sc-if>
+
+<!-- ============ DIALOGS ============ -->
+<sc-if value="{{exportOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position: fixed; inset: 0; z-index: 50; background: rgba(20,20,20,.55); display: flex; align-items: center; justify-content: center; padding: 16px" onKeyDown="{{dialogKey}}">
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="exp-title" style="width: 100%; max-width: 460px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 class="h1" id="exp-title" style="font-size: 34px">Export as PDF</h2>
+      <p style="margin: 0">One comic page per sheet, ready to print at home or send to a print shop.</p>
+      <fieldset style="border: 0; margin: 0; padding: 0">
+        <legend class="label">Paper size</legend>
+        <div style="display: flex; gap: 10px">
+          <button class="chip" aria-pressed="{{isA4}}" onClick="{{pickA4}}">A4</button>
+          <button class="chip" aria-pressed="{{isLetter}}" onClick="{{pickLetter}}">US Letter</button>
+        </div>
+      </fieldset>
+      <p class="hint" style="margin: 0">{{pageCountLabel}}</p>
+      <sc-if value="{{exp.running}}" hint-placeholder-val="{{ false }}">
+        <div class="note" role="status"><span class="spin" aria-hidden="true"></span><span>Preparing your PDF… this can take a minute for big books.</span></div>
+      </sc-if>
+      <sc-if value="{{exp.ready}}" hint-placeholder-val="{{ false }}">
+        <div class="note" role="status" style="background: #FFF4C2; flex-wrap: wrap; align-items: center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M12 12v6M9 15l3 3 3-3"></path></svg>
+          <span style="flex: 1 1 200px"><strong style="overflow-wrap: anywhere">{{exp.name}}</strong><br><span class="muted" style="font-size: 15px">{{exp.meta}}</span></span>
+        </div>
+      </sc-if>
+      <sc-if value="{{exp.error}}" hint-placeholder-val="{{ false }}">
+        <div class="note note-err" role="alert">{{exp.errorText}}</div>
+      </sc-if>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center">
+        <button class="linkbtn" onClick="{{doPrint}}">Or use the browser's print dialog</button>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <button class="btn" onClick="{{closeExport}}">Close</button>
+          <sc-if value="{{exp.canCreate}}" hint-placeholder-val="{{ true }}">
+            <button class="btn btn-primary" onClick="{{createPdf}}" disabled="{{exp.running}}">{{exp.createLabel}}</button>
+          </sc-if>
+          <sc-if value="{{exp.ready}}" hint-placeholder-val="{{ false }}">
+            <a class="btn btn-primary" href="{{exp.url}}" download="{{exp.name}}" target="_blank" rel="noopener">Download PDF</a>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{shareOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position: fixed; inset: 0; z-index: 50; background: rgba(20,20,20,.55); display: flex; align-items: center; justify-content: center; padding: 16px" onKeyDown="{{dialogKey}}">
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="share-title" style="width: 100%; max-width: 520px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 class="h1" id="share-title" style="font-size: 34px">Share a read-only link</h2>
+      <p style="margin: 0">Anyone with the link can read the book. They can't edit it, and reference images are never included.</p>
+      <sc-if value="{{share.busy}}" hint-placeholder-val="{{ true }}">
+        <div class="note" role="status"><span class="spin" aria-hidden="true"></span>Creating link…</div>
+      </sc-if>
+      <sc-if value="{{share.ready}}" hint-placeholder-val="{{ false }}">
+        <div>
+          <label class="label" for="share-url">Link</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <input class="input mono" id="share-url" readOnly="{{ true }}" value="{{share.url}}" style="flex: 1 1 240px">
+            <button class="btn btn-primary" onClick="{{copyShare}}">{{share.copyLabel}}</button>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{share.error}}" hint-placeholder-val="{{ false }}">
+        <div class="note note-err" role="alert">Couldn't create a link right now. Check your connection and try again.</div>
+      </sc-if>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end">
+        <button class="btn" onClick="{{closeShare}}">Close</button>
+        <sc-if value="{{share.ready}}" hint-placeholder-val="{{ false }}"><button class="btn btn-blue" onClick="{{previewShared}}">Preview as a guest</button></sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{confirmOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position: fixed; inset: 0; z-index: 60; background: rgba(20,20,20,.55); display: flex; align-items: center; justify-content: center; padding: 16px" onKeyDown="{{dialogKey}}">
+    <div class="panel" role="alertdialog" aria-modal="true" aria-labelledby="cf-title" style="width: 100%; max-width: 440px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+      <h2 class="h2" id="cf-title" style="font-size: 30px">{{confirm.title}}</h2>
+      <p style="margin: 0">{{confirm.body}}</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end">
+        <button class="btn" onClick="{{confirmNo}}">Keep it</button>
+        <button class="btn btn-red" onClick="{{confirmYes}}">{{confirm.yes}}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============ TOASTS ============ -->
+<div aria-live="polite" style="position: fixed; right: 16px; bottom: 16px; z-index: 70; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; max-width: calc(100% - 32px)">
+  <sc-for list="{{toasts}}" as="ts" hint-placeholder-count="0">
+    <div class="toast {{ts.cls}}">
+      <span style="flex: 1 1 auto">{{ts.text}}</span>
+      <sc-if value="{{ts.hasAction}}" hint-placeholder-val="{{ false }}"><button class="linkbtn" onClick="{{ts.act}}">{{ts.actionLabel}}</button></sc-if>
+      <button class="linkbtn" style="text-decoration: none; font-size: 20px; line-height: 1" aria-label="Dismiss" onClick="{{ts.dismiss}}">×</button>
+    </div>
+  </sc-for>
+</div>
+
+<!-- ============ MOCK-MODE PANEL ============ -->
+<sc-if value="{{mock}}" hint-placeholder-val="{{ true }}">
+  <div style="position: fixed; left: 16px; bottom: 16px; z-index: 65; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: calc(100% - 32px)">
+    <sc-if value="{{dev.open}}" hint-placeholder-val="{{ false }}">
+      <div class="panel" style="width: 320px; max-width: 100%; max-height: 70vh; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; font-size: 15px">
+        <div>
+          <h2 class="h2" style="font-size: 22px">Mock mode</h2>
+          <p class="hint" style="margin: 2px 0 0">No backend, no keys. Simulated jobs, delays and failures.</p>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Image results</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{devFail}}" as="d" hint-placeholder-count="3"><button class="chip chip-sm" aria-pressed="{{d.pressed}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div>
+        </fieldset>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Library</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{devLib}}" as="d" hint-placeholder-count="4"><button class="chip chip-sm" aria-pressed="{{d.pressed}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div>
+        </fieldset>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <button class="chip chip-sm" aria-pressed="{{dev.storyFail}}" onClick="{{toggleStoryFail}}">Story job fails</button>
+          <button class="chip chip-sm" aria-pressed="{{dev.realistic}}" onClick="{{toggleRealistic}}">Real timings (45 s story)</button>
+          <button class="chip chip-sm" aria-pressed="{{dev.offline}}" onClick="{{toggleOffline}}">Offline</button>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend class="label">Jump to screen</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{devJump}}" as="d" hint-placeholder-count="10"><button class="chip chip-sm" onClick="{{d.go}}">{{d.label}}</button></sc-for></div>
+        </fieldset>
+        <button class="linkbtn" style="align-self: flex-start" onClick="{{resetDemo}}">Reset demo data</button>
+      </div>
+    </sc-if>
+    <button class="btn btn-sm" style="background: #141414; color: #FFD93B; box-shadow: 3px 3px 0 #FFD93B" aria-expanded="{{dev.open}}" onClick="{{toggleDev}}">Mock mode</button>
+  </div>
+</sc-if>
+
+</div>
+
+<!-- ============ PRINT ============ -->
+<div class="print-only {{printClass}}">
+  <sc-for list="{{printPages}}" as="pp" hint-placeholder-count="0">
+    <div class="print-page">
+      <div>
+        <dc-import name="PagePanel" page="{{pp.panel}}" title="{{storyTitle}}" starring="{{starring}}" page-no="{{pp.pageNo}}" hint-size="100%,1000px"></dc-import>
+      </div>
+    </div>
+  </sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startScreen":{"editor":"enum","options":["landing","signin","library","desh","kaal","paatra","paristhiti","katha","writing","outline","illustrate","editor","reader","shared"],"default":"landing","section":"Prototype"},"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+
+  // ---------------------------------------------------------------
+  // CONFIG: the one flag. MOCK true = fake backend in this file.
+  // MOCK false = every call goes to API_BASE (see README, src/api/http.js).
+  // No API keys or model names ever live in the front end.
+  // ---------------------------------------------------------------
+  static get CONFIG() { return { MOCK: true, API_BASE: '[YOUR_API_BASE_URL]' }; }
+  static get INSPIRATIONS() { return ['Panchatantra', 'Jataka tales', 'Hitopadesha', 'Ramayana', 'Mahabharata', 'Puranas', 'Original tale']; }
+  static get ERAS() { return ['Long, long ago', 'Satya Yuga', 'Treta Yuga', 'Dvapara Yuga', 'Vedic age', 'Mauryan era', 'Gupta era', 'Present day']; }
+  static get RITUS() { return ['Vasant · spring', 'Grishma · summer', 'Varsha · monsoon', 'Sharad · autumn', 'Hemant · early winter', 'Shishir · winter']; }
+  static get DARSHANS() { return ['None', 'Nyaya · clear reasoning', 'Vaisheshika · how things are made', 'Samkhya · mind and nature', 'Yoga · discipline and focus', 'Mimamsa · right action', 'Vedanta · we are all one']; }
+  static get TONES() { return ['Adventurous', 'Funny', 'Heartwarming', 'Wise and calm', 'Gentle bedtime']; }
+  static get AGES() { return ['3–5', '5–7', '7–10']; }
+  static get COUNTS() { return [6, 8, 12]; }
+  static get STYLES() { return ['Comic', 'Watercolour', 'Crayon', 'Madhubani-inspired']; }
+  static get COLORS() { return ['#1F4FB8', '#8A4FD1', '#2E9C5A', '#C98A4B', '#F28C28', '#D6457A']; }
+  static get ROLE_LABELS() { return { nayak: 'Nayak', sahayak: 'Sahayak', mitra: 'Mitra', guru: 'Guru', parivaar: 'Parivaar', pratinayak: 'Pratinayak' }; }
+  static get PA() {
+    return [
+      { k: 'Dharma', hint: 'duty, righteousness, doing what is right', bg: '#1F4FB8', ink: '#FFFFFF', icon: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4', q: 'What duty does {n} hold to?', ph: 'e.g. Keeping a promise to a friend' },
+      { k: 'Artha', hint: 'resources, wealth, using things wisely', bg: '#FFD93B', ink: '#141414', icon: 'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM9 8.5h6M9 11.5h6M10 11.5c3 0 3 4 0 4l4 0', q: 'What does {n} need, protect or share?', ph: 'e.g. The jamun fruit that feeds the whole tree' },
+      { k: 'Kaam', hint: 'wishes, ambition, love for family and friends', bg: '#FF4A3D', ink: '#141414', icon: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z', q: 'What does {n} wish for?', ph: 'e.g. To be accepted by the other monkeys' },
+      { k: 'Moksh', hint: 'inner peace, letting go, spiritual freedom', bg: '#8A4FD1', ink: '#FFFFFF', icon: 'M12 20c-4 0-8-3-9-7 3 0 6 1 9 4 3-3 6-4 9-4-1 4-5 7-9 7zM12 17c-2-3-2-7 0-11 2 4 2 8 0 11z', q: 'What must {n} let go of, or come to understand?', ph: 'e.g. The fear of being left out' }
+    ];
+  }
+
+  constructor(props) {
+    super(props);
+    this._jobs = {};
+    this._timers = new Set();
+    this._syncTimers = {};
+    this._unsynced = new Set();
+    this.promptRef = { current: null };
+    this.api = this.createApi();
+    this.state = this.initialState();
+  }
+  componentDidMount() {
+    this.restore(() => { const start = this.props.startScreen; if (start && start !== 'landing') this.jumpTo(start); });
+  }
+  componentDidUpdate(prev) {
+    if (prev.startScreen !== this.props.startScreen && this.props.startScreen) this.jumpTo(this.props.startScreen);
+  }
+  componentWillUnmount() {
+    this._unmounted = true;
+    this._timers.forEach((t) => clearTimeout(t));
+    clearInterval(this._writeTick);
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
+  }
+
+  // ---------------- utils ----------------
+  later(fn, ms) { const t = setTimeout(() => { this._timers.delete(t); if (!this._unmounted) fn(); }, ms); this._timers.add(t); return t; }
+  uid(p) { return p + '_' + Math.random().toString(36).slice(2, 9); }
+  hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  rng(seed) { let a = this.hash(String(seed)); return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  ago(ts) { const m = Math.round((Date.now() - ts) / 60000); if (m < 1) return 'Edited just now'; if (m < 60) return 'Edited ' + m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return 'Edited ' + h + ' h ago'; return 'Edited ' + Math.round(h / 24) + ' d ago'; }
+  fmtSize(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  errMsg(e) { return (e && e.message) || 'Something went wrong.'; }
+  lowerFirst(s) { return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  clean(s) { return (s || '').trim().replace(/[.!]+$/, ''); }
+  joinNames(arr) { return arr.join(', ').replace(/, ([^,]*)$/, ' & $1'); }
+
+  // =================================================================
+  // api module: the ONLY place that talks to a backend.
+  // =================================================================
+  createApi() {
+    const C = Component.CONFIG;
+    if (!C.MOCK) {
+      const off = () => Promise.reject({ code: 'NO_BACKEND', message: 'The real backend is not wired into this prototype.' });
+      return new Proxy({}, { get: () => off });
+    }
+    return this.createMockApi();
+  }
+  createMockApi() {
+    const self = this;
+    const wait = (ms) => new Promise((resolve, reject) => { self.later(() => { if (self.state.dev.offline) reject({ code: 'OFFLINE', message: "You're offline." }); else resolve(); }, ms); });
+    const dur = (ms) => (self.state.dev.realistic ? ms * 2.2 : ms);
+    const job = (ms, produce) => { const id = self.uid('job'); self._jobs[id] = { created: Date.now(), ms: ms, produce: produce, final: null }; return { jobId: id }; };
+    return {
+      listStories: async () => {
+        const mode = self.state.dev.library;
+        await wait(mode === 'slow' ? 2800 : 450);
+        if (mode === 'error') throw { code: 'SERVER', message: 'Library failed to load.' };
+        if (mode === 'empty') return [];
+        return self.state.stories.map((s) => ({ id: s.id, title: s.title }));
+      },
+      createStory: async (body) => {
+        await wait(350);
+        return job(self.state.dev.realistic ? 45000 : 9000, () => {
+          if (self.state.dev.storyFail) throw { code: 'STORY_TIMEOUT', message: 'The story writer took too long to answer.' };
+          return self.mockStory(body);
+        });
+      },
+      patchStory: async () => { await wait(350); return { ok: true }; },
+      deleteStory: async () => { await wait(400); return { ok: true }; },
+      createSheet: async (characterId, body) => {
+        await wait(250);
+        return job(dur(4200 + Math.random() * 1800), () => {
+          const o = self.mockOutcome('sheet');
+          return { imageUrl: 'mock://sheet/' + self.uid('s'), fallbackNote: o.note };
+        });
+      },
+      drawPage: async (storyId, n, body) => {
+        await wait(250);
+        return job(dur(3200 + Math.random() * 3200), () => {
+          const o = self.mockOutcome('page');
+          const panelImages = body.panels ? body.panels.map(() => 'mock://panel/' + self.uid('q')) : undefined;
+          return { imageUrl: 'mock://page/' + self.uid('p'), panelImages: panelImages, versionId: self.uid('v'), fallbackNote: o.note };
+        });
+      },
+      rewritePage: async (storyId, n, body) => { await wait(250); return job(dur(2600), () => self.mockRewrite(body)); },
+      getJob: async (jobId) => {
+        await wait(120);
+        const j = self._jobs[jobId];
+        if (!j) throw { code: 'NOT_FOUND', message: 'Job not found.' };
+        const t = Date.now() - j.created;
+        if (t < 500) return { status: 'queued' };
+        if (t < j.ms) return { status: 'running' };
+        if (!j.final) { try { j.final = { status: 'done', result: j.produce() }; } catch (err) { j.final = { status: 'failed', error: err }; } }
+        return j.final;
+      },
+      createUpload: async (body) => { await wait(300); const key = self.uid('u'); return { uploadUrl: 'mock://s3-put/' + key, fileUrl: 'mock://uploads/' + key + '/' + body.filename }; },
+      putFile: async () => { await wait(1100); return { ok: true }; },
+      shareStory: async () => { await wait(800); return { shareUrl: 'https://[YOUR_DOMAIN]/s/' + self.uid('b').slice(2) }; },
+      // PROPOSED: POST /stories/{id}/export { paper } -> { jobId }; result { pdfUrl, pages, bytes }
+      // Mock builds a real (simplified) PDF in the browser; production renders it server-side from the S3 images.
+      exportPdf: async (storyId, body) => {
+        await wait(300);
+        return job(dur(2500 + Math.random() * 1500), () => {
+          const st = self.storyById(storyId);
+          const pdf = self.buildPdf(st, body.paper);
+          return { pdfUrl: URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' })), pages: st.pages.length, bytes: pdf.length };
+        });
+      },
+      deletePhotos: async () => { await wait(700); return { ok: true }; }
+    };
+  }
+  pollJob(jobId, isCancelled) {
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        if (isCancelled && isCancelled()) return reject({ code: 'CANCELLED' });
+        this.api.getJob(jobId).then((j) => {
+          if (isCancelled && isCancelled()) return reject({ code: 'CANCELLED' });
+          if (j.status === 'done') resolve(j.result);
+          else if (j.status === 'failed') reject(j.error || { code: 'FAILED', message: 'Job failed.' });
+          else this.later(tick, 800);
+        }, (err) => { if (err && err.code === 'OFFLINE') this.later(tick, 2000); else reject(err); });
+      };
+      this.later(tick, 800);
+    });
+  }
+  mockOutcome(kind) {
+    const mode = this.state.dev.failMode;
+    const fail = (code) => { throw { code: code, message: 'Declined at every step (with photo, without photo, text only).' }; };
+    if (mode === 'all') fail('IMAGE_SAFETY');
+    if (mode === 'none') return { note: '' };
+    const r = Math.random();
+    const noPhoto = kind === 'sheet'
+      ? 'The reference photo was declined, so this sheet was drawn from your description instead. It may look less like them.'
+      : 'The first try was declined, so this was redrawn without the reference images. Faces may differ slightly from the sheet.';
+    const textOnly = 'Reference images were declined, so this was drawn from the text only. Check that everyone still looks right.';
+    if (r < 0.6) return { note: '' };
+    if (r < 0.8) return { note: noPhoto };
+    if (r < 0.92) return { note: textOnly };
+    fail(r < 0.96 ? 'IMAGE_SAFETY' : 'IMAGE_OTHER');
+  }
+
+  // ---------------- mock story writer ----------------
+  cast(chars) {
+    const named = chars.filter((c) => c.name);
+    const find = (r) => named.find((c) => c.role === r);
+    const nayak = find('nayak') || named[0] || { id: '', name: 'Our hero', role: 'nayak', purushartha: {} };
+    const rival = find('pratinayak');
+    const guru = find('guru');
+    const helper = find('sahayak') || find('mitra') || find('parivaar') || named.find((c) => c !== nayak && c !== rival && c !== guru);
+    return { nayak: nayak, rival: rival, guru: guru, helper: helper, H: nayak.name, R: rival ? rival.name : 'the trouble', G: guru ? guru.name : 'a wise old sage', S: helper ? helper.name : (guru ? guru.name : 'a new friend') };
+  }
+  kaalPhrase(k) {
+    if (!k) return 'long, long ago';
+    let s = k.custom && k.custom.trim() ? this.lowerFirst(this.clean(k.custom)) : k.era === 'Long, long ago' || !k.era ? 'long, long ago' : k.era === 'Present day' ? 'not so long ago' : 'in the ' + k.era;
+    if (k.ritu) s += ', in ' + k.ritu.split(' · ')[0];
+    return s;
+  }
+  chooseFormat(setup, chars) {
+    if (setup.format === 'single') return { layout: 'caption', reason: 'Single scene on every page: one picture with a short caption below.' };
+    if (setup.format === 'grid') return { layout: 'grid', reason: '3×2 comic grid: six panels per page, each with its own speech bubble.' };
+    const keys = chars.filter((c) => c.isKey && c.name).length;
+    const subs = (setup.desh.subs || []).filter(Boolean).length;
+    const len = (setup.katha || '').length + (setup.paristhiti || '').length;
+    const score = keys + subs + (len > 420 ? 2 : len > 200 ? 1 : 0) + (setup.age === '7–10' ? 1 : 0);
+    if (score >= 5) return { layout: 'grid', reason: 'Auto picked a 3×2 comic grid: ' + keys + ' key characters, ' + subs + ' sublocations and a detailed plot need room for dialogue.' };
+    return { layout: 'caption', reason: 'Auto picked a single scene per page: the story is simple enough for one picture and a short caption.' + (score >= 3 ? ' Add more detail or characters and it will switch to a 3×2 grid.' : '') };
+  }
+  styleWord(style) { return { Comic: 'Bold comic-book', Watercolour: 'Soft watercolour', Crayon: 'Hand-drawn crayon', 'Madhubani-inspired': 'Madhubani-inspired folk-art' }[style] || 'Bold comic-book'; }
+  panelsFor(beat, ctx) {
+    const A = beat.A || ctx.c.nayak; const B = beat.B || ctx.c.helper || ctx.c.guru || ctx.c.rival || A;
+    const sw = this.styleWord(ctx.setup.style);
+    const loc = beat.loc;
+    const p = (shot) => sw + ' comic panel. ' + shot + ', ' + loc + ', ' + ctx.when + '. No text or speech bubbles.';
+    const L = beat.lines || ['', '', '', ''];
+    return [
+      { id: this.uid('pn'), prompt: p('Wide establishing shot'), bubble: '', speakerId: '' },
+      { id: this.uid('pn'), prompt: p('Close-up of ' + A.name + ', speaking'), bubble: L[0], speakerId: L[0] ? A.id : '' },
+      { id: this.uid('pn'), prompt: p(B.name + ' replying'), bubble: L[1], speakerId: L[1] ? B.id : '' },
+      { id: this.uid('pn'), prompt: p(A.name + ' and ' + B.name + ' together'), bubble: L[2], speakerId: L[2] ? A.id : '' },
+      { id: this.uid('pn'), prompt: p('Detail: ' + (beat.detail || 'an important object in the scene')), bubble: '', speakerId: '' },
+      { id: this.uid('pn'), prompt: p(A.name + ' making a decision'), bubble: L[3], speakerId: L[3] ? B.id : '' }
+    ];
+  }
+  mockStory(body) {
+    const s = body.setup;
+    const chars = body.characters || [];
+    const c = this.cast(chars);
+    const H = c.H, R = c.R, G = c.G, S = c.S;
+    const place = this.clean(s.desh.main) || 'a faraway land';
+    const subs = (s.desh.subs || []).map((x) => this.clean(x)).filter(Boolean);
+    const sub = (i) => (subs.length ? subs[i % subs.length] : place);
+    const when = this.kaalPhrase(s.kaal);
+    const pa = c.nayak.purushartha || {};
+    const drives = Object.keys(pa).filter((k) => pa[k] && pa[k].on);
+    const primary = drives[0] || 'Dharma';
+    const note = pa[primary] && pa[primary].note ? this.lowerFirst(this.clean(pa[primary].note)) : '';
+    const want = {
+      Dharma: H + ' knew that doing the right thing mattered more than doing the easy thing' + (note ? ': ' + note : '') + '.',
+      Artha: H + ' wanted to use what little there was wisely' + (note ? ': ' + note : ', so nobody went hungry') + '.',
+      Kaam: H + ' carried a wish, bright as a diya' + (note ? ': ' + note : '') + '.',
+      Moksh: H + ' longed for a calm heart, free from worry' + (note ? ', and to let go of ' + note.replace(/^the /, 'the ') : '') + '.'
+    }[primary];
+    const par = this.clean(s.paristhiti);
+    const kat = this.clean((s.katha || '').split(/\.\s+/)[0]);
+    const lesson = this.clean(s.lesson) || 'A calm mind and a kind heart always find the way';
+    const pool = [
+      { c: 'Once upon a time, ' + when + ', in ' + this.lowerFirst(place) + ', there lived ' + H + '.', scene: H + ' in ' + place, loc: sub(0), A: c.nayak, B: c.helper, lines: ['What a beautiful morning!', 'Every morning is beautiful with friends, ' + H + '.', 'Come, let us go to the ' + sub(0) + '.', 'Race you there!'], detail: 'the ' + sub(0) },
+      { c: want, scene: H + ' thinking deeply', loc: sub(1), A: c.nayak, B: c.guru || c.helper, lines: ['What should I do?', 'Listen to your heart, and to dharma.', 'But it is not easy…', 'The right path rarely is.'], detail: 'a small diya flickering' },
+      { c: par ? 'But trouble was brewing: ' + this.lowerFirst(par) + '.' : 'But one day, everything changed.', scene: 'the trouble arrives', loc: sub(2), A: c.rival || c.helper, B: c.nayak, lines: ['Things are not the same anymore!', 'What happened here?', 'You will have to choose, ' + H + '.', 'Then I will choose wisely.'], detail: 'signs of the trouble' },
+      { c: kat ? H + ' had a choice to make. ' + kat + '.' : H + ' had a choice to make.', scene: H + ' facing the choice', loc: sub(0), A: c.nayak, B: c.helper, lines: ['I made a promise.', 'Promises can be heavy.', 'Then I will carry it.', 'And I will help you.'], detail: 'two paths splitting' },
+      { c: R + ' came with a clever plan and a tempting offer.', scene: R + ' offering a deal', loc: sub(1), A: c.rival || c.helper, B: c.nayak, lines: ['Forget your promise. Think of yourself!', 'That would be easy…', 'Easy and clever, yes!', 'But is it right?'], detail: 'the tempting offer' },
+      { c: G + ' said softly, "Pause. Breathe. See clearly, and then act."', scene: G + ' giving advice', loc: sub(2), A: c.guru || c.helper, B: c.nayak, lines: ['Anger clouds the mind, like mud in water.', 'How do I make it clear?', 'Be still. Then look again.', 'I see it now.'], detail: 'still water reflecting the sky' },
+      { c: H + ' chose the harder, kinder path.', scene: H + ' acting bravely', loc: sub(0), A: c.nayak, B: c.helper, lines: ['I will keep my word.', 'Even now?', 'Especially now.', 'Then so will I!'], detail: 'hands joined together' },
+      { c: 'In the end, even ' + R + ' understood.', scene: R + ' changing their mind', loc: sub(1), A: c.rival || c.helper, B: c.nayak, lines: ['I was wrong about you.', 'Everyone can choose again.', 'Will you forgive me?', 'Of course, friend.'], detail: 'a shared meal' },
+      { c: 'Back at the ' + sub(0) + ', everyone gathered to celebrate.', scene: 'a celebration', loc: sub(0), A: c.helper || c.nayak, B: c.nayak, lines: ['Hooray for ' + H + '!', 'We did it together.', 'Let us light the lamps!', 'And tell the story again!'], detail: 'rows of glowing diyas' },
+      { c: H + ' smiled. The old stories were right after all.', scene: H + ' at peace', loc: sub(2), A: c.nayak, B: c.guru || c.helper, lines: ['I understand the old stories now.', 'Then you will tell them one day.', 'I will start tonight!', ''], detail: 'a starry sky' }
+    ];
+    const fmt = this.chooseFormat(s, chars);
+    const sw = this.styleWord(s.style);
+    const prompt = (scene) => sw + " children's book illustration. " + scene + '. Setting: ' + place + ', ' + when + '. Mood: ' + (s.tone || 'adventurous').toLowerCase() + '. Match the approved character sheets. No text, letters or speech bubbles.';
+    const total = s.pageCount || 8;
+    const mid = total - 2;
+    const pick = [];
+    for (let i = 0; i < mid; i++) pick.push(pool[Math.round(i * (pool.length - 1) / Math.max(1, mid - 1))]);
+    const insp = s.inspiration && s.inspiration[0];
+    const title = c.rival ? H + ' and the ' + (c.rival.form === 'Human' ? 'Clever ' : '') + R : H + "'s " + (primary === 'Dharma' ? 'Promise' : primary === 'Artha' ? 'Treasure' : primary === 'Kaam' ? 'Wish' : 'Quiet Heart');
+    const ctx = { setup: s, c: c, when: when };
+    const pages = [{ caption: title, imagePrompt: prompt('Cover: ' + H + ' front and centre with the whole cast in ' + place), layout: 'caption', location: place }]
+      .concat(pick.map((b) => ({ caption: b.c, imagePrompt: prompt(b.scene), layout: fmt.layout, location: b.loc, panels: fmt.layout === 'grid' ? this.panelsFor(b, ctx) : [] })))
+      .concat([{ caption: 'Seekh: ' + lesson + '.', imagePrompt: prompt('Ending: the whole cast together at the ' + sub(0) + ', peaceful and happy'), layout: 'caption', location: sub(0) }]);
+    return { storyId: body.storyId, title: title, characters: chars.map((x) => ({ id: x.id, name: x.name })), pages: pages, format: fmt.layout, inspiredBy: insp || '' };
+  }
+  mockRewrite(body) {
+    const st = this.cur();
+    const c = this.cast(st ? st.characters : []);
+    const alts = [
+      'Suddenly, ' + c.H + ' heard a tiny sound from the ' + ((st && st.setup.desh.subs[0]) || 'trees') + '.',
+      '"Are you sure?" asked ' + c.S + '. ' + c.H + ' nodded slowly.',
+      'Nobody expected what happened next, least of all ' + c.R + '.',
+      c.H + ' closed both eyes, took one deep breath, and stepped forward.',
+      'The wind changed, and with it, everything else.'
+    ];
+    let cap = alts[Math.floor(Math.random() * alts.length)];
+    if (cap === body.caption) cap = alts[(alts.indexOf(cap) + 1) % alts.length];
+    const p = (body.imagePrompt || '').replace(/^([^.]*\.)\s*/, '$1 Dramatic low camera angle. ');
+    const panels = (body.panels || []).map((pn, i) => Object.assign({}, pn, { bubble: pn.bubble ? (i % 2 ? 'Hmm… are you sure?' : pn.bubble.replace(/!$/, '…')) : '' }));
+    return { caption: cap, imagePrompt: p, panels: panels };
+  }
+
+  // ---------------- mock art ----------------
+  figFor(c, i, r, x) {
+    if (!c) return { t: 'translate(0 0)', op: 0, personOp: 0, petOp: 0, capeOp: 0, bunOp: 0, color: '#FFFFFF' };
+    const pet = c.form === 'Animal' || c.form === 'Bird';
+    const sc = c.role === 'guru' || c.role === 'parivaar' ? 1.12 : pet ? 0.9 : c.role === 'nayak' ? 1.05 : 0.92;
+    return { t: 'translate(' + x + ' 270) scale(' + sc + ')', op: 1, personOp: pet ? 0 : 1, petOp: pet ? 1 : 0, capeOp: c.form === 'Divine being' ? 1 : 0, bunOp: !pet && c.gender === 'female' ? 1 : 0, color: c.color || '#1F4FB8' };
+  }
+  makeArt(seed, st, chars) {
+    const r = this.rng(seed);
+    const pick = (arr) => arr[Math.floor(r() * arr.length)];
+    const setup = (st && st.setup) || {};
+    const tone = setup.tone || 'Adventurous';
+    const style = setup.style || 'Comic';
+    const ritu = (setup.kaal && setup.kaal.ritu) || '';
+    const skies = { Adventurous: ['#8FD3A8', '#7FB2FF', '#B9E4F0'], Funny: ['#FFB8CC', '#9BE3D6', '#FFE07A'], Heartwarming: ['#FFC98B', '#FFE6A7', '#FFB89A'], 'Wise and calm': ['#C9DDF2', '#E8D9F5', '#BFE3D8'], 'Gentle bedtime': ['#1B2C5E', '#2C3E7A', '#24366B'] };
+    let sky = pick(skies[tone] || skies.Adventurous);
+    if (ritu.indexOf('Varsha') === 0) sky = pick(['#8FA6BF', '#9CB3C9']);
+    const night = tone === 'Gentle bedtime';
+    const ink = style === 'Watercolour' ? '#3A3A3A' : style === 'Madhubani-inspired' ? '#7A1F12' : '#141414';
+    const sw = style === 'Watercolour' ? 2.5 : style === 'Crayon' ? 4 : 5;
+    const dash = style === 'Crayon' ? '12 3' : style === 'Madhubani-inspired' ? '2 4' : 'none';
+    const fo = style === 'Watercolour' ? 0.82 : 1;
+    const y1 = 200 + Math.floor(r() * 30), y2 = 222 + Math.floor(r() * 16);
+    const cx = 40 + Math.floor(r() * 140);
+    const cs = (chars || (st && st.characters) || []).slice(0, 3);
+    return {
+      sky: sky, sun: night ? '#F7F1C8' : sky === '#FFE07A' ? '#FF4A3D' : '#FFD93B', sunX: 250 + Math.floor(r() * 110),
+      ink: ink, sw: sw, dash: dash, fo: fo,
+      cloud: 'M' + cx + ' 86 a18 18 0 0 1 30 -12 a22 22 0 0 1 40 6 a15 15 0 0 1 2 30 h-68 a14 14 0 0 1 -4 -24 z', cloudOp: night ? 0 : 1,
+      hill2: 'M0 ' + (y1 - 20) + ' Q90 ' + (y1 - 60) + ' 190 ' + (y1 - 10) + ' T400 ' + (y1 - 30) + ' V300 H0 Z',
+      hill: 'M0 ' + y2 + ' Q100 ' + (y2 - 36) + ' 200 ' + (y2 - 4) + ' T400 ' + (y2 - 8) + ' V300 H0 Z',
+      hillA: night ? '#3C5A8A' : pick(['#6BBF59', '#8FCB5A', '#C9A15B']), hillB: night ? '#2A4270' : pick(['#2E9C5A', '#4FA36B', '#A07A3E']),
+      f1: this.figFor(cs[0], 0, r, 130 + Math.floor(r() * 20)), f2: this.figFor(cs[1], 1, r, 225 + Math.floor(r() * 20)), f3: this.figFor(cs[2], 2, r, 310 + Math.floor(r() * 16))
+    };
+  }
+
+  // ---------------- builders ----------------
+  emptyPa() { const o = {}; Component.PA.forEach((p) => { o[p.k] = { on: false, note: '' }; }); return o; }
+  newChar(role, idx, fields) {
+    return Object.assign({
+      id: this.uid('c'), name: '', age: '', gender: 'male', form: 'Human', role: role, isKey: role === 'nayak' || role === 'pratinayak', appearance: '', refs: [],
+      purushartha: this.emptyPa(), color: Component.COLORS[(idx || 0) % Component.COLORS.length],
+      sheet: { status: 'none', versions: [], active: 0, note: '', error: '' }
+    }, fields || {});
+  }
+  blankSetup() {
+    return { desh: { main: '', subs: [] }, refs: [], kaal: { era: 'Long, long ago', custom: '', ritu: '' }, paristhiti: '', stakes: '', inspiration: ['Panchatantra'], katha: '', lesson: '', darshan: 'None', tone: 'Adventurous', age: '5–7', pageCount: 8, style: 'Comic', format: 'auto' };
+  }
+  pageFromJob(p, i, total) {
+    return { id: this.uid('pg'), kind: i === 0 ? 'cover' : i === total - 1 ? 'end' : 'middle', caption: p.caption, imagePrompt: p.imagePrompt, layout: p.layout || 'caption', location: p.location || '', panels: (p.panels || []).map((x) => Object.assign({ id: this.uid('pn') }, x)), bubble: '', status: 'none', versions: [], activeVersionId: null, error: null, rewriting: false };
+  }
+  seedStories() {
+    const now = Date.now();
+    const approved = (seed) => ({ status: 'approved', versions: [{ imageUrl: 'mock://sheet/' + seed, note: '' }], active: 0, note: '', error: '' });
+    const pa = (on) => { const o = this.emptyPa(); Object.keys(on).forEach((k) => { o[k] = { on: true, note: on[k] }; }); return o; };
+    const mk = (setup, chars, status, drawn) => {
+      const st = { id: this.uid('st'), title: '', status: status, setup: setup, characters: chars, pages: [], updatedAt: now };
+      const res = this.mockStory({ setup: setup, characters: chars });
+      st.title = res.title;
+      st.pages = res.pages.map((p, i) => this.pageFromJob(p, i, res.pages.length));
+      if (drawn) st.pages.forEach((pg, i) => {
+        const v = { id: this.uid('v'), imageUrl: 'mock://page/seed' + i + st.id, panelImages: pg.panels.map((x, k) => 'mock://panel/seed' + i + '-' + k + st.id), note: i === 3 ? 'The first try was declined, so this was redrawn without the reference images. Faces may differ slightly from the sheet.' : '', at: now };
+        pg.versions = [v]; pg.activeVersionId = v.id; pg.status = 'done';
+      });
+      return st;
+    };
+    const chiku = [
+      this.newChar('nayak', 3, { name: 'Chiku', gender: 'male', form: 'Animal', appearance: 'A small grey monkey with a red thread tied on one wrist', sheet: approved('chiku'), purushartha: pa({ Dharma: 'Keeping his promise to Neela', Moksh: 'The fear of being left out' }) }),
+      this.newChar('mitra', 2, { name: 'Neela', gender: 'female', form: 'Animal', appearance: 'A young green crocodile with a kind smile', sheet: approved('neela'), isKey: true, purushartha: pa({ Kaam: 'A safe home for her little brother' }) }),
+      this.newChar('guru', 5, { name: 'Kurma Dada', gender: 'male', form: 'Animal', appearance: 'An ancient tortoise with moss on his shell', sheet: approved('kurma') }),
+      this.newChar('pratinayak', 1, { name: 'Bandar Raja', gender: 'male', form: 'Animal', appearance: 'A big proud monkey with a golden armband', sheet: approved('raja'), purushartha: pa({ Artha: 'Keeping all the jamun fruit for his troop' }) })
+    ];
+    const a = mk({ desh: { main: 'A forest on the banks of the Narmada', subs: ['The old jamun tree', 'The river island', 'Tortoise rock'] }, refs: [], kaal: { era: 'Long, long ago', custom: '', ritu: 'Varsha · monsoon' }, paristhiti: 'The monsoon came early. The river flooded Neela’s home, and the only safe place left is the monkeys’ island, which Bandar Raja refuses to share.', stakes: 'A friendship, and a promise made long ago', inspiration: ['Panchatantra'], katha: 'Chiku promised Neela she could always shelter on his island. When Bandar Raja objects, Chiku must choose between fitting in and keeping his word.', lesson: 'A promise is a small piece of dharma we carry with us', darshan: 'Mimamsa · right action', tone: 'Adventurous', age: '5–7', pageCount: 6, style: 'Comic', format: 'auto' }, chiku, 'done', true);
+    a.updatedAt = now - 3 * 86400000;
+    const gauri = [
+      this.newChar('nayak', 5, { name: 'Gauri', gender: 'female', age: '8', appearance: 'Two long plaits, a yellow lehenga, a brass lamp in her hands', sheet: approved('gauri'), purushartha: pa({ Dharma: 'Lighting the temple lamp every evening, as her grandmother did' }), refs: [{ id: 'r1', name: 'gauri-diwali.jpg', size: 1840000, status: 'uploaded', fileUrl: 'mock://uploads/x/gauri-diwali.jpg' }] }),
+      this.newChar('parivaar', 0, { name: 'Nani', gender: 'female', appearance: 'Silver bun, white saree with a blue border, warm smile', sheet: { status: 'review', versions: [{ imageUrl: 'mock://sheet/nani', note: 'The reference photo was declined, so this sheet was drawn from your description instead. It may look less like them.' }], active: 0, note: '', error: '' } }),
+      this.newChar('pratinayak', 3, { name: 'Seth Dhanpal', gender: 'male', appearance: 'A plump merchant with a ledger and a big turban', purushartha: pa({ Artha: 'Selling all the oil at double the price before Diwali' }) })
+    ];
+    const b = mk({ desh: { main: 'A village by the Ganga', subs: ['The temple steps', 'The ghat', 'The market lane'] }, refs: [], kaal: { era: 'Gupta era', custom: '', ritu: 'Sharad · autumn' }, paristhiti: 'Seth Dhanpal has bought up all the lamp oil in the village just before Diwali.', stakes: 'The temple lamp that has never gone out', inspiration: ['Hitopadesha', 'Original tale'], katha: 'Gauri must find a way to keep the temple lamp burning without giving in to the greedy merchant.', lesson: 'Light grows when we share it', darshan: 'Vedanta · we are all one', tone: 'Heartwarming', age: '5–7', pageCount: 8, style: 'Watercolour', format: 'single' }, gauri, 'outline', false);
+    b.updatedAt = now - 2 * 3600000;
+    return [b, a];
+  }
+  initialState() {
+    return {
+      screen: 'landing', authMode: 'signin', email: '', password: '', authBusy: false, authError: '', user: null,
+      stories: this.seedStories(), storyId: null, libIds: null, libStatus: 'idle', menuOpen: false,
+      writing: null, kathaError: false, editorIndex: 1, readerIndex: 0, speaking: false,
+      toasts: [], dev: { open: false, failMode: 'some', storyFail: false, offline: false, realistic: false, library: 'normal' },
+      exportOpen: false, paper: 'a4', exp: { status: 'idle' }, share: { open: false, busy: false, url: '', copied: false, error: false },
+      confirm: null, saveState: 'saved'
+    };
+  }
+
+  // ---------------- persistence ----------------
+  persist() {
+    try {
+      const strip = (s) => Object.assign({}, s, { pages: s.pages.map((p) => Object.assign({}, p, { rewriting: false })) });
+      window.localStorage.setItem('csm2-katha-v1', JSON.stringify({ v: 1, stories: this.state.stories.map(strip) }));
+    } catch (e) {}
+  }
+  restore(done) {
+    let stories = null;
+    try { const raw = window.localStorage.getItem('csm2-katha-v1'); const d = raw ? JSON.parse(raw) : null; if (d && d.v === 1 && Array.isArray(d.stories) && d.stories.length) stories = d.stories; } catch (e) {}
+    if (!stories) { if (done) done(); return; }
+    const fixRefs = (rs) => (rs || []).filter((r) => r.status !== 'uploading');
+    const fix = (s) => Object.assign({}, s, {
+      setup: Object.assign({}, this.blankSetup(), s.setup, { refs: fixRefs(s.setup && s.setup.refs) }),
+      pages: (s.pages || []).map((p) => Object.assign({}, p, { status: p.status === 'drawing' ? 'queued' : p.status, rewriting: false })),
+      characters: (s.characters || []).map((c) => Object.assign({}, c, { refs: fixRefs(c.refs), sheet: Object.assign({}, c.sheet, { status: c.sheet.status === 'drawing' ? (c.sheet.versions.length ? 'review' : 'none') : c.sheet.status }) }))
+    });
+    this.setState({ stories: stories.map(fix) }, done);
+  }
+  resetDemo() {
+    try { window.localStorage.removeItem('csm2-katha-v1'); } catch (e) {}
+    this._jobs = {};
+    const keepDev = Object.assign({}, this.state.dev, { open: true });
+    this.setState(Object.assign(this.initialState(), { dev: keepDev, screen: 'library', user: { email: 'you@example.com' } }), () => this.loadLibrary());
+    this.toast('Demo data reset.');
+  }
+
+  // ---------------- state helpers ----------------
+  cur() { return this.state.stories.find((s) => s.id === this.state.storyId); }
+  storyById(id) { return this.state.stories.find((s) => s.id === id); }
+  updateStory(id, fn, opts) {
+    this.setState((s) => ({ stories: s.stories.map((st) => (st.id === id ? Object.assign({}, fn(st), { updatedAt: Date.now() }) : st)) }), () => {
+      this.persist();
+      if (!(opts && opts.noSync)) this.scheduleSync(id);
+      if (opts && opts.then) opts.then();
+    });
+  }
+  updateSetup(fn) { const st = this.cur(); this.updateStory(st.id, (x) => Object.assign({}, x, { setup: fn(x.setup) })); }
+  updatePage(storyId, pageId, patch, opts) {
+    this.updateStory(storyId, (st) => Object.assign({}, st, { pages: st.pages.map((p) => (p.id === pageId ? Object.assign({}, p, typeof patch === 'function' ? patch(p) : patch) : p)) }), opts);
+  }
+  updatePanel(storyId, pageId, panelId, patch) {
+    this.updatePage(storyId, pageId, (p) => ({ panels: p.panels.map((x) => (x.id === panelId ? Object.assign({}, x, patch) : x)) }));
+  }
+  updateChar(storyId, charId, patch, opts) {
+    this.updateStory(storyId, (st) => Object.assign({}, st, { characters: st.characters.map((c) => (c.id === charId ? Object.assign({}, c, typeof patch === 'function' ? patch(c) : patch) : c)) }), opts);
+  }
+  scheduleSync(id) {
+    clearTimeout(this._syncTimers[id]);
+    this.setState({ saveState: 'saving' });
+    this._syncTimers[id] = this.later(() => {
+      const st = this.storyById(id);
+      if (!st) return;
+      this.api.patchStory(id, { title: st.title, setup: st.setup, pages: st.pages })
+        .then(() => { this._unsynced.delete(id); this.setState({ saveState: this._unsynced.size ? 'local' : 'saved' }); })
+        .catch(() => { this._unsynced.add(id); this.setState({ saveState: 'local' }); });
+    }, 900);
+  }
+  toast(text, kind, action) {
+    const id = this.uid('t');
+    this.setState((s) => ({ toasts: s.toasts.concat([{ id: id, text: text, kind: kind || 'info', action: action || null }]).slice(-4) }));
+    this.later(() => this.dismissToast(id), action ? 7000 : 4200);
+  }
+  dismissToast(id) { this.setState((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })); }
+  go(screen, extra) {
+    this.setState(Object.assign({ screen: screen, menuOpen: false }, extra || {}));
+    try { window.scrollTo(0, 0); } catch (e) {}
+    if (screen === 'library') this.loadLibrary();
+    if (screen === 'illustrate') this.later(() => { const st = this.cur(); if (st) this.pump(st.id); }, 50);
+  }
+  jumpTo(screen) {
+    const s = this.state;
+    const done = s.stories.find((x) => x.status === 'done') || s.stories[0];
+    const draft = s.stories.find((x) => x.status !== 'done') || s.stories[0];
+    const user = { email: 'you@example.com' };
+    if (screen === 'signin') return this.go('signin', { user: null });
+    if (screen === 'library') return this.go('library', { user: user });
+    if (['desh', 'kaal', 'paatra', 'paristhiti', 'katha', 'outline'].indexOf(screen) >= 0) return this.go(screen, { user: user, storyId: draft && draft.id });
+    if (screen === 'writing') { this.setState({ user: user, storyId: draft && draft.id }, () => this.writeStory(true)); return; }
+    if (screen === 'editor') return this.go('editor', { user: user, storyId: done && done.id, editorIndex: 2 });
+    if (screen === 'shared') return this.go('shared', { user: user, storyId: done && done.id, readerIndex: 0 });
+    return this.go(screen, { user: user, storyId: done && done.id, readerIndex: 0 });
+  }
+
+  // ---------------- auth (Cognito in production) ----------------
+  doSignin(email) {
+    this.setState({ authBusy: true, authError: '' });
+    this.later(() => { this.setState({ authBusy: false, user: { email: email }, password: '' }); this.go('library'); this.toast('Signed in as ' + email + '.'); }, 900);
+  }
+  emailSignin(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const email = (this.state.email || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return this.setState({ authError: 'Enter a valid email address.' });
+    if (!this.state.password) return this.setState({ authError: 'Enter your password.' });
+    if (this.state.password === 'wrong') { this.setState({ authBusy: true, authError: '' }); this.later(() => this.setState({ authBusy: false, authError: "That email and password don't match. Try again or reset your password." }), 800); return; }
+    this.doSignin(email);
+  }
+
+  // ---------------- library ----------------
+  loadLibrary() {
+    this.setState({ libStatus: 'loading' });
+    this.api.listStories().then((list) => this.setState({ libIds: list.map((x) => x.id), libStatus: 'ready' }), () => this.setState({ libStatus: 'error' }));
+  }
+  newStory(base) {
+    const setup = base ? Object.assign({}, base.setup, { paristhiti: '', stakes: '', katha: '', lesson: '' }) : this.blankSetup();
+    const st = {
+      id: this.uid('st'), title: base ? base.title + ': Part 2' : 'Untitled katha', status: 'draft', setup: setup,
+      characters: base ? base.characters.map((c) => Object.assign({}, c, { id: this.uid('c'), sheet: Object.assign({}, c.sheet) })) : [this.newChar('nayak', 0)],
+      pages: [], updatedAt: Date.now()
+    };
+    this.setState((s) => ({ stories: [st].concat(s.stories), libIds: s.libIds ? [st.id].concat(s.libIds) : s.libIds, storyId: st.id }), () => {
+      this.persist();
+      this.go(base ? 'paristhiti' : 'desh');
+      if (base) this.toast('Sequel started: same desh, kaal and paatra. Set the new paristhiti.');
+    });
+  }
+  openStory(st) {
+    const screen = st.status === 'done' ? 'reader' : st.status === 'illustrating' ? 'illustrate' : st.status === 'outline' ? 'outline' : 'desh';
+    this.go(screen, { storyId: st.id, readerIndex: 0 });
+  }
+  askDeleteStory(st) {
+    this.setState({ confirm: { title: 'Delete this storybook?', body: '“' + st.title + '” and all its pictures will be removed. This can’t be undone.', yes: 'Delete', run: () => {
+      this.api.deleteStory(st.id).then(() => {
+        this.setState((s) => ({ stories: s.stories.filter((x) => x.id !== st.id), libIds: (s.libIds || []).filter((x) => x !== st.id) }), () => this.persist());
+        this.toast('Storybook deleted.');
+      }, (e) => this.toast(e.code === 'OFFLINE' ? "You're offline. Try deleting again when you're back." : 'Couldn’t delete it. Try again.', 'warn'));
+    } } });
+  }
+
+  // ---------------- references (multi-upload, presigned S3) ----------------
+  updateRefs(stId, target, fn) {
+    if (target.type === 'place') this.updateStory(stId, (x) => Object.assign({}, x, { setup: Object.assign({}, x.setup, { refs: fn(x.setup.refs || []) }) }), { noSync: true });
+    else this.updateChar(stId, target.id, (c) => ({ refs: fn(c.refs || []) }), { noSync: true });
+  }
+  onRefFiles(target, e) {
+    const st = this.cur();
+    const files = Array.from((e && e.target && e.target.files) || []);
+    try { e.target.value = ''; } catch (x) {}
+    files.slice(0, 8).forEach((file) => {
+      if (file.size > 10 * 1048576) { this.toast(file.name + ' is over 10 MB. Try a smaller one.', 'warn'); return; }
+      const id = this.uid('r');
+      this.updateRefs(st.id, target, (rs) => rs.concat([{ id: id, name: file.name, size: file.size, status: 'uploading' }]));
+      this.api.createUpload({ filename: file.name, contentType: file.type || 'image/jpeg', purpose: target.type === 'place' ? 'place-reference' : 'character-reference', characterId: target.id })
+        .then((u) => this.api.putFile(u.uploadUrl, file).then(() => u))
+        .then((u) => this.updateRefs(st.id, target, (rs) => rs.map((r) => (r.id === id ? Object.assign({}, r, { status: 'uploaded', fileUrl: u.fileUrl }) : r))))
+        .catch((err) => { this.updateRefs(st.id, target, (rs) => rs.filter((r) => r.id !== id)); this.toast(err.code === 'OFFLINE' ? "You're offline, so " + file.name + " wasn't uploaded." : 'Upload failed for ' + file.name + '.', 'warn'); });
+    });
+    if (files.length > 8) this.toast('Up to 8 images at a time.', 'warn');
+  }
+  removeRef(target, r) { this.updateRefs(this.cur().id, target, (rs) => rs.filter((x) => x.id !== r.id)); this.toast(r.name + ' deleted.'); }
+  askDeletePhotos() {
+    this.setState({ menuOpen: false, confirm: { title: 'Delete all your images?', body: 'Every reference image you uploaded, in every storybook, will be deleted from our servers. Approved cartoon sheets and drawn pages stay.', yes: 'Delete images', run: () => {
+      this.api.deletePhotos().then(() => {
+        this.setState((s) => ({ stories: s.stories.map((st) => Object.assign({}, st, { setup: Object.assign({}, st.setup, { refs: [] }), characters: st.characters.map((c) => Object.assign({}, c, { refs: [] })) })) }), () => this.persist());
+        this.toast('All reference images deleted.');
+      }, () => this.toast("Couldn't delete images right now. Try again when you're online.", 'warn'));
+    } } });
+  }
+
+  // ---------------- paatra ----------------
+  addChar(role) { const st = this.cur(); this.updateStory(st.id, (x) => Object.assign({}, x, { characters: x.characters.concat([this.newChar(role, x.characters.length)]) })); }
+  removeChar(c) {
+    const st = this.cur();
+    const idx = st.characters.findIndex((x) => x.id === c.id);
+    this.updateStory(st.id, (x) => Object.assign({}, x, { characters: x.characters.filter((y) => y.id !== c.id) }));
+    this.toast((c.name || 'Character') + ' removed.', 'info', { label: 'Undo', run: () => this.updateStory(st.id, (x) => { const cs = x.characters.slice(); cs.splice(idx, 0, c); return Object.assign({}, x, { characters: cs }); }) });
+  }
+  drawSheet(c) {
+    const st = this.cur();
+    if (!c.name.trim() && !c.appearance.trim()) return this.toast('Add a name or a short description first.', 'warn');
+    this.updateChar(st.id, c.id, (x) => ({ sheet: Object.assign({}, x.sheet, { status: 'drawing', error: '' }) }), { noSync: true });
+    this.api.createSheet(c.id, { name: c.name, gender: c.gender, form: c.form, role: c.role, age: c.age, appearance: c.appearance, style: st.setup.style, referenceUrls: (c.refs || []).filter((r) => r.fileUrl).map((r) => r.fileUrl) })
+      .then((r) => this.pollJob(r.jobId))
+      .then((res) => this.updateChar(st.id, c.id, (x) => { const vs = x.sheet.versions.concat([{ imageUrl: res.imageUrl, note: res.fallbackNote || '' }]); return { sheet: { status: 'review', versions: vs, active: vs.length - 1, note: '', error: '' } }; }))
+      .catch((err) => {
+        const msg = err.code === 'OFFLINE' ? "You're offline. Try again when you're back." : 'The image service declined it with the reference images, without them, and from text only. Try a simpler description, or remove the images.';
+        this.updateChar(st.id, c.id, (x) => ({ sheet: Object.assign({}, x.sheet, { status: x.sheet.versions.length ? 'review' : 'failed', error: msg }) }), { noSync: true });
+        if (c.sheet.versions.length) this.toast('The new sheet failed. Your earlier one is kept.', 'warn');
+      });
+  }
+  approveSheet(c) { this.updateChar(this.cur().id, c.id, (x) => ({ sheet: Object.assign({}, x.sheet, { status: 'approved' }) })); this.toast((c.name || 'Character') + "'s sheet approved. It'll guide every page."); }
+  togglePa(c, k) { this.updateChar(this.cur().id, c.id, (x) => { const p = Object.assign({}, x.purushartha); p[k] = Object.assign({}, p[k], { on: !(p[k] && p[k].on) }); return { purushartha: p }; }); }
+  paNote(c, k, v) { this.updateChar(this.cur().id, c.id, (x) => { const p = Object.assign({}, x.purushartha); p[k] = Object.assign({}, p[k], { note: v }); return { purushartha: p }; }); }
+
+  // ---------------- writing ----------------
+  missing(st) {
+    const m = [];
+    if (!this.clean(st.setup.desh.main)) m.push('the main place (Desh)');
+    if (!st.characters.some((c) => c.role === 'nayak' && c.name.trim())) m.push('a named nayak (Paatra)');
+    if (!this.clean(st.setup.katha)) m.push('the main plot (Katha)');
+    return m;
+  }
+  writeStory(force) {
+    const st = this.cur();
+    if (!st) return;
+    if (this.missing(st).length) { this.go('katha'); this.setState({ kathaError: !this.clean(st.setup.katha) }); return; }
+    if (st.pages.length && !force) {
+      this.setState({ confirm: { title: 'Write a brand-new draft?', body: 'Your current outline and any edits will be replaced. Pictures already drawn stay in their page history until you redraw.', yes: 'Write new draft', run: () => this.writeStory(true) } });
+      return;
+    }
+    const token = this.uid('w');
+    this._writeToken = token;
+    this.setState({ screen: 'writing', writing: { startedAt: Date.now(), elapsed: 0, error: null, token: token } });
+    clearInterval(this._writeTick);
+    this._writeTick = setInterval(() => { if (this._unmounted) return; this.setState((s) => (s.writing && s.writing.token === token ? { writing: Object.assign({}, s.writing, { elapsed: Date.now() - s.writing.startedAt }) } : null)); }, 500);
+    const cancelled = () => this._writeToken !== token;
+    const body = {
+      storyId: st.id, setup: st.setup,
+      characters: st.characters.map((c) => ({ id: c.id, name: c.name, gender: c.gender, form: c.form, role: c.role, isKey: c.isKey, age: c.age, appearance: c.appearance, purushartha: c.purushartha, color: c.color, sheetUrl: c.sheet.versions[c.sheet.active] ? c.sheet.versions[c.sheet.active].imageUrl : null })),
+      referenceUrls: (st.setup.refs || []).filter((r) => r.fileUrl).map((r) => r.fileUrl)
+    };
+    this.api.createStory(body)
+      .then((r) => this.pollJob(r.jobId, cancelled))
+      .then((res) => {
+        clearInterval(this._writeTick);
+        if (cancelled()) return;
+        this.updateStory(st.id, (x) => Object.assign({}, x, { title: res.title, status: 'outline', pages: res.pages.map((p, i) => this.pageFromJob(p, i, res.pages.length)) }));
+        this.go('outline', { writing: null });
+        this.toast('Your katha is ready to review.');
+      })
+      .catch((err) => {
+        clearInterval(this._writeTick);
+        if (err.code === 'CANCELLED') return;
+        const msg = err.code === 'OFFLINE' ? "You're offline, so the story couldn't start." : err.code === 'STORY_TIMEOUT' ? 'The story writer took too long to answer.' : this.errMsg(err);
+        this.setState((s) => ({ writing: Object.assign({}, s.writing, { error: msg }) }));
+      });
+  }
+  cancelWriting() { this._writeToken = null; clearInterval(this._writeTick); this.go('katha', { writing: null }); this.toast('Story writing cancelled. Everything you set up is kept.'); }
+
+  // ---------------- outline ----------------
+  movePage(id, dir) {
+    const st = this.cur();
+    this.updateStory(st.id, (x) => { const ps = x.pages.slice(); const i = ps.findIndex((p) => p.id === id); const j = i + dir; if (j < 1 || j > ps.length - 2) return x; const t = ps[i]; ps[i] = ps[j]; ps[j] = t; return Object.assign({}, x, { pages: ps }); });
+  }
+  deletePage(id) {
+    const st = this.cur();
+    const i = st.pages.findIndex((p) => p.id === id);
+    const pg = st.pages[i];
+    this.updateStory(st.id, (x) => Object.assign({}, x, { pages: x.pages.filter((p) => p.id !== id) }));
+    this.toast('Page deleted.', 'info', { label: 'Undo', run: () => this.updateStory(st.id, (x) => { const ps = x.pages.slice(); ps.splice(i, 0, pg); return Object.assign({}, x, { pages: ps }); }) });
+  }
+  addPageAfter(id) {
+    const st = this.cur();
+    const i = st.pages.findIndex((p) => p.id === id);
+    const fmt = this.chooseFormat(st.setup, st.characters);
+    const fresh = this.pageFromJob({ caption: '', imagePrompt: '', layout: fmt.layout, location: st.setup.desh.subs[0] || st.setup.desh.main }, 1, 3);
+    if (fmt.layout === 'grid') fresh.panels = this.blankPanels(st, fresh);
+    this.updateStory(st.id, (x) => { const ps = x.pages.slice(); ps.splice(i + 1, 0, fresh); return Object.assign({}, x, { pages: ps }); });
+  }
+  blankPanels(st, page) {
+    const c = this.cast(st.characters);
+    return this.panelsFor({ loc: page.location || st.setup.desh.main || 'the scene', A: c.nayak, B: c.helper, lines: ['', '', '', ''], detail: 'an important object' }, { setup: st.setup, c: c, when: this.kaalPhrase(st.setup.kaal) });
+  }
+  setLayout(page, layout) {
+    const st = this.cur();
+    this.updatePage(st.id, page.id, (p) => ({ layout: layout, panels: layout === 'grid' && !(p.panels && p.panels.length) ? this.blankPanels(st, p) : p.panels }));
+  }
+  rewritePage(pg) {
+    const st = this.cur();
+    const n = st.pages.findIndex((p) => p.id === pg.id);
+    this.updatePage(st.id, pg.id, { rewriting: true }, { noSync: true });
+    this.api.rewritePage(st.id, n, { caption: pg.caption, imagePrompt: pg.imagePrompt, panels: pg.panels })
+      .then((r) => this.pollJob(r.jobId))
+      .then((res) => this.updatePage(st.id, pg.id, { caption: pg.kind === 'cover' ? pg.caption : res.caption, imagePrompt: res.imagePrompt, panels: res.panels && res.panels.length ? res.panels : pg.panels, rewriting: false }))
+      .catch((err) => { this.updatePage(st.id, pg.id, { rewriting: false }, { noSync: true }); this.toast(err.code === 'OFFLINE' ? "You're offline. Rewrite needs a connection." : "Couldn't rewrite that page. Try again.", 'warn'); });
+  }
+
+  // ---------------- illustrate ----------------
+  startIllustrating() {
+    const st = this.cur();
+    this.updateStory(st.id, (x) => Object.assign({}, x, { status: 'illustrating', pages: x.pages.map((p) => (p.status === 'done' ? p : Object.assign({}, p, { status: 'queued', error: null }))) }), { then: () => this.go('illustrate') });
+  }
+  retryFailed() {
+    const st = this.cur();
+    this.updateStory(st.id, (x) => Object.assign({}, x, { status: 'illustrating', pages: x.pages.map((p) => (p.status === 'failed' ? Object.assign({}, p, { status: 'queued', error: null }) : p)) }), { then: () => this.pump(st.id) });
+  }
+  pump(storyId) {
+    const st = this.storyById(storyId);
+    if (!st || this.state.dev.offline) return;
+    const ps = st.pages;
+    const drawing = ps.filter((p) => p.status === 'drawing').length;
+    const cover = ps[0];
+    if (cover && cover.status === 'queued') { if (drawing === 0) this.drawPage(storyId, cover.id); return; }
+    if (cover && cover.status === 'drawing') return;
+    ps.filter((p) => p.status === 'queued').slice(0, Math.max(0, 3 - drawing)).forEach((p) => this.drawPage(storyId, p.id));
+    const busy = ps.some((p) => p.status === 'queued' || p.status === 'drawing');
+    if (!busy && st.status === 'illustrating') {
+      const failed = ps.filter((p) => p.status === 'failed').length;
+      if (!failed) {
+        this.updateStory(storyId, (x) => Object.assign({}, x, { status: 'done' }));
+        this.toast('All pictures are drawn. Your book is ready!', 'info', { label: 'Read it', run: () => this.go('reader', { storyId: storyId, readerIndex: 0 }) });
+      } else this.toast(failed + (failed === 1 ? ' page needs' : ' pages need') + ' a new prompt.', 'warn');
+    }
+  }
+  drawPage(storyId, pageId) {
+    const st = this.storyById(storyId);
+    const n = st.pages.findIndex((p) => p.id === pageId);
+    const pg = st.pages[n];
+    if (this.state.dev.offline) { this.toast("You're offline. Drawing will resume when you're back.", 'warn'); return; }
+    this.updatePage(storyId, pageId, { status: 'drawing', error: null }, { noSync: true });
+    const isGrid = pg.kind === 'middle' && pg.layout === 'grid';
+    this.api.drawPage(storyId, n, { prompt: pg.imagePrompt, layout: isGrid ? 'grid' : 'single', panels: isGrid ? pg.panels.map((x) => ({ prompt: x.prompt, speakerId: x.speakerId })) : undefined })
+      .then((r) => this.pollJob(r.jobId))
+      .then((res) => this.updatePage(storyId, pageId, (p) => ({ status: 'done', versions: p.versions.concat([{ id: res.versionId, imageUrl: res.imageUrl, panelImages: res.panelImages || [], note: res.fallbackNote || '', at: Date.now() }]), activeVersionId: res.versionId, error: null }), { then: () => this.pump(storyId) }))
+      .catch((err) => {
+        const offline = err.code === 'OFFLINE';
+        this.updatePage(storyId, pageId, { status: offline ? 'queued' : 'failed', error: offline ? null : { code: err.code || 'ERROR', message: this.errMsg(err) } }, { noSync: true, then: () => this.pump(storyId) });
+      });
+  }
+  redrawCurrent() {
+    const st = this.cur();
+    const pg = st.pages[this.state.editorIndex];
+    if (!pg || pg.status === 'drawing') return;
+    const isGrid = pg.kind === 'middle' && pg.layout === 'grid';
+    if (!isGrid && !pg.imagePrompt.trim()) return this.toast('Write a picture prompt first.', 'warn');
+    if (isGrid && !pg.panels.some((x) => x.prompt.trim())) return this.toast('Write at least one panel prompt first.', 'warn');
+    this.drawPage(st.id, pg.id);
+  }
+
+  // ---------------- reader ----------------
+  setReader(i) {
+    const st = this.cur();
+    const idx = Math.max(0, Math.min(st ? st.pages.length - 1 : 0, i));
+    this.setState({ readerIndex: idx });
+    if (this.state.speaking) this.later(() => this.speakPage(idx), 60);
+  }
+  pageText(st, i) {
+    const p = st.pages[i];
+    if (!p) return '';
+    if (p.kind === 'cover') return st.title + '.';
+    if (p.kind === 'end') return p.caption + ' The End.';
+    let t = p.caption;
+    if (p.layout === 'grid') (p.panels || []).forEach((pn) => { if (pn.bubble) { const sp = st.characters.find((c) => c.id === pn.speakerId); t += ' ' + (sp ? sp.name + ' says: ' : '') + pn.bubble; } });
+    else if (p.bubble) t = p.bubble + ' ' + t;
+    return t;
+  }
+  speakPage(i) {
+    try {
+      const synth = window.speechSynthesis; synth.cancel();
+      const u = new SpeechSynthesisUtterance(this.pageText(this.cur(), i));
+      u.rate = 0.92; u.pitch = 1.05; u.lang = 'en-IN';
+      u.onend = () => { if (!this._unmounted && this.state.readerIndex === i) this.setState({ speaking: false }); };
+      synth.speak(u);
+    } catch (e) { this.setState({ speaking: false }); this.toast("Read aloud isn't available in this browser.", 'warn'); }
+  }
+  toggleSpeak() {
+    if (this.state.speaking) { try { window.speechSynthesis.cancel(); } catch (e) {} this.setState({ speaking: false }); return; }
+    if (typeof window === 'undefined' || !window.speechSynthesis) return this.toast("Read aloud isn't available in this browser.", 'warn');
+    this.setState({ speaking: true });
+    this.speakPage(this.state.readerIndex);
+  }
+
+  // ---------------- PDF export ----------------
+  createPdf() {
+    const st = this.cur();
+    if (!st) return;
+    this.clearPdf();
+    const token = this.uid('x');
+    this._pdfToken = token;
+    const paper = this.state.paper;
+    this.setState({ exp: { status: 'running' } });
+    this.api.exportPdf(st.id, { paper: paper })
+      .then((r) => this.pollJob(r.jobId, () => this._pdfToken !== token))
+      .then((res) => {
+        const safe = (st.title || 'storybook').replace(/[^A-Za-z0-9 _-]+/g, '').trim().replace(/\s+/g, '-') || 'storybook';
+        this.setState({ exp: { status: 'ready', url: res.pdfUrl, name: safe + '-' + (paper === 'a4' ? 'A4' : 'Letter') + '.pdf', meta: res.pages + ' pages · ' + (paper === 'a4' ? 'A4' : 'US Letter') + ' · ' + this.fmtSize(res.bytes) } });
+      })
+      .catch((err) => { if (err.code === 'CANCELLED') return; this.setState({ exp: { status: 'error', errorText: err.code === 'OFFLINE' ? "You're offline. PDF export needs a connection." : "Couldn't build the PDF. Try again." } }); });
+  }
+  clearPdf() {
+    this._pdfToken = null;
+    const e = this.state.exp;
+    if (e && e.url) { try { URL.revokeObjectURL(e.url); } catch (x) {} }
+  }
+  // A small, dependency-free PDF writer for the mock: page colours, art boxes from the mock
+  // palette, captions, bubbles and "The End". Real exports come from the backend.
+  buildPdf(st, paper) {
+    const W = paper === 'letter' ? 612 : 595.28, H = paper === 'letter' ? 792 : 841.89, M = 36;
+    const asc = (s) => String(s || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, '...').replace(/[–—]/g, '-').replace(/·/g, '-').replace(/×/g, 'x').replace(/[^\x20-\x7E]/g, '');
+    const pstr = (s) => '(' + asc(s).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)') + ')';
+    const rgb = (hex) => { const h = String(hex || '#ffffff').replace('#', ''); return [0, 2, 4].map((i) => (parseInt(h.substr(i, 2), 16) / 255).toFixed(3)).join(' '); };
+    const f = (n) => (Math.round(n * 100) / 100).toString();
+    const wrap = (text, size, width) => {
+      const max = Math.max(6, Math.floor(width / (size * 0.56)));
+      const lines = []; let line = '';
+      asc(text).split(/\s+/).filter(Boolean).forEach((w) => { if ((line + ' ' + w).trim().length > max) { if (line) lines.push(line); line = w; } else line = (line + ' ' + w).trim(); });
+      if (line) lines.push(line);
+      return lines;
+    };
+    const rect = (x, y, w, h, fill, lw) => (fill ? rgb(fill) + ' rg ' : '') + f(lw || 0) + ' w 0.078 0.078 0.078 RG ' + f(x) + ' ' + f(y) + ' ' + f(w) + ' ' + f(h) + ' re ' + (fill ? (lw ? 'B' : 'f') : 'S');
+    const circle = (cx, cy, r, fill, lw) => { const k = 0.5523 * r; return rgb(fill) + ' rg ' + f(lw) + ' w 0.078 0.078 0.078 RG ' + f(cx + r) + ' ' + f(cy) + ' m ' + [f(cx + r), f(cy + k), f(cx + k), f(cy + r), f(cx), f(cy + r)].join(' ') + ' c ' + [f(cx - k), f(cy + r), f(cx - r), f(cy + k), f(cx - r), f(cy)].join(' ') + ' c ' + [f(cx - r), f(cy - k), f(cx - k), f(cy - r), f(cx), f(cy - r)].join(' ') + ' c ' + [f(cx + k), f(cy - r), f(cx + r), f(cy - k), f(cx + r), f(cy)].join(' ') + ' c ' + (lw ? 'B' : 'f'); };
+    const text = (x, y, size, s, fill, mode, lw) => 'BT /F1 ' + f(size) + ' Tf ' + (mode || 0) + ' Tr ' + f(lw || 1) + ' w ' + rgb(fill || '#141414') + ' rg 0.078 0.078 0.078 RG ' + f(x) + ' ' + f(y) + ' Td ' + pstr(s) + ' Tj ET';
+    const centerX = (s, size) => Math.max(M, (W - asc(s).length * size * 0.56) / 2);
+    const artBox = (x, y, w, h, art, done, label) => {
+      const o = [];
+      if (done && art) {
+        o.push(rect(x, y, w, h, art.sky, 0));
+        o.push(circle(x + w * 0.75, y + h * 0.75, Math.min(w, h) * 0.1, art.sun, 1.5));
+        o.push(rect(x, y, w, h * 0.3, art.hillA, 0));
+        const figs = [art.f1, art.f2, art.f3].filter((g) => g && g.op);
+        figs.forEach((g, i) => {
+          const fx = x + w * (0.3 + i * 0.22), fy = y + h * 0.18, s = Math.min(w, h) * 0.07;
+          o.push(rect(fx - s * 0.6, fy, s * 1.2, s * 1.8, g.color, 1.5));
+          o.push(circle(fx, fy + s * 2.4, s * 0.6, g.petOp ? g.color : '#F2CFAE', 1.5));
+        });
+      } else {
+        o.push(rect(x, y, w, h, '#F3EEE4', 0));
+        o.push(text(x + 8, y + h / 2, 10, label || 'Picture not drawn yet', '#4A4A4A'));
+      }
+      o.push(rect(x, y, w, h, null, 3));
+      return o.join('\n');
+    };
+    const captionBox = (x, yTop, w, s, size, fill) => {
+      const lines = wrap(s, size, w - 20);
+      const h = lines.length * size * 1.3 + 16;
+      const o = [rect(x, yTop - h, w, h, fill || '#FFD93B', 2.5)];
+      lines.forEach((ln, i) => o.push(text(x + 10, yTop - 10 - size - i * size * 1.3 + 2, size, ln)));
+      return { ops: o.join('\n'), h: h };
+    };
+    const starring = (() => { const n = this.joinNames(st.characters.filter((c) => c.name).map((c) => c.name)); return n ? 'Starring ' + n : ''; })();
+    const streams = st.pages.map((p, i) => {
+      const v = p.versions.find((x) => x.id === p.activeVersionId) || p.versions[p.versions.length - 1];
+      const done = !!v;
+      const art = v && v.imageUrl.indexOf('mock://') === 0 ? this.makeArt(v.imageUrl, st) : null;
+      const o = [];
+      if (p.kind === 'cover') {
+        o.push(rect(0, 0, W, H, '#1F4FB8', 0));
+        const tl = wrap(st.title, 34, W - 2 * M);
+        tl.forEach((ln, k) => o.push(text(centerX(ln, 34), H - M - 34 - k * 38, 34, ln, '#FFD93B', 2, 1.6)));
+        const top = H - M - 34 - tl.length * 38 - 6;
+        o.push(artBox(M, M + 50, W - 2 * M, top - (M + 50), art, done));
+        if (starring) { o.push(rect(M + 40, M + 8, W - 2 * M - 80, 28, '#FFFFFF', 2.5)); o.push(text(centerX(starring, 12), M + 17, 12, starring)); }
+      } else if (p.kind === 'end') {
+        o.push(rect(0, 0, W, H, '#FF4A3D', 0));
+        o.push(text(centerX('The End', 72), M + 20, 72, 'The End', '#FFFFFF', 2, 2));
+        const cap = captionBox(M, M + 130, W - 2 * M, p.caption, 14, '#FFFFFF');
+        o.push(cap.ops);
+        o.push(artBox(M, M + 150, W - 2 * M, H - 2 * M - 150, art, done));
+      } else {
+        o.push(rect(0, 0, W, H, '#FFFDF8', 0));
+        const lines = wrap(p.caption, 14, W - 2 * M - 20);
+        const capH = lines.length * 14 * 1.3 + 16;
+        o.push(captionBox(M, M + capH, W - 2 * M, p.caption, 14).ops);
+        const top = H - M, bottom = M + capH + 18;
+        if (p.layout === 'grid' && p.panels && p.panels.length) {
+          const g = 10, cw = (W - 2 * M - g) / 2, ch = (top - bottom - 2 * g) / 3;
+          p.panels.slice(0, 6).forEach((pn, k) => {
+            const cx = M + (k % 2) * (cw + g), cy = top - (Math.floor(k / 2) + 1) * ch - Math.floor(k / 2) * g;
+            const pu = v && v.panelImages ? v.panelImages[k] : '';
+            o.push(artBox(cx, cy, cw, ch, pu ? this.makeArt(pu, st) : null, done, ''));
+            if (pn.bubble) {
+              const bl = wrap(pn.bubble, 9, cw - 30).slice(0, 3);
+              const bw = Math.min(cw - 12, Math.max.apply(null, bl.map((l) => l.length)) * 9 * 0.56 + 14), bh = bl.length * 11 + 8;
+              const bx = k % 2 ? cx + cw - bw - 6 : cx + 6;
+              o.push(rect(bx, cy + ch - bh - 6, bw, bh, '#FFFFFF', 1.5));
+              bl.forEach((ln, j) => o.push(text(bx + 7, cy + ch - 6 - 12 - j * 11 + 2, 9, ln)));
+            }
+          });
+        } else {
+          o.push(artBox(M, bottom, W - 2 * M, top - bottom, art, done));
+          if (done && p.bubble) {
+            const bl = wrap(p.bubble, 12, (W - 2 * M) * 0.55);
+            const bh = bl.length * 15 + 10;
+            o.push(rect(M + 12, top - 12 - bh, (W - 2 * M) * 0.6, bh, '#FFFFFF', 2));
+            bl.forEach((ln, j) => o.push(text(M + 22, top - 12 - 15 - j * 15 + 2, 12, ln)));
+          }
+        }
+        o.push(circle(W - M + 2, H - M + 2, 12, '#FFFFFF', 2));
+        o.push(text(W - M - 2 - (String(i + 1).length - 1) * 3, H - M - 2, 11, String(i + 1)));
+      }
+      return o.join('\n');
+    });
+    const objs = [];
+    objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+    objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+    const kids = [];
+    streams.forEach((s, i) => {
+      const cid = 4 + i * 2, pid = 5 + i * 2;
+      objs[cid] = '<< /Length ' + s.length + ' >>\nstream\n' + s + '\nendstream';
+      objs[pid] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + f(W) + ' ' + f(H) + '] /Resources << /Font << /F1 3 0 R >> >> /Contents ' + cid + ' 0 R >>';
+      kids.push(pid + ' 0 R');
+    });
+    objs[2] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + kids.length + ' >>';
+    let out = '%PDF-1.4\n';
+    const offs = [];
+    for (let n = 1; n < objs.length; n++) { offs[n] = out.length; out += n + ' 0 obj\n' + objs[n] + '\nendobj\n'; }
+    const xref = out.length;
+    out += 'xref\n0 ' + objs.length + '\n0000000000 65535 f \n';
+    for (let n = 1; n < objs.length; n++) out += String(offs[n]).padStart(10, '0') + ' 00000 n \n';
+    out += 'trailer\n<< /Size ' + objs.length + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF\n';
+    return out;
+  }
+
+  // ---------------- share ----------------
+  openShare() {
+    const st = this.cur();
+    this.setState({ share: { open: true, busy: true, url: '', copied: false, error: false } });
+    this.api.shareStory(st.id).then((r) => this.setState({ share: { open: true, busy: false, url: r.shareUrl, copied: false, error: false } }), () => this.setState({ share: { open: true, busy: false, url: '', copied: false, error: true } }));
+  }
+  copyShare() {
+    const ok = () => this.setState((s) => ({ share: Object.assign({}, s.share, { copied: true }) }));
+    try { navigator.clipboard.writeText(this.state.share.url).then(ok, ok); } catch (e) { ok(); }
+  }
+
+  // =================================================================
+  renderVals() {
+    const s = this.state;
+    const st = this.cur();
+    const scr = s.screen;
+    const setupScreens = ['desh', 'kaal', 'paatra', 'paristhiti', 'katha'];
+    const storyScreens = setupScreens.concat(['writing', 'outline', 'illustrate', 'editor', 'reader']);
+    const is = {}; ['landing', 'signin', 'library', 'writing', 'outline', 'illustrate', 'editor', 'reader', 'shared'].concat(setupScreens).forEach((k) => { is[k] = scr === k; });
+    const chars = st ? st.characters : [];
+    const pages = st ? st.pages : [];
+    const setup = st ? st.setup : this.blankSetup();
+    const named = chars.filter((c) => c.name);
+    const starringPlain = this.joinNames(named.map((c) => c.name)) || 'Add your paatra';
+    const starring = 'Starring ' + starringPlain;
+    const RL = Component.ROLE_LABELS;
+
+    const activeVersion = (p) => p.versions.find((v) => v.id === p.activeVersionId) || p.versions[p.versions.length - 1];
+    const panelFor = (p, version) => {
+      const v = version || activeVersion(p);
+      let status = 'none';
+      if (version) status = 'done';
+      else if (p.status === 'drawing') status = 'drawing';
+      else if (p.status === 'queued') status = 'queued';
+      else if (v) status = 'done';
+      else if (p.status === 'failed') status = 'failed';
+      const url = v ? v.imageUrl : '';
+      const isMock = url.indexOf('mock://') === 0;
+      const isGrid = p.kind === 'middle' && p.layout === 'grid';
+      const panels = isGrid ? (p.panels || []).slice(0, 6).map((pn, k) => {
+        const pu = v && v.panelImages ? v.panelImages[k] || '' : '';
+        const spk = chars.find((c) => c.id === pn.speakerId);
+        const other = chars.find((c) => c.id !== pn.speakerId && c.role === 'nayak') || chars.find((c) => c.id !== pn.speakerId);
+        const pair = [spk || other, spk ? other : (chars[1] || null)].filter(Boolean);
+        return { imageUrl: pu, art: pu.indexOf('mock://') === 0 || !pu ? this.makeArt(pu || (p.id + k), st, pair) : null, bubble: pn.bubble };
+      }) : null;
+      return {
+        kind: p.kind, caption: p.caption, layout: p.layout || 'caption', bubble: p.bubble || '', status: status,
+        imageUrl: url, imageUrl2: url, panels: panels,
+        art: isMock ? this.makeArt(url, st) : null, art2: isMock ? this.makeArt(url + '#b', st) : null, alt: p.caption
+      };
+    };
+    const pageLabel = (p, i) => (p.kind === 'cover' ? 'Cover' : p.kind === 'end' ? 'Last page' : 'Page ' + (i + 1));
+
+    // ----- steps -----
+    const heroMissing = !chars.some((c) => c.role === 'nayak' && c.name.trim());
+    const anyDone = pages.some((p) => p.versions.length);
+    const stepDefs = [
+      ['desh', 'Desh', true], ['kaal', 'Kaal', true], ['paatra', 'Paatra', true], ['paristhiti', 'Paristhiti', true], ['katha', 'Katha', true],
+      ['outline', 'Outline', pages.length > 0], ['illustrate', 'Pictures', !!st && (st.status === 'illustrating' || st.status === 'done' || anyDone)], ['reader', 'Read', anyDone]
+    ];
+    const curKey = scr === 'writing' ? 'katha' : scr === 'editor' ? 'illustrate' : scr;
+    const steps = stepDefs.map((d, i) => ({ n: i + 1, label: d[1], current: d[0] === curKey, ariaCurrent: d[0] === curKey ? 'step' : 'false', locked: !d[2], opacity: d[2] ? 1 : 0.45, go: () => this.go(d[0], { readerIndex: 0 }) }));
+
+    // ----- library -----
+    const libStories = s.libIds ? s.libIds.map((id) => this.storyById(id)).filter(Boolean) : [];
+    const lib = { loading: s.libStatus === 'loading' || s.libStatus === 'idle', error: s.libStatus === 'error', empty: s.libStatus === 'ready' && libStories.length === 0, ready: s.libStatus === 'ready' && libStories.length > 0 };
+    const books = libStories.map((b) => {
+      const drawn = b.pages.filter((p) => p.versions.length).length;
+      const label = b.status === 'done' ? 'Ready to read' : b.status === 'illustrating' ? 'Drawing ' + drawn + '/' + b.pages.length : b.status === 'outline' ? 'Outline to review' : 'Draft';
+      const coverPage = b.pages[0];
+      const v = coverPage && coverPage.versions[coverPage.versions.length - 1];
+      const names = this.joinNames(b.characters.filter((c) => c.name).map((c) => c.name));
+      return {
+        title: b.title, statusLabel: label, updated: this.ago(b.updatedAt),
+        meta: [b.setup.inspiration[0], this.clean(b.setup.desh.main)].filter(Boolean).join(' · '),
+        badgeClass: b.status === 'done' ? 'b-done' : b.status === 'illustrating' ? 'b-drawing' : 'b-queued',
+        starring: names ? 'Starring ' + names : '',
+        cover: { kind: 'cover', caption: b.title, status: v ? 'done' : 'none', imageUrl: v ? v.imageUrl : '', art: v ? this.makeArt(v.imageUrl, b) : null },
+        open: () => this.openStory(b), sequel: () => this.newStory(b), del: () => this.askDeleteStory(b)
+      };
+    });
+
+    // ----- refs -----
+    const refVals = (list, target) => (list || []).map((r) => ({ name: r.name, size: this.fmtSize(r.size), uploading: r.status === 'uploading', done: r.status !== 'uploading', remove: () => this.removeRef(target, r) }));
+
+    // ----- desh / kaal -----
+    const subsArr = setup.desh.subs || [];
+    const subs = subsArr.map((v, i) => ({
+      n: i + 1, id: 'sub-' + i, value: v,
+      onChange: (e) => { const val = e.target.value; this.updateSetup((x) => { const ss = x.desh.subs.slice(); ss[i] = val; return Object.assign({}, x, { desh: Object.assign({}, x.desh, { subs: ss }) }); }); },
+      remove: () => this.updateSetup((x) => Object.assign({}, x, { desh: Object.assign({}, x.desh, { subs: x.desh.subs.filter((y, k) => k !== i) }) }))
+    }));
+    const addSubVal = (v) => this.updateSetup((x) => (x.desh.subs.length >= 6 ? x : Object.assign({}, x, { desh: Object.assign({}, x.desh, { subs: x.desh.subs.concat([v]) }) })));
+    const deshIdeas = ['A forest on the banks of the Narmada', 'The kingdom of Kashi', 'A village by the Ganga', 'An ashram in the Himalayas', 'The Dandaka forest'].map((t) => ({ label: t, use: () => this.updateSetup((x) => Object.assign({}, x, { desh: Object.assign({}, x.desh, { main: t }) })) }));
+    const subIdeas = ['Banyan tree', 'River ghat', 'Palace courtyard', 'Gurukul', 'Village well', 'Mango grove'].filter((t) => subsArr.indexOf(t) < 0).map((t) => ({ label: t, use: () => addSubVal(t) }));
+    const eras = Component.ERAS.map((v) => ({ label: v, pressed: setup.kaal.era === v, pick: () => this.updateSetup((x) => Object.assign({}, x, { kaal: Object.assign({}, x.kaal, { era: v }) })) }));
+    const ritus = Component.RITUS.map((v) => ({ label: v, pressed: setup.kaal.ritu === v, pick: () => this.updateSetup((x) => Object.assign({}, x, { kaal: Object.assign({}, x.kaal, { ritu: x.kaal.ritu === v ? '' : v }) })) }));
+    const placeLine = this.clean(setup.desh.main) || '[no place yet]';
+    const settingLine = placeLine + (subsArr.filter(Boolean).length ? ' (' + subsArr.filter(Boolean).join(', ') + ')' : '') + ', ' + this.kaalPhrase(setup.kaal) + '.';
+
+    // ----- paatra -----
+    const stripeFor = { nayak: ['#1F4FB8', '#FFFFFF'], pratinayak: ['#FF4A3D', '#141414'], guru: ['#8A4FD1', '#FFFFFF'] };
+    const nayaks = chars.filter((x) => x.role === 'nayak').length;
+    const charVals = chars.map((c) => {
+      const sh = c.sheet;
+      const hasArt = sh.versions.length > 0 && sh.status !== 'drawing';
+      const stripe = stripeFor[c.role] || ['#FFD93B', '#141414'];
+      const human = c.form === 'Human' || c.form === 'Divine being';
+      const dn = c.name || 'this character';
+      return {
+        name: c.name, age: c.age, role: c.role, form: c.form, appearance: c.appearance, color: c.color,
+        heading: c.name || 'New ' + RL[c.role].toLowerCase(), subheading: RL[c.role] + ' · ' + (c.gender === 'female' ? 'Female' : 'Male') + ' · ' + c.form + (c.isKey ? ' · key' : ''),
+        displayName: dn, stripe: stripe[0], stripeInk: stripe[1],
+        icon: { human: human ? 1 : 0, female: c.gender === 'female' ? 1 : 0, animal: c.form === 'Animal' ? 1 : 0, bird: c.form === 'Bird' ? 1 : 0, halo: c.form === 'Divine being' ? 1 : 0 },
+        isMale: c.gender !== 'female', isFemale: c.gender === 'female',
+        setMale: () => this.updateChar(st.id, c.id, { gender: 'male' }), setFemale: () => this.updateChar(st.id, c.id, { gender: 'female' }),
+        nameId: 'n-' + c.id, ageId: 'a-' + c.id, roleId: 'r-' + c.id, formId: 'fm-' + c.id, appId: 'd-' + c.id, fileId: 'f-' + c.id,
+        onName: (e) => this.updateChar(st.id, c.id, { name: e.target.value }),
+        onAge: (e) => this.updateChar(st.id, c.id, { age: e.target.value.replace(/[^0-9]/g, '').slice(0, 3) }),
+        onRole: (e) => { const r = e.target.value; this.updateChar(st.id, c.id, { role: r, isKey: r === 'nayak' || r === 'pratinayak' ? true : c.isKey }); },
+        onForm: (e) => this.updateChar(st.id, c.id, { form: e.target.value }),
+        onAppearance: (e) => this.updateChar(st.id, c.id, { appearance: e.target.value }),
+        isKey: !!c.isKey, keyLocked: c.role === 'nayak', onKey: (e) => this.updateChar(st.id, c.id, { isKey: !!e.target.checked }),
+        pa: Component.PA.map((p) => {
+          const v = (c.purushartha && c.purushartha[p.k]) || { on: false, note: '' };
+          return { k: p.k, hint: p.hint, icon: p.icon, on: !!v.on, note: v.note, noteId: 'pa-' + p.k + '-' + c.id, bg: v.on ? p.bg : '#FFFFFF', ink: v.on ? p.ink : '#141414', shadow: v.on ? '3px 3px 0 #141414' : 'none', question: p.q.replace('{n}', dn), placeholder: p.ph, toggle: () => this.togglePa(c, p.k), onNote: (e) => this.paNote(c, p.k, e.target.value) };
+        }),
+        refs: refVals(c.refs, { type: 'char', id: c.id }), onRefs: (e) => this.onRefFiles({ type: 'char', id: c.id }, e),
+        canRemove: !(c.role === 'nayak' && nayaks === 1), remove: () => this.removeChar(c),
+        art: { color: c.color, personOp: human ? 1 : 0, petOp: human ? 0 : 1, capeOp: c.form === 'Divine being' ? 1 : 0, bunOp: c.gender === 'female' ? 1 : 0 },
+        sheetHasArt: hasArt, sheetNone: sh.status === 'none' || (sh.status === 'failed' && !sh.versions.length), sheetDrawing: sh.status === 'drawing',
+        sheetReview: sh.status === 'review', sheetApproved: sh.status === 'approved', sheetFailed: !!sh.error && sh.status !== 'drawing', sheetError: sh.error,
+        hasSheetNote: hasArt && !!(sh.versions[sh.active] && sh.versions[sh.active].note), sheetNote: sh.versions[sh.active] ? sh.versions[sh.active].note : '',
+        showDraw: sh.status === 'none' || sh.status === 'failed', drawLabel: sh.status === 'failed' ? 'Try again' : 'Draw character sheet',
+        draw: () => this.drawSheet(c), approve: () => this.approveSheet(c)
+      };
+    });
+    const pending = chars.filter((c) => c.sheet.status !== 'approved');
+    const imgCount = chars.reduce((n, c) => n + (c.refs || []).length, 0) + (setup.refs || []).length;
+    const noPhotosAnywhere = !s.stories.some((x) => (x.setup.refs || []).length || x.characters.some((c) => (c.refs || []).length));
+    const toDraw = chars.filter((c) => (c.sheet.status === 'none' || c.sheet.status === 'failed') && (c.name.trim() || c.appearance.trim()));
+    const paGuide = Component.PA.map((p) => ({ k: p.k, hint: p.hint, icon: p.icon, bg: p.bg, ink: p.ink }));
+
+    // ----- katha -----
+    const chips = (arr, get, set) => arr.map((v) => ({ label: typeof v === 'number' ? v + ' pages' : v, pressed: get(v), pick: () => set(v) }));
+    const setKey = (k) => (v) => this.updateSetup((x) => Object.assign({}, x, { [k]: v }));
+    const fmt = this.chooseFormat(setup, chars);
+    const formats = [
+      ['auto', 'Auto', 'Picks per story: simple tales get single scenes, richer ones get comic grids.'],
+      ['single', 'Single scene', 'One picture per page with a short caption below.'],
+      ['grid', '3×2 comic grid', 'Six panels per page, each with a speech bubble.']
+    ].map((f) => ({ label: f[1], desc: f[2], pressed: setup.format === f[0], bg: setup.format === f[0] ? '#FFD93B' : '#FFFFFF', shadow: setup.format === f[0] ? '3px 3px 0 #141414' : 'none', autoOp: f[0] === 'auto' ? 1 : 0, singleOp: f[0] === 'single' ? 1 : 0, gridOp: f[0] === 'grid' ? 1 : 0, pick: () => this.updateSetup((x) => Object.assign({}, x, { format: f[0] })) }));
+    const miss = st ? this.missing(st) : [];
+    const keyNames = chars.filter((c) => c.isKey && c.name).map((c) => { const d = Object.keys(c.purushartha || {}).filter((k) => c.purushartha[k].on); return c.name + (d.length ? ' (' + d.join(', ') + ')' : ''); });
+    const glance = {
+      desh: settingLine.split(', ' + this.kaalPhrase(setup.kaal))[0],
+      kaal: this.kaalPhrase(setup.kaal).replace(/^./, (m) => m.toUpperCase()),
+      paatra: keyNames.length ? keyNames.join(' · ') + (named.length > keyNames.length ? ' + ' + (named.length - keyNames.length) + ' more' : '') : starringPlain,
+      paristhiti: this.clean(setup.paristhiti) ? (setup.paristhiti.length > 110 ? setup.paristhiti.slice(0, 107) + '…' : setup.paristhiti) : '[not set: optional, but it makes the story richer]'
+    };
+    const lessonIdeas = ['A promise is a small piece of dharma', 'True wealth is what we share', 'A calm mind sees clearly', 'Small and wise can beat big and proud'].map((t) => ({ label: t, use: () => this.updateSetup((x) => Object.assign({}, x, { lesson: t })) }));
+    const n0 = this.cast(chars);
+    const parPrompts = ['What changed just before the story?', 'Who is in trouble?', 'What rule or promise is being tested?', 'Why can’t ' + n0.H + ' simply walk away?'].map((t) => ({ label: t, use: () => this.updateSetup((x) => Object.assign({}, x, { paristhiti: (x.paristhiti ? x.paristhiti.trim() + '\n' : '') + t + ' ' })) }));
+
+    // ----- writing -----
+    const w = s.writing;
+    const total = s.dev.realistic ? 45000 : 9000;
+    const frac = w ? Math.min(0.96, w.elapsed / total) : 0;
+    const wLabels = ['Reading the desh and kaal', 'Placing your paatra', 'Weaving in the paristhiti', 'Writing the katha, page by page', 'Laying out panels and bubbles', 'Checking the seekh and reading level'];
+    const wTh = [0, 0.1, 0.25, 0.45, 0.7, 0.88];
+    const writingSteps = wLabels.map((l, i) => { const done = frac >= (wTh[i + 1] || 1.01); const active = !done && frac >= wTh[i]; return { label: l, done: done, active: active, bg: done ? '#FFD93B' : '#FFFFFF', opacity: done || active ? 1 : 0.5 }; });
+    const secs = w ? Math.floor(w.elapsed / 1000) : 0;
+
+    // ----- panel editors -----
+    const panelEditors = (p) => (p.panels || []).map((pn, k) => ({
+      n: k + 1, bubble: pn.bubble, prompt: pn.prompt, bId: 'pb-' + pn.id, pId: 'pp-' + pn.id,
+      onBubble: (e) => this.updatePanel(st.id, p.id, pn.id, { bubble: e.target.value }),
+      onPrompt: (e) => this.updatePanel(st.id, p.id, pn.id, { prompt: e.target.value }),
+      speakers: [{ id: '', name: 'Narrator' }].concat(named.map((c) => ({ id: c.id, name: c.name }))).map((o) => ({ name: o.name, pressed: (pn.speakerId || '') === o.id, pick: () => this.updatePanel(st.id, p.id, pn.id, { speakerId: o.id }) }))
+    }));
+    const layoutChips = (p, withFull) => [['caption', 'Single scene'], ['grid', '3×2 comic grid']].concat(withFull ? [['full', 'Full picture']] : []).map((l) => ({ label: l[1], pressed: (p.layout || 'caption') === l[0], pick: () => this.setLayout(p, l[0]) }));
+
+    // ----- outline -----
+    const midCount = pages.filter((p) => p.kind === 'middle').length;
+    const outline = pages.map((p, i) => {
+      const isMid = p.kind === 'middle';
+      const isGrid = isMid && p.layout === 'grid';
+      return {
+        label: pageLabel(p, i), isMiddle: isMid, isGrid: isGrid, notGrid: !isGrid, hasLoc: !!p.location, loc: p.location,
+        stripe: p.kind === 'cover' ? '#1F4FB8' : p.kind === 'end' ? '#FF4A3D' : '#FFD93B', stripeInk: p.kind === 'cover' ? '#FFFFFF' : '#141414',
+        captionLabel: p.kind === 'cover' ? 'Cover title' : isGrid ? 'Narration (top of page)' : p.kind === 'end' ? 'Closing line and seekh' : 'Caption', caption: p.caption, prompt: p.imagePrompt,
+        capId: 'cap-' + p.id, promptId: 'pr-' + p.id,
+        onCaption: (e) => { const v = e.target.value; this.updatePage(st.id, p.id, { caption: v }); if (p.kind === 'cover') this.updateStory(st.id, (x) => Object.assign({}, x, { title: v })); },
+        onPrompt: (e) => this.updatePage(st.id, p.id, { imagePrompt: e.target.value }),
+        layouts: layoutChips(p, false), panels: isGrid ? panelEditors(p) : [],
+        cantUp: i <= 1, cantDown: i >= pages.length - 2, up: () => this.movePage(p.id, -1), down: () => this.movePage(p.id, 1),
+        cantDelete: midCount <= 1, del: () => this.deletePage(p.id),
+        canAdd: p.kind !== 'end' && pages.length < 14, addAfter: () => this.addPageAfter(p.id),
+        rewriting: !!p.rewriting, rewriteLabel: p.rewriting ? 'Rewriting…' : 'Rewrite this page', rewrite: () => this.rewritePage(p), bodyOpacity: p.rewriting ? 0.55 : 1
+      };
+    });
+    const toDrawN = pages.filter((p) => p.status !== 'done');
+    const gridN = toDrawN.filter((p) => p.layout === 'grid' && p.kind === 'middle').length;
+
+    // ----- illustrate -----
+    const cnt = (k) => pages.filter((p) => p.status === k).length;
+    const nDone = cnt('done'), nFailed = cnt('failed');
+    const pct = pages.length ? Math.round((nDone + nFailed) / pages.length * 100) : 0;
+    const ill = { nDone: nDone, nDrawing: cnt('drawing'), nQueued: cnt('queued'), nFailed: nFailed, hasFailed: nFailed > 0, allDone: pages.length > 0 && nDone === pages.length, pct: pct, pctLabel: pct + '%', countLabel: nDone + ' of ' + pages.length + ' pages drawn' };
+    const thumbs = pages.map((p, i) => {
+      const v = activeVersion(p);
+      return {
+        page: panelFor(p), label: pageLabel(p, i) + (p.kind === 'middle' && p.layout === 'grid' ? ' · grid' : ''), pageNo: p.kind === 'middle' ? String(i + 1) : '',
+        statusLabel: p.status === 'none' ? 'Not started' : p.status === 'done' ? 'Done' : p.status === 'failed' ? 'Failed' : p.status === 'drawing' ? 'Drawing' : 'Queued',
+        badgeClass: 'b-' + (p.status === 'none' ? 'queued' : p.status), isDrawing: p.status === 'drawing', failed: p.status === 'failed',
+        hasNote: !!(v && v.note) && p.status === 'done', note: v ? v.note : '', open: () => this.go('editor', { editorIndex: i })
+      };
+    });
+
+    // ----- editor -----
+    const ei = Math.min(s.editorIndex, Math.max(0, pages.length - 1));
+    const ep = pages[ei];
+    let ed = { label: '', panel: null, versions: [], layouts: [], panels: [] };
+    if (ep) {
+      const av = activeVersion(ep);
+      const isGrid = ep.kind === 'middle' && ep.layout === 'grid';
+      ed = {
+        label: pageLabel(ep, ei), pageNo: ep.kind === 'middle' ? String(ei + 1) : '', panel: panelFor(ep),
+        atFirst: ei === 0, atLast: ei === pages.length - 1, prev: () => this.setState({ editorIndex: ei - 1 }), next: () => this.setState({ editorIndex: ei + 1 }),
+        isMiddle: ep.kind === 'middle', isGrid: isGrid, notGrid: !isGrid, showBubble: ep.kind === 'middle' && !isGrid,
+        captionLabel: ep.kind === 'cover' ? 'Cover title' : isGrid ? 'Narration' : 'Caption',
+        caption: ep.caption, prompt: ep.imagePrompt, bubble: ep.bubble || '', panels: isGrid ? panelEditors(ep) : [],
+        onCaption: (e) => { const v = e.target.value; this.updatePage(st.id, ep.id, { caption: v }); if (ep.kind === 'cover') this.updateStory(st.id, (x) => Object.assign({}, x, { title: v })); },
+        onPrompt: (e) => this.updatePage(st.id, ep.id, { imagePrompt: e.target.value }),
+        onBubble: (e) => this.updatePage(st.id, ep.id, { bubble: e.target.value }),
+        onPromptKey: (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); this.redrawCurrent(); } },
+        focusPrompt: () => { try { if (this.promptRef.current) this.promptRef.current.focus(); } catch (x) {} },
+        layouts: layoutChips(ep, true),
+        isDrawing: ep.status === 'drawing', failed: ep.status === 'failed', errorCode: ep.error ? ep.error.code : '',
+        hasNote: ep.status === 'done' && !!(av && av.note), note: av ? av.note : '',
+        redraw: () => this.redrawCurrent(), redrawLabel: ep.versions.length ? (isGrid ? 'Redraw all 6 panels' : 'Redraw') : 'Draw this page',
+        hasVersions: ep.versions.length > 1,
+        versions: ep.versions.map((v, k) => ({ n: k + 1, active: v.id === (av && av.id), ring: v.id === (av && av.id) ? '4px solid #1F4FB8' : '0 solid transparent', suffix: v.note ? ' · fallback' : '', panel: Object.assign(panelFor(ep, v), { bubble: '' }), pick: () => this.updatePage(st.id, ep.id, { activeVersionId: v.id }) }))
+      };
+    }
+
+    // ----- reader -----
+    const ri = Math.min(s.readerIndex, Math.max(0, pages.length - 1));
+    const rp = pages[ri];
+    const rd = rp ? { panel: panelFor(rp), pageNo: rp.kind === 'middle' ? String(ri + 1) : '', label: 'Page ' + (ri + 1) + ' of ' + pages.length, atFirst: ri === 0, atLast: ri === pages.length - 1, prev: () => this.setReader(ri - 1), next: () => this.setReader(ri + 1) } : { panel: null, label: '', atFirst: true, atLast: true };
+
+    const toastVals = s.toasts.map((t) => ({ text: t.text, cls: t.kind === 'warn' ? 't-warn' : '', hasAction: !!t.action, actionLabel: t.action ? t.action.label : '', act: () => { if (t.action) t.action.run(); this.dismissToast(t.id); }, dismiss: () => this.dismissToast(t.id) }));
+    const devFail = [['none', 'Always works'], ['some', 'Realistic refusals'], ['all', 'Always refused']].map((d) => ({ label: d[1], pressed: s.dev.failMode === d[0], pick: () => this.setState({ dev: Object.assign({}, s.dev, { failMode: d[0] }) }) }));
+    const devLib = [['normal', 'Normal'], ['slow', 'Slow'], ['empty', 'Empty'], ['error', 'Error']].map((d) => ({ label: d[1], pressed: s.dev.library === d[0], pick: () => this.setState({ dev: Object.assign({}, s.dev, { library: d[0] }) }, () => { if (scr === 'library') this.loadLibrary(); }) }));
+    const devJump = [['landing', 'Landing'], ['signin', 'Sign in'], ['library', 'Library'], ['desh', 'Desh'], ['kaal', 'Kaal'], ['paatra', 'Paatra'], ['paristhiti', 'Paristhiti'], ['katha', 'Katha'], ['writing', 'Writing'], ['outline', 'Outline'], ['illustrate', 'Pictures'], ['editor', 'Page editor'], ['reader', 'Reader'], ['shared', 'Shared view']].map((d) => ({ label: d[1], go: () => this.jumpTo(d[0]) }));
+    const goTo = (k) => () => this.go(k);
+
+    return {
+      is: is, mock: Component.CONFIG.MOCK,
+      showShell: !!s.user && storyScreens.concat(['library']).indexOf(scr) >= 0,
+      inStory: !!st && storyScreens.indexOf(scr) >= 0,
+      landingCover: { kind: 'cover', status: 'done', imageUrl: 'mock://page/landing', art: this.makeArt('mock://page/landing', { setup: { tone: 'Adventurous', style: 'Comic' } }, [{ role: 'nayak', form: 'Animal', color: '#C98A4B' }, { role: 'mitra', form: 'Human', gender: 'female', color: '#2E9C5A' }, { role: 'guru', form: 'Human', gender: 'male', color: '#8A4FD1' }]) },
+      // auth
+      goSignin: goTo('signin'), goLanding: goTo('landing'),
+      authTitle: s.authMode === 'signin' ? 'Welcome back' : 'Create your account',
+      authCta: s.authBusy ? 'Signing in…' : s.authMode === 'signin' ? 'Sign in' : 'Create account',
+      authSwitch: s.authMode === 'signin' ? 'New here? Create an account' : 'Have an account? Sign in',
+      toggleAuthMode: () => this.setState({ authMode: s.authMode === 'signin' ? 'signup' : 'signin', authError: '' }),
+      forgot: () => this.toast('In production this opens the Cognito reset-password flow.'),
+      email: s.email, password: s.password, authBusy: s.authBusy, authError: s.authError,
+      onEmail: (e) => this.setState({ email: e.target.value, authError: '' }), onPassword: (e) => this.setState({ password: e.target.value, authError: '' }),
+      emailSignin: (e) => this.emailSignin(e), googleSignin: () => this.doSignin('you@gmail.com'),
+      // shell
+      goLibrary: goTo('library'), libNavClass: scr === 'library' ? 'btn-primary' : 'btn-quiet',
+      saveLabel: s.dev.offline || s.saveState === 'local' ? 'Saved on this device' : s.saveState === 'saving' ? 'Saving…' : 'All changes saved',
+      saveBg: s.dev.offline || s.saveState === 'local' ? '#FFF4C2' : '#FFFFFF', saving: s.saveState === 'saving' && !s.dev.offline,
+      menuOpen: s.menuOpen, toggleMenu: () => this.setState({ menuOpen: !s.menuOpen }),
+      userInitial: s.user ? s.user.email.charAt(0).toUpperCase() : '?', userEmail: s.user ? s.user.email : '',
+      signOut: () => { this.go('landing', { user: null, storyId: null, email: '', password: '' }); this.toast('Signed out.'); },
+      askDeletePhotos: () => this.askDeletePhotos(), offline: s.dev.offline,
+      storyTitle: st ? st.title : '', starring: starring, steps: steps, heroName: n0.H,
+      // library
+      lib: lib, books: books, skeletons: [1, 2, 3, 4], newStory: () => this.newStory(), loadLibrary: () => this.loadLibrary(),
+      // nav
+      goDesh: goTo('desh'), goKaal: goTo('kaal'), goPaatra: goTo('paatra'), goParisthiti: goTo('paristhiti'), goKatha: goTo('katha'),
+      // desh
+      setup: setup,
+      onDeshMain: (e) => { const v = e.target.value; this.updateSetup((x) => Object.assign({}, x, { desh: Object.assign({}, x.desh, { main: v }) })); },
+      deshIdeas: deshIdeas, subs: subs, noSubs: subsArr.length === 0, subsFull: subsArr.length >= 6, subIdeas: subIdeas, addSub: () => addSubVal(''),
+      placeRefs: refVals(setup.refs, { type: 'place' }), onPlaceRefs: (e) => this.onRefFiles({ type: 'place' }, e),
+      // kaal
+      eras: eras, ritus: ritus, settingLine: settingLine,
+      onKaalCustom: (e) => { const v = e.target.value; this.updateSetup((x) => Object.assign({}, x, { kaal: Object.assign({}, x.kaal, { custom: v }) })); },
+      // paatra
+      chars: charVals, heroMissing: heroMissing, paGuide: paGuide,
+      addRoles: [['sahayak', 'Sahayak'], ['mitra', 'Mitra'], ['guru', 'Guru'], ['parivaar', 'Parivaar'], ['pratinayak', 'Pratinayak']].map((r) => ({ label: r[1], add: () => this.addChar(r[0]) })),
+      sheetSummary: chars.length ? (chars.length - pending.length) + ' of ' + chars.length + ' sheets approved' : '',
+      drawAllSheets: () => toDraw.forEach((c) => this.drawSheet(c)), noSheetsToDraw: toDraw.length === 0,
+      photoCount: imgCount === 1 ? '1 image' : imgCount + ' images', noPhotosAnywhere: noPhotosAnywhere,
+      // paristhiti
+      onParisthiti: (e) => setKey('paristhiti')(e.target.value), onStakes: (e) => setKey('stakes')(e.target.value), parPrompts: parPrompts,
+      // katha
+      inspirations: chips(Component.INSPIRATIONS, (v) => setup.inspiration.indexOf(v) >= 0, (v) => this.updateSetup((x) => Object.assign({}, x, { inspiration: x.inspiration.indexOf(v) >= 0 ? x.inspiration.filter((y) => y !== v) : x.inspiration.concat([v]) }))),
+      onKatha: (e) => { setKey('katha')(e.target.value); this.setState({ kathaError: false }); }, kathaError: s.kathaError,
+      onLesson: (e) => setKey('lesson')(e.target.value), lessonIdeas: lessonIdeas,
+      darshans: chips(Component.DARSHANS, (v) => setup.darshan === v, setKey('darshan')),
+      tones: chips(Component.TONES, (v) => setup.tone === v, setKey('tone')), ages: chips(Component.AGES, (v) => setup.age === v, setKey('age')),
+      counts: chips(Component.COUNTS, (v) => setup.pageCount === v, setKey('pageCount')), styles: chips(Component.STYLES, (v) => setup.style === v, setKey('style')),
+      formats: formats, formatReason: fmt.reason, glance: glance,
+      hasMissing: miss.length > 0, missingText: 'add ' + this.joinNames(miss) + '.',
+      writeStory: () => this.writeStory(), retryWrite: () => this.writeStory(true), writeCta: pages.length ? 'Write a new draft' : 'Write my katha',
+      // writing
+      writingOk: !!w && !w.error, writingFailed: !!(w && w.error), writingError: w ? w.error : '',
+      writingPct: Math.round(frac * 100) + '%', writingSteps: writingSteps,
+      writingElapsed: Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + ' elapsed', cancelWriting: () => this.cancelWriting(),
+      // outline
+      outline: outline, lessonLine: this.clean(setup.lesson) || '[none set: add one on the Katha step]',
+      onTitle: (e) => { const v = e.target.value; this.updateStory(st.id, (x) => Object.assign({}, x, { title: v, pages: x.pages.map((p, i) => (i === 0 ? Object.assign({}, p, { caption: v }) : p)) })); },
+      rewriteAll: () => this.writeStory(),
+      illustrateSummary: 'This will draw ' + toDrawN.length + ' pages, cover first' + (gridN ? ' (' + gridN + ' of them as six-panel grids)' : '') + '.',
+      sheetsPending: pending.length > 0, pendingNames: pending.map((c) => c.name || RL[c.role]).join(', '), startIllustrating: () => this.startIllustrating(),
+      // illustrate
+      ill: ill, thumbs: thumbs, illHeading: ill.allDone ? 'Every picture is drawn' : 'Drawing your pictures',
+      retryFailed: () => this.retryFailed(), goReader: () => this.go('reader', { readerIndex: 0 }), goIllustrate: goTo('illustrate'),
+      // editor / reader
+      ed: ed, promptRef: this.promptRef, rd: rd,
+      speaking: s.speaking, readAloudLabel: s.speaking ? 'Stop reading' : 'Read aloud', readAloud: () => this.toggleSpeak(),
+      readerKey: (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); this.setReader(ri + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); this.setReader(ri - 1); } },
+      exitShared: goTo('library'),
+      // export / print
+      exportOpen: s.exportOpen, openExport: () => this.setState({ exportOpen: true }), closeExport: () => { this.clearPdf(); this.setState({ exportOpen: false, exp: { status: 'idle' } }); },
+      isA4: s.paper === 'a4', isLetter: s.paper === 'letter',
+      pickA4: () => { this.clearPdf(); this.setState({ paper: 'a4', exp: { status: 'idle' } }); }, pickLetter: () => { this.clearPdf(); this.setState({ paper: 'letter', exp: { status: 'idle' } }); },
+      exp: { running: s.exp.status === 'running', ready: s.exp.status === 'ready', error: s.exp.status === 'error', errorText: s.exp.errorText || '', url: s.exp.url || '', name: s.exp.name || 'storybook.pdf', meta: s.exp.meta || '', canCreate: s.exp.status !== 'ready', createLabel: s.exp.status === 'running' ? 'Preparing…' : s.exp.status === 'error' ? 'Try again' : 'Create PDF' },
+      createPdf: () => this.createPdf(),
+      printClass: s.paper === 'a4' ? 'print-a4' : 'print-letter', pageCountLabel: pages.length + ' pages, ' + (s.paper === 'a4' ? 'A4 (210 × 297 mm)' : 'US Letter (8.5 × 11 in)') + '.',
+      doPrint: () => { this.setState({ exportOpen: false }); this.later(() => { try { window.print(); } catch (e) { this.toast("Printing isn't available in this preview.", 'warn'); } }, 150); },
+      printPages: pages.map((p, i) => ({ panel: panelFor(p), pageNo: p.kind === 'middle' ? String(i + 1) : '' })),
+      // share
+      shareOpen: s.share.open, share: { busy: s.share.busy, ready: !!s.share.url, url: s.share.url, error: s.share.error, copyLabel: s.share.copied ? 'Copied' : 'Copy link' },
+      openShare: () => this.openShare(), closeShare: () => this.setState({ share: Object.assign({}, s.share, { open: false }) }), copyShare: () => this.copyShare(),
+      previewShared: () => this.go('shared', { share: Object.assign({}, s.share, { open: false }), readerIndex: 0 }),
+      // confirm
+      confirmOpen: !!s.confirm, confirm: s.confirm || { title: '', body: '', yes: '' },
+      confirmNo: () => this.setState({ confirm: null }), confirmYes: () => { const c = s.confirm; this.setState({ confirm: null }); if (c && c.run) c.run(); },
+      dialogKey: (e) => { if (e.key === 'Escape') this.setState({ exportOpen: false, confirm: null, share: Object.assign({}, s.share, { open: false }) }); },
+      // toasts + dev
+      toasts: toastVals, dev: s.dev, devFail: devFail, devLib: devLib, devJump: devJump,
+      toggleDev: () => this.setState({ dev: Object.assign({}, s.dev, { open: !s.dev.open }) }),
+      toggleStoryFail: () => this.setState({ dev: Object.assign({}, s.dev, { storyFail: !s.dev.storyFail }) }),
+      toggleRealistic: () => this.setState({ dev: Object.assign({}, s.dev, { realistic: !s.dev.realistic }) }),
+      toggleOffline: () => {
+        const goingOnline = s.dev.offline;
+        this.setState({ dev: Object.assign({}, s.dev, { offline: !s.dev.offline }) }, () => {
+          if (goingOnline) {
+            const ids = Array.from(this._unsynced);
+            ids.forEach((id) => this.scheduleSync(id));
+            this.toast(ids.length ? "You're back online. Syncing your edits." : "You're back online.");
+            this.state.stories.filter((x) => x.status === 'illustrating').forEach((x) => this.pump(x.id));
+          } else this.toast("You're offline. Edits stay on this device.", 'warn');
+        });
+      },
+      resetDemo: () => this.resetDemo()
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page panel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="container-type: inline-size; width: 100%; aspect-ratio: 210 / 297; box-sizing: border-box; border: max(2px, 1.2cqw) solid #141414; background-color: {{bg}}; background-image: {{dots}}; background-size: 3.4cqw 3.4cqw; position: relative; overflow: hidden; font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', sans-serif; color: #141414; display: flex; flex-direction: column; padding: 4cqw; gap: 3cqw">
+
+  <sc-if value="{{isCover}}" hint-placeholder-val="{{ false }}">
+    <h2 style="margin: 0; font-family: 'Bangers', Impact, 'Arial Black', sans-serif; font-weight: 400; font-size: 11cqw; line-height: 0.95; letter-spacing: 0.02em; color: #FFD93B; -webkit-text-stroke: 0.55cqw #141414; paint-order: stroke fill; text-shadow: 1.1cqw 1.1cqw 0 #141414; text-align: center; text-wrap: balance">{{title}}</h2>
+  </sc-if>
+
+  <sc-if value="{{isGrid}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 2.4cqw">
+      <sc-for list="{{panels}}" as="pn" hint-placeholder-count="6">
+        <div style="position: relative; min-height: 0; border: max(2px, 0.9cqw) solid #141414; background: #FFFFFF; overflow: hidden; box-shadow: 0.9cqw 0.9cqw 0 #141414">
+          <sc-if value="{{pn.mock}}" hint-placeholder-val="{{ true }}">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="display: block; width: 100%; height: 100%" aria-hidden="true">
+              <rect width="400" height="300" fill="{{pn.a.sky}}"></rect>
+              <circle cx="{{pn.a.sunX}}" cy="70" r="34" fill="{{pn.a.sun}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></circle>
+              <path d="{{pn.a.hill}}" fill="{{pn.a.hillA}}" fill-opacity="{{pn.a.fo}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}" stroke-dasharray="{{pn.a.dash}}"></path>
+              <g transform="{{pn.a.f1.t}}" opacity="{{pn.a.f1.op}}">
+                <g opacity="{{pn.a.f1.personOp}}">
+                  <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}" opacity="{{pn.a.f1.capeOp}}"></path>
+                  <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{pn.a.f1.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></path>
+                  <circle cy="-100" r="9" fill="#141414" opacity="{{pn.a.f1.bunOp}}"></circle>
+                  <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></circle>
+                  <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle><circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+                  <path d="M-7 -72 Q0 -66 7 -72" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+                </g>
+                <g opacity="{{pn.a.f1.petOp}}">
+                  <ellipse cy="-18" rx="30" ry="17" fill="{{pn.a.f1.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></ellipse>
+                  <circle cx="26" cy="-40" r="15" fill="{{pn.a.f1.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></circle>
+                  <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+                </g>
+              </g>
+              <g transform="{{pn.a.f2.t}}" opacity="{{pn.a.f2.op}}">
+                <g opacity="{{pn.a.f2.personOp}}">
+                  <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{pn.a.f2.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></path>
+                  <circle cy="-100" r="9" fill="#141414" opacity="{{pn.a.f2.bunOp}}"></circle>
+                  <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></circle>
+                  <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle><circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+                </g>
+                <g opacity="{{pn.a.f2.petOp}}">
+                  <ellipse cy="-18" rx="30" ry="17" fill="{{pn.a.f2.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></ellipse>
+                  <circle cx="26" cy="-40" r="15" fill="{{pn.a.f2.color}}" stroke="{{pn.a.ink}}" stroke-width="{{pn.a.sw}}"></circle>
+                  <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+                </g>
+              </g>
+            </svg>
+          </sc-if>
+          <sc-if value="{{pn.real}}" hint-placeholder-val="{{ false }}">
+            <img src="{{pn.imageUrl}}" alt="" style="display: block; width: 100%; height: 100%; object-fit: cover">
+          </sc-if>
+          <sc-if value="{{pn.pending}}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; background: {{pn.pendingBg}}; background-size: 3.4cqw 3.4cqw"></div>
+          </sc-if>
+          <sc-if value="{{pn.hasBubble}}" hint-placeholder-val="{{ true }}">
+            <div style="position: absolute; top: 1.4cqw; left: {{pn.left}}; right: {{pn.right}}; max-width: 82%; background: #FFFFFF; border: max(1.5px, 0.6cqw) solid #141414; border-radius: 3.5cqw; padding: 1cqw 1.8cqw; font-weight: 700; font-size: 2.7cqw; line-height: 1.2">{{pn.bubble}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{gridPendingLabel}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 0; align-self: center; font-family: 'Bangers', Impact, sans-serif; font-size: 5cqw; letter-spacing: 0.04em; background: #FFFFFF; border: max(2px, 0.9cqw) solid #141414; padding: 0.8cqw 3cqw">{{gridPendingLabel}}</p>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{notGrid}}" hint-placeholder-val="{{ true }}">
+  <div style="flex: 1 1 auto; min-height: 0; display: flex; gap: 3cqw">
+    <div style="flex: 1 1 0; min-width: 0; position: relative; border: max(2px, 1.2cqw) solid #141414; background: #FFFFFF; overflow: hidden; box-shadow: 1.4cqw 1.4cqw 0 #141414">
+
+      <sc-if value="{{showMockArt}}" hint-placeholder-val="{{ true }}">
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="display: block; width: 100%; height: 100%" role="img" aria-label="{{alt}}">
+          <rect width="400" height="300" fill="{{a.sky}}"></rect>
+          <circle cx="{{a.sunX}}" cy="70" r="34" fill="{{a.sun}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-dasharray="{{a.dash}}"></circle>
+          <path d="{{a.cloud}}" fill="#FFFFFF" fill-opacity="{{a.cloudOp}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-dasharray="{{a.dash}}" stroke-linejoin="round" opacity="{{a.cloudOp}}"></path>
+          <path d="{{a.hill2}}" fill="{{a.hillB}}" fill-opacity="{{a.fo}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-dasharray="{{a.dash}}" stroke-linejoin="round"></path>
+          <path d="{{a.hill}}" fill="{{a.hillA}}" fill-opacity="{{a.fo}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-dasharray="{{a.dash}}" stroke-linejoin="round"></path>
+          <g transform="{{a.f1.t}}" opacity="{{a.f1.op}}">
+            <g opacity="{{a.f1.personOp}}">
+              <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round" opacity="{{a.f1.capeOp}}"></path>
+              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{a.f1.color}}" fill-opacity="{{a.fo}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cy="-100" r="9" fill="#141414" opacity="{{a.f1.bunOp}}"></circle>
+              <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle>
+              <circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+              <path d="M-7 -72 Q0 -66 7 -72" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+            </g>
+            <g opacity="{{a.f1.petOp}}">
+              <path d="M-28 -24 Q-46 -34 -40 -48" fill="none" stroke="{{a.f1.color}}" stroke-width="7" stroke-linecap="round"></path>
+              <ellipse cy="-18" rx="30" ry="17" fill="{{a.f1.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></ellipse>
+              <path d="M16 -50 L20 -66 L30 -52 Z" fill="{{a.f1.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cx="26" cy="-40" r="15" fill="{{a.f1.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+            </g>
+          </g>
+          <g transform="{{a.f2.t}}" opacity="{{a.f2.op}}">
+            <g opacity="{{a.f2.personOp}}">
+              <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round" opacity="{{a.f2.capeOp}}"></path>
+              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{a.f2.color}}" fill-opacity="{{a.fo}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cy="-100" r="9" fill="#141414" opacity="{{a.f2.bunOp}}"></circle>
+              <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle>
+              <circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+              <path d="M-7 -72 Q0 -66 7 -72" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+            </g>
+            <g opacity="{{a.f2.petOp}}">
+              <path d="M-28 -24 Q-46 -34 -40 -48" fill="none" stroke="{{a.f2.color}}" stroke-width="7" stroke-linecap="round"></path>
+              <ellipse cy="-18" rx="30" ry="17" fill="{{a.f2.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></ellipse>
+              <path d="M16 -50 L20 -66 L30 -52 Z" fill="{{a.f2.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cx="26" cy="-40" r="15" fill="{{a.f2.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+            </g>
+          </g>
+          <g transform="{{a.f3.t}}" opacity="{{a.f3.op}}">
+            <g opacity="{{a.f3.personOp}}">
+              <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round" opacity="{{a.f3.capeOp}}"></path>
+              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{a.f3.color}}" fill-opacity="{{a.fo}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cy="-100" r="9" fill="#141414" opacity="{{a.f3.bunOp}}"></circle>
+              <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle>
+              <circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+              <path d="M-7 -72 Q0 -66 7 -72" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+            </g>
+            <g opacity="{{a.f3.petOp}}">
+              <path d="M-28 -24 Q-46 -34 -40 -48" fill="none" stroke="{{a.f3.color}}" stroke-width="7" stroke-linecap="round"></path>
+              <ellipse cy="-18" rx="30" ry="17" fill="{{a.f3.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></ellipse>
+              <path d="M16 -50 L20 -66 L30 -52 Z" fill="{{a.f3.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}" stroke-linejoin="round"></path>
+              <circle cx="26" cy="-40" r="15" fill="{{a.f3.color}}" stroke="{{a.ink}}" stroke-width="{{a.sw}}"></circle>
+              <circle cx="30" cy="-42" r="2.6" fill="#141414"></circle>
+            </g>
+          </g>
+        </svg>
+      </sc-if>
+
+      <sc-if value="{{showRealImage}}" hint-placeholder-val="{{ false }}">
+        <img src="{{imageUrl}}" alt="{{alt}}" style="display: block; width: 100%; height: 100%; object-fit: cover">
+      </sc-if>
+
+      <sc-if value="{{isQueued}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4cqw; background-color: #F3EEE4; background-image: radial-gradient(rgba(20,20,20,.18) 1.2px, transparent 1.7px); background-size: 3.4cqw 3.4cqw; font-family: 'Bangers', Impact, sans-serif; font-size: 6.5cqw; letter-spacing: 0.04em">Waiting its turn</div>
+      </sc-if>
+      <sc-if value="{{isDrawing}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4cqw; background: repeating-linear-gradient(45deg, #FFD93B 0 3cqw, #FFF3B8 3cqw 6cqw); font-family: 'Bangers', Impact, sans-serif; font-size: 7.5cqw; letter-spacing: 0.04em">
+          <span style="background: #FFFFFF; border: max(2px, 0.9cqw) solid #141414; padding: 1.5cqw 3.5cqw">Drawing…</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{isFailed}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; gap: 2cqw; align-items: center; justify-content: center; text-align: center; padding: 5cqw; background: repeating-linear-gradient(-45deg, #FFE1DC 0 3cqw, #FFFFFF 3cqw 6cqw)">
+          <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 7cqw; letter-spacing: 0.04em; color: #141414">Couldn't draw this page</span>
+          <span style="font-weight: 700; font-size: 3.8cqw">Edit the prompt and redraw</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{isNone}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4cqw; background: #FFFDF8; font-weight: 700; font-size: 4.2cqw; color: #4A4A4A">Picture not drawn yet</div>
+      </sc-if>
+
+      <sc-if value="{{hasBubble}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; top: 3cqw; left: 3cqw; max-width: 62%; background: #FFFFFF; border: max(2px, 0.9cqw) solid #141414; border-radius: 5cqw; padding: 2cqw 3.2cqw; font-weight: 700; font-size: 3.9cqw; line-height: 1.25; box-shadow: 0.9cqw 0.9cqw 0 #141414">
+          {{bubble}}
+          <span aria-hidden="true" style="position: absolute; left: 6cqw; bottom: -2.6cqw; width: 4cqw; height: 4cqw; background: #FFFFFF; border-right: max(2px, 0.9cqw) solid #141414; border-bottom: max(2px, 0.9cqw) solid #141414; transform: rotate(45deg)"></span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{captionOverlay}}" hint-placeholder-val="{{ false }}">
+        <p style="position: absolute; left: 3cqw; right: 3cqw; bottom: 3cqw; margin: 0; background: #FFD93B; border: max(2px, 0.9cqw) solid #141414; padding: 2.4cqw 3cqw; font-weight: 700; font-size: 4.2cqw; line-height: 1.3; text-wrap: pretty; box-shadow: 1cqw 1cqw 0 #141414">{{caption}}</p>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{twoPanels}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 0 0 38%; min-width: 0; position: relative; border: max(2px, 1.2cqw) solid #141414; background: #FFFFFF; overflow: hidden; box-shadow: 1.4cqw 1.4cqw 0 #141414">
+        <sc-if value="{{showMockArt}}" hint-placeholder-val="{{ false }}">
+          <svg viewBox="0 0 160 300" preserveAspectRatio="xMidYMid slice" style="display: block; width: 100%; height: 100%" aria-hidden="true">
+            <rect width="160" height="300" fill="{{b.sky}}"></rect>
+            <path d="M0 230 Q80 200 160 230 V300 H0 Z" fill="{{b.hillA}}" fill-opacity="{{b.fo}}" stroke="{{b.ink}}" stroke-width="{{b.sw}}"></path>
+            <g transform="translate(80 262) scale(1.7)" opacity="{{b.f1.personOp}}">
+              <path d="M-18 -52 L-46 -4 L-12 -14 Z" fill="#FF4A3D" stroke="{{b.ink}}" stroke-width="3" opacity="{{b.f1.capeOp}}"></path>
+              <path d="M-22 0 Q-24 -58 0 -60 Q24 -58 22 0 Z" fill="{{b.f1.color}}" stroke="{{b.ink}}" stroke-width="3"></path>
+              <circle cy="-80" r="21" fill="#F2CFAE" stroke="{{b.ink}}" stroke-width="3"></circle>
+              <circle cx="-7" cy="-82" r="2.8" fill="#141414"></circle>
+              <circle cx="7" cy="-82" r="2.8" fill="#141414"></circle>
+              <path d="M-9 -73 Q0 -64 9 -73" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"></path>
+            </g>
+          </svg>
+        </sc-if>
+        <sc-if value="{{showRealImage2}}" hint-placeholder-val="{{ false }}">
+          <img src="{{imageUrl2}}" alt="" style="display: block; width: 100%; height: 100%; object-fit: cover">
+        </sc-if>
+        <sc-if value="{{notDone}}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; inset: 0; background: #F3EEE4"></div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{captionBelow}}" hint-placeholder-val="{{ true }}">
+    <p style="margin: 0; background: #FFD93B; border: max(2px, 0.9cqw) solid #141414; padding: 2.4cqw 3cqw; font-weight: 700; font-size: 4.2cqw; line-height: 1.3; text-wrap: pretty; box-shadow: 1cqw 1cqw 0 #141414">{{caption}}</p>
+  </sc-if>
+
+  <sc-if value="{{isCover}}" hint-placeholder-val="{{ false }}">
+    <p style="margin: 0; align-self: center; background: #FFFFFF; border: max(2px, 0.9cqw) solid #141414; padding: 1.6cqw 4cqw; font-weight: 700; font-size: 3.8cqw; text-align: center; box-shadow: 1cqw 1cqw 0 #141414">{{starring}}</p>
+  </sc-if>
+
+  <sc-if value="{{isEnd}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5cqw">
+      <p style="margin: 0; font-weight: 700; font-size: 4.2cqw; line-height: 1.3; text-align: center; background: #FFFFFF; border: max(2px, 0.9cqw) solid #141414; padding: 2cqw 3cqw; text-wrap: pretty">{{caption}}</p>
+      <p style="margin: 0; font-family: 'Bangers', Impact, 'Arial Black', sans-serif; font-size: 19cqw; line-height: 0.95; letter-spacing: 0.02em; color: #FFFFFF; -webkit-text-stroke: 0.7cqw #141414; paint-order: stroke fill; text-shadow: 1.4cqw 1.4cqw 0 #141414">The End</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{showPageNo}}" hint-placeholder-val="{{ false }}">
+    <span aria-hidden="true" style="position: absolute; top: 1.6cqw; right: 1.6cqw; min-width: 6cqw; height: 6cqw; padding: 0 1cqw; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border: max(2px, 0.7cqw) solid #141414; border-radius: 999px; font-weight: 700; font-size: 3.2cqw">{{pageNo}}</span>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"page":{"editor":null,"tsType":"object"},"title":{"editor":null},"starring":{"editor":null},"pageNo":{"editor":null},"$preview":{"width":420,"height":594}}'>
+class Component extends DCLogic {
+  sampleArt() {
+    const fig = (x, color, pet, cape, bun) => ({ t: 'translate(' + x + ' 268)', op: 1, personOp: pet ? 0 : 1, petOp: pet ? 1 : 0, capeOp: cape ? 1 : 0, bunOp: bun ? 1 : 0, color: color });
+    return {
+      sky: '#7FB2FF', sun: '#FFD93B', sunX: 320, ink: '#141414', sw: 5, dash: 'none', fo: 1,
+      cloud: 'M70 86 a18 18 0 0 1 30 -12 a22 22 0 0 1 40 6 a15 15 0 0 1 2 30 h-68 a14 14 0 0 1 -4 -24 z', cloudOp: 1,
+      hill: 'M0 232 Q100 196 200 228 T400 222 V300 H0 Z', hill2: 'M0 206 Q90 168 190 200 T400 190 V300 H0 Z',
+      hillA: '#6BBF59', hillB: '#2E9C5A',
+      f1: fig(150, '#1F4FB8', false, false, true), f2: fig(250, '#8A4FD1', false, false, false), f3: fig(325, '#C98A4B', true, false, false)
+    };
+  }
+  renderVals() {
+    const pg = this.props.page || { kind: 'middle', layout: 'grid', status: 'done', caption: 'The monsoon rain fell, and the river began to rise.' };
+    const kind = pg.kind || 'middle';
+    const layout = pg.layout || 'caption';
+    const status = pg.status || 'done';
+    const done = status === 'done';
+    const isMiddle = kind === 'middle';
+    const url = pg.imageUrl || '';
+    const real = done && !!url && url.indexOf('mock://') !== 0;
+    const a = pg.art || this.sampleArt();
+    const b = pg.art2 || a;
+    const isGrid = isMiddle && layout === 'grid';
+    const sampleBubbles = ['Look, the river is rising!', 'Stay calm, Chiku.', '', 'I gave my word.', '', 'Then we keep it!'];
+    const pendingBg = status === 'drawing' ? 'repeating-linear-gradient(45deg, #FFD93B 0 3cqw, #FFF3B8 3cqw 6cqw)'
+      : status === 'failed' ? 'repeating-linear-gradient(-45deg, #FFE1DC 0 3cqw, #FFFFFF 3cqw 6cqw)'
+      : 'radial-gradient(rgba(20,20,20,.18) 1.2px, #F3EEE4 1.7px)';
+    const panels = isGrid ? (pg.panels || sampleBubbles.map((t) => ({ bubble: t }))).slice(0, 6).map((pn, k) => {
+      const url = pn.imageUrl || '';
+      const realP = done && !!url && url.indexOf('mock://') !== 0;
+      return {
+        a: pn.art || a, mock: done && !realP, real: realP, imageUrl: url,
+        pending: !done, pendingBg: pendingBg,
+        hasBubble: !!(pn.bubble && String(pn.bubble).trim()), bubble: pn.bubble || '',
+        left: k % 2 ? 'auto' : '1.4cqw', right: k % 2 ? '1.4cqw' : 'auto'
+      };
+    }) : [];
+    return {
+      isGrid: isGrid, notGrid: !isGrid, panels: panels,
+      gridPendingLabel: isGrid && !done ? (status === 'drawing' ? 'Drawing 6 panels…' : status === 'queued' ? 'Waiting its turn' : status === 'failed' ? "Couldn't draw this page" : 'Not drawn yet') : '',
+      bg: kind === 'cover' ? '#1F4FB8' : kind === 'end' ? '#FF4A3D' : '#FFFDF8',
+      dots: isMiddle ? 'none' : 'radial-gradient(rgba(20,20,20,.28) 1.2px, transparent 1.8px)',
+      isCover: kind === 'cover',
+      isEnd: kind === 'end',
+      title: this.props.title || pg.caption || 'Chiku and the River Promise',
+      starring: this.props.starring || 'Starring Chiku, Neela & Kurma Dada',
+      caption: pg.caption || '',
+      bubble: pg.bubble || '',
+      hasBubble: done && !!(pg.bubble && pg.bubble.trim()),
+      alt: pg.alt || pg.caption || 'Story illustration',
+      a: a, b: b,
+      showMockArt: done && !real,
+      showRealImage: real,
+      showRealImage2: real && !!pg.imageUrl2,
+      imageUrl: url,
+      imageUrl2: pg.imageUrl2 || url,
+      isQueued: status === 'queued',
+      isDrawing: status === 'drawing',
+      isFailed: status === 'failed',
+      isNone: status === 'none',
+      notDone: !done,
+      twoPanels: isMiddle && layout === 'two',
+      captionOverlay: isMiddle && layout === 'full',
+      captionBelow: isMiddle && layout !== 'full',
+      showPageNo: isMiddle && !!this.props.pageNo,
+      pageNo: this.props.pageNo || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

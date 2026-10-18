@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#1F4FB8}a:hover{color:#141414}
+.ds *{box-sizing:border-box}
+.sec{display:flex;flex-direction:column;gap:20px}
+.h1{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.03em;font-size:44px;line-height:1;margin:0}
+.h2{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.04em;font-size:24px;line-height:1.05;margin:0}
+.panel{background:#FFFFFF;border:5px solid #141414;box-shadow:6px 6px 0 #141414;border-radius:6px}
+.code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px}
+.btn{font-family:'Bangers',Impact,sans-serif;font-weight:400;font-size:20px;letter-spacing:.05em;min-height:48px;padding:0 20px;border:4px solid #141414;border-radius:10px;box-shadow:4px 4px 0 #141414;background:#FFFFFF;color:#141414;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #141414}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #141414}
+.btn:focus-visible,.chip:focus-visible,.input:focus-visible{outline:4px solid #1F4FB8;outline-offset:3px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:2px 2px 0 #141414}
+.btn-primary{background:#FFD93B}.btn-blue{background:#1F4FB8;color:#FFFFFF}.btn-red{background:#FF4A3D}
+.btn-sm{min-height:44px;font-size:17px;padding:0 14px;border-width:3px;box-shadow:3px 3px 0 #141414}
+.btn-lg{min-height:60px;font-size:26px;padding:0 28px}
+.btn-quiet{background:transparent;box-shadow:none;border-color:transparent;text-decoration:underline;text-underline-offset:4px}
+.chip{font:inherit;font-weight:700;font-size:16px;min-height:44px;padding:0 14px;border:3px solid #141414;border-radius:999px;background:#FFFFFF;color:#141414;cursor:pointer}
+.chip[aria-pressed="true"]{background:#FFD93B;box-shadow:3px 3px 0 #141414}
+.input{font:inherit;font-size:17px;border:3px solid #141414;border-radius:8px;padding:10px 12px;background:#FFFFFF;width:100%;min-height:48px;color:#141414}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;line-height:1;padding:6px 10px;border:3px solid #141414;border-radius:999px;background:#FFFFFF}
+.note{border:3px solid #141414;border-radius:10px;background:#E6EEFF;padding:12px 14px}
+.progress{height:30px;border:4px solid #141414;border-radius:999px;background:#FFFFFF;overflow:hidden;box-shadow:3px 3px 0 #141414}
+.progress > span{display:block;height:100%;background:repeating-linear-gradient(45deg,#FFD93B 0 14px,#FFE77A 14px 28px);border-right:4px solid #141414}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:2px solid #141414;vertical-align:top}
+th{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.05em;font-size:18px}
+</style>
+</helmet>
+<div class="ds" style="font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; color: #141414; background-color: #F3EEE4; background-image: radial-gradient(rgba(20,20,20,.10) 1.2px, transparent 1.7px); background-size: 14px 14px; font-size: 17px; line-height: 1.45; padding: 48px 20px 80px">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px">
+
+  <header style="display: flex; flex-direction: column; gap: 12px">
+    <h1 style="margin: 0; font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: clamp(56px, 9vw, 96px); line-height: .92; letter-spacing: .02em; color: #FFD93B; -webkit-text-stroke: 3px #141414; paint-order: stroke fill; text-shadow: 6px 6px 0 #141414">Storybook Maker design system</h1>
+    <p style="margin: 0; max-width: 66ch; font-size: 19px">The v1 comic look, tightened for a product: one ink, three loud colours on warm paper, a strict border and shadow scale, and Bangers reserved for things that should feel like a shout.</p>
+  </header>
+
+  <!-- COLOURS -->
+  <section class="sec">
+    <h2 class="h1">Colour</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 20px">
+      <div class="panel" style="overflow: hidden"><div style="height: 110px; background: #141414; border-bottom: 5px solid #141414"></div><div style="padding: 14px"><p class="h2">Ink</p><p class="code" style="margin: 4px 0">#141414 · --ink</p><p style="margin: 0; font-size: 15px">Text, borders, hard shadows. Body text on every light surface.</p></div></div>
+      <div class="panel" style="overflow: hidden"><div style="height: 110px; background: #FFD93B; border-bottom: 5px solid #141414"></div><div style="padding: 14px"><p class="h2">Yellow</p><p class="code" style="margin: 4px 0">#FFD93B · --yellow</p><p style="margin: 0; font-size: 15px">Primary action, captions, selected chips, app bar. Ink text only (14:1).</p></div></div>
+      <div class="panel" style="overflow: hidden"><div style="height: 110px; background: #FF4A3D; border-bottom: 5px solid #141414"></div><div style="padding: 14px"><p class="h2">Red</p><p class="code" style="margin: 4px 0">#FF4A3D · --red</p><p style="margin: 0; font-size: 15px">Last page, destructive buttons, pet stripe. Ink text (5.8:1). White (3.3:1) only for huge stroked display type.</p></div></div>
+      <div class="panel" style="overflow: hidden"><div style="height: 110px; background: #1F4FB8; border-bottom: 5px solid #141414"></div><div style="padding: 14px"><p class="h2">Blue</p><p class="code" style="margin: 4px 0">#1F4FB8 · --blue</p><p style="margin: 0; font-size: 15px">Cover, links, focus rings, secondary actions. White text (7.3:1).</p></div></div>
+      <div class="panel" style="overflow: hidden"><div style="height: 110px; background-color: #F3EEE4; background-image: radial-gradient(rgba(20,20,20,.14) 1.2px, transparent 1.7px); background-size: 14px 14px; border-bottom: 5px solid #141414"></div><div style="padding: 14px"><p class="h2">Paper</p><p class="code" style="margin: 4px 0">#F3EEE4 · 14px halftone</p><p style="margin: 0; font-size: 15px">App ground. Dots at 10% ink; panels sit on it in white.</p></div></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: 14px">
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #FFFDF8"></span><span><strong>Page white</strong><br><span class="code">#FFFDF8</span></span></div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #E6EEFF"></span><span><strong>Info tint</strong><br><span class="code">#E6EEFF</span></span></div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #FFF4C2"></span><span><strong>Warn tint</strong><br><span class="code">#FFF4C2</span></span></div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #FFE7E3"></span><span><strong>Error tint</strong><br><span class="code">#FFE7E3</span></span></div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #B3261E"></span><span><strong>Error text</strong><br><span class="code">#B3261E</span></span></div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 40px; height: 40px; border: 3px solid #141414; border-radius: 6px; background: #4A4A4A"></span><span><strong>Muted text</strong><br><span class="code">#4A4A4A</span></span></div>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section class="sec">
+    <h2 class="h1">Type</h2>
+    <div class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+        <span class="code" style="flex: 0 0 180px">Display · Bangers 64–96<br>stroke 3px + 5px shadow</span>
+        <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 72px; line-height: .95; color: #FFD93B; -webkit-text-stroke: 3px #141414; paint-order: stroke fill; text-shadow: 5px 5px 0 #141414">Kapow!</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+        <span class="code" style="flex: 0 0 180px">H1 · Bangers 40</span>
+        <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 40px; letter-spacing: .03em">Review the story</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+        <span class="code" style="flex: 0 0 180px">H2 · Bangers 24–26</span>
+        <span style="font-family: 'Bangers', Impact, sans-serif; font-size: 26px; letter-spacing: .04em">Character sheet</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+        <span class="code" style="flex: 0 0 180px">Body · Comic Neue 17/1.45<br>labels 700</span>
+        <span style="max-width: 56ch">The trail led past the whispering hedge and over the wobbly bridge. <strong>Labels and captions use the bold weight.</strong></span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline">
+        <span class="code" style="flex: 0 0 180px">Prompt · JetBrains Mono 14</span>
+        <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; max-width: 60ch">Bold comic-book children's book illustration. Maya crossing a rickety wooden bridge. No text, letters or speech bubbles.</span>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #4A4A4A">Bangers is display-only: titles, buttons, step numbers. Never use it for sentences. Fallbacks: Impact, then Arial Black; Comic Sans MS for Comic Neue.</p>
+    </div>
+  </section>
+
+  <!-- SPACING, BORDERS -->
+  <section class="sec">
+    <h2 class="h1">Spacing, borders, shadows</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 24px">
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <h3 class="h2">Spacing scale (px)</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">4</span><span style="height: 16px; width: 4px; background: #1F4FB8"></span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">8</span><span style="height: 16px; width: 8px; background: #1F4FB8"></span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">12</span><span style="height: 16px; width: 12px; background: #1F4FB8"></span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">16</span><span style="height: 16px; width: 16px; background: #1F4FB8"></span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">20</span><span style="height: 16px; width: 20px; background: #1F4FB8"></span><span style="font-size: 15px">page gutter (mobile 16–20)</span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">24</span><span style="height: 16px; width: 24px; background: #1F4FB8"></span><span style="font-size: 15px">card gap</span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">32</span><span style="height: 16px; width: 32px; background: #1F4FB8"></span></div>
+          <div style="display: flex; gap: 12px; align-items: center"><span class="code" style="width: 40px">56</span><span style="height: 16px; width: 56px; background: #1F4FB8"></span><span style="font-size: 15px">section gap</span></div>
+        </div>
+      </div>
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h3 class="h2">Border + shadow pairs</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-end">
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: center"><span style="width: 96px; height: 72px; background: #FFFFFF; border: 5px solid #141414; box-shadow: 6px 6px 0 #141414; border-radius: 6px"></span><span class="code">5 / 6 panel</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: center"><span style="width: 96px; height: 48px; background: #FFD93B; border: 4px solid #141414; box-shadow: 4px 4px 0 #141414; border-radius: 10px"></span><span class="code">4 / 4 button</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: center"><span style="width: 96px; height: 44px; background: #FFFFFF; border: 3px solid #141414; box-shadow: 3px 3px 0 #141414; border-radius: 999px"></span><span class="code">3 / 3 chip, input</span></div>
+        </div>
+        <p style="margin: 0; font-size: 15px">Shadows are always hard (no blur), offset down-right, in ink. Pressed state moves the element into its shadow. Radii stay small: 6 panels, 8 inputs, 10 buttons, pill chips.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUTTONS & CONTROLS -->
+  <section class="sec">
+    <h2 class="h1">Buttons and controls</h2>
+    <div class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center">
+        <button class="btn btn-primary btn-lg">Draw the pictures</button>
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn">Secondary</button>
+        <button class="btn btn-blue">Share link</button>
+        <button class="btn btn-red">Delete</button>
+        <button class="btn btn-quiet">Quiet</button>
+        <button class="btn btn-sm">Small</button>
+        <button class="btn" disabled="{{ true }}">Disabled</button>
+      </div>
+      <table>
+        <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>Primary (yellow)</td><td>One per screen: the next step forward.</td></tr>
+          <tr><td>Secondary (white)</td><td>Back, regenerate, retry, all other actions.</td></tr>
+          <tr><td>Blue</td><td>Sharing and "draw sheet": actions that call an AI job but don't advance the flow.</td></tr>
+          <tr><td>Red</td><td>Only inside a confirm dialog, for the destructive choice.</td></tr>
+          <tr><td>Sizes</td><td>lg 60px (hero CTAs) · md 48px · sm 44px. Never below 44px.</td></tr>
+        </tbody>
+      </table>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+        <button class="chip" aria-pressed="true">Superhero action</button>
+        <button class="chip" aria-pressed="false">Funny</button>
+        <button class="chip" aria-pressed="false">Gentle bedtime</button>
+        <span style="font-size: 15px">Chips are toggle buttons with <span class="code">aria-pressed</span>.</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 16px">
+        <div><label style="display: block; font-weight: 700; margin-bottom: 6px" for="ds-in">Name</label><input class="input" id="ds-in" value="Maya" readOnly="{{ true }}"></div>
+        <div><label style="display: block; font-weight: 700; margin-bottom: 6px" for="ds-pr">Picture prompt</label><textarea class="input code" id="ds-pr" rows="2" readOnly="{{ true }}" style="font-size: 14px">Maya leaping in triumph. No text.</textarea></div>
+      </div>
+      <p style="margin: 0; font-size: 15px">Focus: 4px blue outline, 3px offset, on every interactive element.</p>
+    </div>
+  </section>
+
+  <!-- PAGE PANEL -->
+  <section class="sec">
+    <h2 class="h1">Page panel</h2>
+    <p style="margin: 0; max-width: 70ch">One component draws every page everywhere: library covers, the progress grid, the editor, the reader and print. It scales with container units, so a thumbnail and an A4 sheet are the same markup. Text is always real HTML laid over the picture.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 28px">
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{coverPage}}" title="Chiku and the River Promise" starring="Starring Chiku, Neela &amp; Kurma Dada" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>Cover</strong> · blue, halftone, stroked title</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{midPage}}" page-no="3" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>Picture + caption</strong> · yellow caption box</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{fullPage}}" page-no="4" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>Full picture</strong> · bubble + overlaid caption</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{twoPage}}" page-no="5" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>3×2 comic grid</strong> · six panels, one bubble each</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{endPage}}" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>Last page</strong> · red, big "The End"</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <div style="box-shadow: 6px 6px 0 #141414"><dc-import name="PagePanel" page="{{drawingPage}}" page-no="6" hint-size="100%,320px"></dc-import></div>
+        <figcaption><strong>Drawing</strong> · also queued, failed, not drawn</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- PURUSHARTHA + PAATRA -->
+  <section class="sec">
+    <h2 class="h1">Purushartha and paatra icons</h2>
+    <p style="margin: 0; max-width: 70ch">Each purushartha has a fixed colour, icon and name. The name is always shown, so the meaning never rests on colour alone.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px">
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 3px solid #141414; border-radius: 10px; background: #1F4FB8; color: #FFFFFF; box-shadow: 3px 3px 0 #141414"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"></path></svg><span><strong style="font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 20px; letter-spacing: .04em">Dharma</strong><br>#1F4FB8 · white text 7.3:1</span></div>
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 3px solid #141414; border-radius: 10px; background: #FFD93B; box-shadow: 3px 3px 0 #141414"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM9 8.5h6M9 11.5h6M10 11.5c3 0 3 4 0 4l4 0"></path></svg><span><strong style="font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 20px; letter-spacing: .04em">Artha</strong><br>#FFD93B · ink text 14:1</span></div>
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 3px solid #141414; border-radius: 10px; background: #FF4A3D; box-shadow: 3px 3px 0 #141414"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg><span><strong style="font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 20px; letter-spacing: .04em">Kaam</strong><br>#FF4A3D · ink text 5.8:1</span></div>
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 3px solid #141414; border-radius: 10px; background: #8A4FD1; color: #FFFFFF; box-shadow: 3px 3px 0 #141414"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20c-4 0-8-3-9-7 3 0 6 1 9 4 3-3 6-4 9-4-1 4-5 7-9 7zM12 17c-2-3-2-7 0-11 2 4 2 8 0 11z"></path></svg><span><strong style="font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 20px; letter-spacing: .04em">Moksh</strong><br>#8A4FD1 (new token) · white 5.1:1</span></div>
+    </div>
+    <div class="panel" style="padding: 20px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end">
+      <figure style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#E6EEFF" stroke="#141414" stroke-width="3"></circle><path d="M11 60c2-11 10-16 21-16s19 5 21 16z" fill="#1F4FB8" stroke="#141414" stroke-width="3"></path><circle cx="32" cy="27" r="11" fill="#F2CFAE" stroke="#141414" stroke-width="3"></circle><path d="M21 26c0-8 5-12 11-12s11 4 11 12c-3-4-7-5-11-5s-8 1-11 5z" fill="#141414"></path></svg><figcaption style="font-weight: 700">Male</figcaption></figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FFE7E3" stroke="#141414" stroke-width="3"></circle><path d="M11 60c2-11 10-16 21-16s19 5 21 16z" fill="#FF4A3D" stroke="#141414" stroke-width="3"></path><circle cx="32" cy="12" r="5.5" fill="#141414"></circle><circle cx="32" cy="27" r="11" fill="#F2CFAE" stroke="#141414" stroke-width="3"></circle><path d="M21 26c0-8 5-12 11-12s11 4 11 12c-3-4-7-5-11-5s-8 1-11 5z" fill="#141414"></path><path d="M20 27c-1 6 0 12 3 16" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round"></path><circle cx="32" cy="24" r="1.7" fill="#FF4A3D"></circle></svg><figcaption style="font-weight: 700">Female</figcaption></figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FFFDF8" stroke="#141414" stroke-width="3"></circle><path d="M17 24l4-12 9 8z M47 24l-4-12-9 8z" fill="#C98A4B" stroke="#141414" stroke-width="3" stroke-linejoin="round"></path><circle cx="32" cy="34" r="16" fill="#C98A4B" stroke="#141414" stroke-width="3"></circle><ellipse cx="32" cy="41" rx="7" ry="5" fill="#F2CFAE" stroke="#141414" stroke-width="2.5"></ellipse><circle cx="26" cy="31" r="2.2" fill="#141414"></circle><circle cx="38" cy="31" r="2.2" fill="#141414"></circle></svg><figcaption style="font-weight: 700">Animal</figcaption></figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FFFDF8" stroke="#141414" stroke-width="3"></circle><path d="M28 18l4-9 4 9" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round"></path><circle cx="30" cy="33" r="15" fill="#2E9C5A" stroke="#141414" stroke-width="3"></circle><path d="M43 30l13 4-13 4z" fill="#FFD93B" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"></path><circle cx="34" cy="30" r="2.4" fill="#141414"></circle></svg><figcaption style="font-weight: 700">Bird</figcaption></figure>
+      <p style="margin: 0; flex: 1 1 260px; font-size: 15px">Character thumbnails: male and female busts in the character's colour. Animal and bird forms swap the bust, and a divine being adds a yellow halo. Card stripes follow the role: blue nayak, red pratinayak, purple guru, yellow for everyone else.</p>
+    </div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section class="sec">
+    <h2 class="h1">Progress, status, notes, toasts</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px">
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h3 class="h2">Progress</h3>
+        <div style="display: flex; justify-content: space-between; font-weight: 700"><span>5 of 8 pictures drawn</span><span>63%</span></div>
+        <div class="progress" role="img" aria-label="63 percent"><span style="width: 63%"></span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <span class="badge" style="background: #FFD93B">5 done</span>
+          <span class="badge" style="background: #1F4FB8; color: #FFFFFF">2 drawing</span>
+          <span class="badge" style="border-style: dashed">1 queued</span>
+          <span class="badge" style="background: #FFD3CE">0 failed</span>
+        </div>
+        <p style="margin: 0; font-size: 15px">Unknown-length jobs (story writing) show elapsed time and named stages, never a fake percentage that stalls at 99.</p>
+      </div>
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h3 class="h2">Notes</h3>
+        <div class="note"><strong>Info:</strong> fallback used, uploads in progress.</div>
+        <div class="note" style="background: #FFF4C2"><strong>Warn:</strong> missing hero name, offline.</div>
+        <div class="note" style="background: #FFE7E3"><strong>Error:</strong> what failed + the one action that fixes it.</div>
+      </div>
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h3 class="h2">Toasts</h3>
+        <div style="background: #141414; color: #FFFFFF; border-radius: 10px; box-shadow: 5px 5px 0 #FFD93B; padding: 12px 16px; display: flex; gap: 12px; font-weight: 700"><span style="flex: 1">Page deleted.</span><span style="color: #FFD93B; text-decoration: underline">Undo</span></div>
+        <div style="background: #FFFFFF; border: 4px solid #141414; border-radius: 10px; box-shadow: 5px 5px 0 #FF4A3D; padding: 12px 16px; font-weight: 700">Couldn't rewrite that page. Try again.</div>
+        <p style="margin: 0; font-size: 15px">Bottom-right, max 4, 4 s (7 s with an action), announced via <span class="code">aria-live="polite"</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARDS -->
+  <section class="sec">
+    <h2 class="h1">Cards</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px">
+      <article class="panel" style="padding: 0; overflow: hidden">
+        <div style="padding: 10px 16px; border-bottom: 4px solid #141414; background: #1F4FB8"><h3 class="h2" style="color: #FFFFFF">Maya · Hero</h3></div>
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <p style="margin: 0">Character card. Role sets the stripe: blue hero, yellow family and friends, red pets.</p>
+          <div style="display: flex; gap: 8px"><button class="btn btn-sm btn-primary">Approve</button><button class="btn btn-sm">Regenerate</button></div>
+        </div>
+      </article>
+      <article class="panel" style="padding: 0; overflow: hidden">
+        <div style="padding: 8px 14px; border-bottom: 4px solid #141414; background: #FFD93B; display: flex; justify-content: space-between; align-items: center"><h3 class="h2" style="font-size: 22px">Page 3</h3><span class="badge">Rewrite this page</span></div>
+        <div style="padding: 14px"><p style="margin: 0">Outline card: caption and prompt side by side, move, rewrite and delete in the header, "add a page after" in the footer.</p></div>
+      </article>
+    </div>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      coverPage: { kind: 'cover', status: 'done' },
+      midPage: { kind: 'middle', layout: 'caption', status: 'done', caption: 'The trail led past the whispering hedge and over the wobbly bridge.' },
+      fullPage: { kind: 'middle', layout: 'full', status: 'done', bubble: 'Hold on, Biscuit!', caption: 'Then came trouble. A wall of brambles blocked the way!' },
+      twoPage: { kind: 'middle', layout: 'grid', status: 'done', caption: 'The monsoon rain fell, and the river began to rise.' },
+      endPage: { kind: 'end', status: 'done', caption: 'Seekh: A promise is a small piece of dharma we carry with us.' },
+      drawingPage: { kind: 'middle', layout: 'caption', status: 'drawing', caption: 'Back home, Papa listened to every word of the adventure.' }
+    };
+  }
+}
+</script>
+</body>
+</html>

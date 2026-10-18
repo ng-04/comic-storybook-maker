@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>README</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#1F4FB8}a:hover{color:#141414}
+.rd *{box-sizing:border-box}
+.h1{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.03em;font-size:42px;line-height:1;margin:0}
+.h2{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.04em;font-size:24px;line-height:1.05;margin:0}
+.panel{background:#FFFFFF;border:5px solid #141414;box-shadow:6px 6px 0 #141414;border-radius:6px}
+.code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px}
+.node{background:#FFFFFF;border:4px solid #141414;border-radius:8px;box-shadow:4px 4px 0 #141414;padding:10px 12px;font-weight:700;text-align:center;min-width:120px}
+.arrow{font-family:'Bangers',Impact,sans-serif;font-size:26px;align-self:center}
+.tbl{overflow-x:auto;border:4px solid #141414;border-radius:6px;background:#FFFFFF}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:10px 12px;border-bottom:2px solid #141414;vertical-align:top;font-size:15px}
+th{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.05em;font-size:18px;background:#FFD93B}
+tr:last-child td{border-bottom:0}
+pre{margin:0;background:#141414;color:#F3EEE4;border-radius:6px;padding:16px;overflow-x:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;line-height:1.55}
+.m{display:inline-block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:600;padding:2px 6px;border:2px solid #141414;border-radius:4px;margin-right:6px}
+.get{background:#E6EEFF}.post{background:#FFD93B}.patch{background:#FFF4C2}.del{background:#FFD3CE}
+</style>
+</helmet>
+<div class="rd" style="font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; color: #141414; background-color: #F3EEE4; background-image: radial-gradient(rgba(20,20,20,.10) 1.2px, transparent 1.7px); background-size: 14px 14px; font-size: 17px; line-height: 1.5; padding: 48px 20px 80px">
+<div style="max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; gap: 52px">
+
+  <header style="display: flex; flex-direction: column; gap: 12px">
+    <h1 style="margin: 0; font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: clamp(52px, 8vw, 84px); line-height: .92; letter-spacing: .02em; color: #FFD93B; -webkit-text-stroke: 3px #141414; paint-order: stroke fill; text-shadow: 6px 6px 0 #141414">README</h1>
+    <p style="margin: 0; max-width: 70ch; font-size: 19px">Static React + Vite front end on S3 + CloudFront. Cognito for sign-in. Every AI and storage call goes through one <span class="code">api</span> module to your Lambda backend, so there are no keys and no model names in the browser. Long work is asynchronous: start a job, get a <span class="code">jobId</span>, poll <span class="code">/jobs/{id}</span>.</p>
+  </header>
+
+  <!-- SCREEN MAP -->
+  <section style="display: flex; flex-direction: column; gap: 20px">
+    <h2 class="h1">Screen map</h2>
+    <div class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch">
+        <span class="node" style="background: #E6EEFF">Landing</span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node" style="background: #E6EEFF">Sign in<br><span class="code" style="font-weight: 400">Cognito</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node" style="background: #FFD93B">Library</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch">
+        <span class="node" style="background: #FFD93B">Library</span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">1 · Desh<br><span class="code" style="font-weight: 400">place, sublocations, refs</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">2 · Kaal<br><span class="code" style="font-weight: 400">era, ritu</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">3 · Paatra<br><span class="code" style="font-weight: 400">M/F icons, purushartha, sheets</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">4 · Paristhiti<br><span class="code" style="font-weight: 400">circumstances</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">5 · Katha<br><span class="code" style="font-weight: 400">plot, seekh, format</span></span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch">
+        <span class="node">5 · Katha</span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">Writing…<br><span class="code" style="font-weight: 400">story job, cancel</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">Outline review<br><span class="code" style="font-weight: 400">single or 3×2 per page</span></span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch">
+        <span class="node">Outline</span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node">Pictures<br><span class="code" style="font-weight: 400">cover, then 3 at a time</span></span><span class="arrow" aria-hidden="true">⇄</span>
+        <span class="node">Page editor<br><span class="code" style="font-weight: 400">redraw, versions</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node" style="background: #FF4A3D">Reader<br><span class="code" style="font-weight: 400">read aloud, PDF, share</span></span><span class="arrow" aria-hidden="true">→</span>
+        <span class="node" style="background: #1F4FB8; color: #FFFFFF">Shared view<br><span class="code" style="font-weight: 400">read-only</span></span>
+      </div>
+      <p style="margin: 0; font-size: 15px">Library also offers <strong>Make a sequel</strong> (same desh, kaal, paatra and approved sheets, straight to Paristhiti) and <strong>Delete</strong>. Global: account menu with Delete my photos and Sign out, offline banner, save status, toasts, confirm dialogs.</p>
+    </div>
+  </section>
+
+  <!-- API -->
+  <section style="display: flex; flex-direction: column; gap: 20px">
+    <h2 class="h1">API contract</h2>
+    <p style="margin: 0; max-width: 72ch">All calls send <span class="code">Authorization: Bearer &lt;Cognito ID token&gt;</span>. Errors are <span class="code">{ code, message }</span>. Model-calling endpoints return <span class="code">202 { jobId }</span> immediately, well under API Gateway's 29-second limit.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Body</th><th>Returns / job result</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m post">POST</span><span class="code">/stories</span></td><td class="code">{ setup: { desh, kaal, paristhiti, inspiration, katha, lesson, darshan, format, … }, characters: [{ gender, form, role, isKey, purushartha }], referenceUrls }</td><td class="code">{ jobId } → { storyId, title, characters, pages: [{ caption, imagePrompt, layout, location, panels? }] }</td></tr>
+          <tr><td><span class="m get">GET</span><span class="code">/stories</span></td><td>—</td><td class="code">[{ id, title, status, coverUrl, updatedAt }]</td></tr>
+          <tr><td><span class="m get">GET</span><span class="code">/stories/{id}</span></td><td>—</td><td class="code">full story incl. page versions</td></tr>
+          <tr><td><span class="m patch">PATCH</span><span class="code">/stories/{id}</span></td><td class="code">{ title?, pages? }</td><td>captions, prompts, order, layout, bubble, activeVersionId</td></tr>
+          <tr><td><span class="m del">DELETE</span><span class="code">/stories/{id}</span></td><td>—</td><td class="code">204</td></tr>
+          <tr><td><span class="m post">POST</span><span class="code">/characters/{id}/sheet</span></td><td class="code">{ name, gender, form, role, appearance, style, referenceUrls[] }</td><td class="code">{ jobId } → { imageUrl }</td></tr>
+          <tr><td><span class="m post">POST</span><span class="code">/stories/{id}/pages/{n}/image</span></td><td class="code">{ prompt, layout, panels?: [{ prompt, speakerId }] }</td><td class="code">{ jobId } → { imageUrl, versionId, fallbackNote, panelImages? (6 for a grid) }</td></tr>
+          <tr><td><span class="m get">GET</span><span class="code">/jobs/{jobId}</span></td><td>—</td><td class="code">{ status: queued | running | done | failed, result?, error? }</td></tr>
+          <tr><td><span class="m post">POST</span><span class="code">/uploads</span></td><td class="code">{ filename, contentType, purpose: character-reference | place-reference, characterId? }</td><td class="code">{ uploadUrl, fileUrl }, then PUT to S3</td></tr>
+          <tr><td><span class="m post">POST</span><span class="code">/stories/{id}/share</span></td><td>—</td><td class="code">{ shareUrl }</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px">
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+        <h3 class="h2">Image retry ladder</h3>
+        <p style="margin: 0">The backend tries <strong>with photo → without photo → text only</strong> on <span class="code">IMAGE_SAFETY</span> / <span class="code">IMAGE_OTHER</span>. It returns <span class="code">fallbackNote</span> (empty when step 1 worked), which the UI shows as written. If all three fail, the job fails with <span class="code">{ code, message, attempts }</span> and the UI offers "edit prompt and redraw".</p>
+      </div>
+      <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #FFF4C2">
+        <h3 class="h2">Proposed additions</h3>
+        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 16px">
+          <li><span class="code">POST /characters</span>, <span class="code">PATCH /characters/{id}</span>: sheets are drawn before a story exists, so characters need IDs first.</li>
+          <li><span class="code">POST /stories/{id}/pages/{n}/rewrite</span> → job → <span class="code">{ caption, imagePrompt }</span>.</li>
+          <li><span class="code">DELETE /me/images</span> and <span class="code">DELETE /uploads/{id}</span>.</li>
+          <li><span class="code">panelImages</span> on grid results, and a single-panel redraw endpoint.</li>
+          <li><span class="code">fallbackNote</span> on the sheet result too.</li>
+          <li>Optional: <span class="code">DELETE /jobs/{id}</span> (true cancel), <span class="code">DELETE /stories/{id}/share</span> (revoke), public <span class="code">GET /share/{token}</span>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILES -->
+  <section style="display: flex; flex-direction: column; gap: 20px">
+    <h2 class="h1">Front-end files</h2>
+    <pre>src/
+  config.js              MOCK flag + API_BASE (from VITE_* env)
+  api/
+    index.js             export const api = CONFIG.MOCK ? mockApi : httpApi
+    http.js              fetch + Cognito token + { code, message } errors
+    mock.js              fake jobs, delays, refusals, offline
+    jobs.js              pollJob(jobId, { signal }) with back-off
+    uploads.js           POST /uploads, then PUT to S3
+  auth/                  cognito.js (Amplify or Hosted UI + PKCE), RequireAuth.jsx
+  state/                 store.js, persist.js (local cache + sync queue)
+  screens/               Landing  SignIn  Library  Writing  Outline  Illustrate
+                         PageEditor  Reader  SharedView
+    setup/               Desh  Kaal  Paatra  Paristhiti  Katha
+  components/            PagePanel  PanelEditor  CharacterCard  GenderIcon
+                         PurusharthaPicker  ReferenceTray  SublocationList
+                         FormatPicker  SheetPreview  Stepper  ProgressBar
+                         StatusBadge  Toasts  ConfirmDialog  ExportDialog  ShareDialog
+                         OfflineBanner  MockPanel
+  hooks/                 useJob  useIllustrationQueue  useSpeech  useOnline
+  styles/                tokens.css  components.css  print.css</pre>
+    <div class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+      <h3 class="h2">Mock mode</h3>
+      <pre>// src/config.js
+export const CONFIG = {
+  MOCK: import.meta.env.VITE_MOCK === 'true',
+  API_BASE: import.meta.env.VITE_API_BASE,
+};</pre>
+      <p style="margin: 0; font-size: 15px">The full README (contract details, <span class="code">http.js</span> and <span class="code">jobs.js</span> sketches, offline and security notes) is delivered alongside this canvas as README.md.</p>
+    </div>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edge states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#1F4FB8}a:hover{color:#141414}
+.wrap *{box-sizing:border-box}
+.h2{font-family:'Bangers',Impact,sans-serif;font-weight:400;letter-spacing:.04em;font-size:24px;line-height:1.05;margin:0}
+.panel{background:#FFFFFF;border:5px solid #141414;box-shadow:6px 6px 0 #141414;border-radius:6px}
+.btn{font-family:'Bangers',Impact,sans-serif;font-size:18px;letter-spacing:.05em;min-height:44px;padding:0 14px;border:3px solid #141414;border-radius:10px;box-shadow:3px 3px 0 #141414;background:#FFFFFF;color:#141414;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.btn-primary{background:#FFD93B}.btn-red{background:#FF4A3D}.btn-blue{background:#1F4FB8;color:#FFFFFF}
+.note{border:3px solid #141414;border-radius:10px;background:#E6EEFF;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;font-size:16px}
+.note-err{background:#FFE7E3}.note-warn{background:#FFF4C2}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;line-height:1;padding:6px 10px;border:3px solid #141414;border-radius:999px;background:#FFFFFF;white-space:nowrap}
+.tag{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;font-weight:600;background:#141414;color:#FFD93B;padding:3px 8px;border-radius:4px;align-self:flex-start}
+.input{font:inherit;border:3px solid #141414;border-radius:8px;padding:10px 12px;background:#FFFFFF;width:100%;min-height:48px}
+.spin{width:20px;height:20px;border:4px solid #141414;border-top-color:transparent;border-radius:50%;display:inline-block;flex:0 0 auto}
+.progress{height:26px;border:4px solid #141414;border-radius:999px;background:#FFFFFF;overflow:hidden}
+.progress > span{display:block;height:100%;background:repeating-linear-gradient(45deg,#FFD93B 0 14px,#FFE77A 14px 28px);border-right:4px solid #141414}
+</style>
+</helmet>
+<div class="wrap" style="font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; color: #141414; background-color: #F3EEE4; background-image: radial-gradient(rgba(20,20,20,.10) 1.2px, transparent 1.7px); background-size: 14px 14px; font-size: 17px; line-height: 1.45; padding: 48px 20px 64px">
+  <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+    <header style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 64px; line-height: .95; letter-spacing: .02em; color: #FFD93B; -webkit-text-stroke: 3px #141414; paint-order: stroke fill; text-shadow: 5px 5px 0 #141414">Edge states</h1>
+      <p style="margin: 0; max-width: 70ch">Every error, empty and loading state from the prototype, side by side. Each one can also be triggered live from the prototype's Mock mode panel.</p>
+    </header>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 28px">
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">page · fallback worked</span>
+        <h2 class="h2">Redrawn without the photo</h2>
+        <div class="note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 auto"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path></svg><span><strong>Heads up:</strong> The first try was declined, so this was redrawn without the reference photo. Faces may differ slightly from the sheet.</span></div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="badge" style="background: #FFD93B">Done</span><span class="badge" style="background: #E6EEFF">Fallback used</span></div>
+        <p style="margin: 0; font-size: 15px">Shown from <code>fallbackNote</code>. Thumbnails get a small "Fallback used" badge; versions get "· fallback".</p>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">page · every step failed</span>
+        <h2 class="h2">Couldn't draw this page</h2>
+        <div class="note note-err" role="alert" style="flex-direction: column; gap: 6px">
+          <strong>We couldn't draw this page.</strong>
+          <span>The image service declined it every way we tried: with the reference photo, without it, and from text only (IMAGE_SAFETY). Simplifying the prompt usually fixes it.</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn btn-primary">Redraw</button><button class="btn">Edit prompt</button></div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">story job · running</span>
+        <h2 class="h2">Writing your story…</h2>
+        <div class="progress" aria-hidden="true"><span style="width: 46%"></span></div>
+        <ul style="margin: 0; padding-left: 20px; font-weight: 700">
+          <li>Reading your characters ✓</li>
+          <li>Planning the adventure ✓</li>
+          <li>Writing the captions</li>
+          <li style="opacity: .5">Writing picture prompts</li>
+        </ul>
+        <p style="margin: 0; font-size: 15px">0:21 elapsed · usually 30 to 60 seconds</p>
+        <button class="btn" style="align-self: flex-start">Cancel</button>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">story job · failed</span>
+        <h2 class="h2">The story didn't come together</h2>
+        <p style="margin: 0">The story writer took too long to answer. Nothing was charged for pictures, and your characters and settings are saved.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn btn-primary">Try again</button><button class="btn">Change the idea</button></div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">character sheet · photo declined</span>
+        <h2 class="h2">Drawn from your description</h2>
+        <div style="aspect-ratio: 4 / 3; border: 4px solid #141414; border-radius: 6px; background: #FFFDF8; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #4A4A4A">[sheet image]</div>
+        <div class="note" style="font-size: 15px">The photo was declined, so this sheet was drawn from your description instead. It may look less like them.</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn btn-primary">Approve</button><button class="btn">Regenerate</button></div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">character sheet · failed</span>
+        <h2 class="h2">No sheet yet</h2>
+        <div class="note note-err" role="alert" style="font-size: 15px"><span><strong>We couldn't draw this sheet.</strong> The image service declined it with the photo, without it, and from text only. Try a simpler description, or remove the photo.</span></div>
+        <button class="btn btn-blue" style="align-self: flex-start">Try again</button>
+      </section>
+
+      <section class="panel" style="padding: 0; overflow: hidden; display: flex; flex-direction: column">
+        <div style="padding: 20px 20px 0; display: flex; flex-direction: column; gap: 14px">
+          <span class="tag">offline</span>
+          <h2 class="h2">No lost edits</h2>
+        </div>
+        <div role="status" style="margin-top: 14px; background: #141414; color: #FFFFFF; padding: 10px 20px; font-weight: 700">You're offline. Your edits are kept on this device and will sync when you're back. Drawing is paused.</div>
+        <div style="padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 10px">
+          <span class="badge" style="background: #FFF4C2; align-self: flex-start">Saved on this device</span>
+          <p style="margin: 0; font-size: 15px">Edits write to local storage first, then PATCH when online. Job polling backs off and resumes; queued pages restart.</p>
+        </div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">library · empty</span>
+        <div style="border: 5px solid #141414; border-radius: 6px; padding: 22px; background-color: #1F4FB8; background-image: radial-gradient(rgba(20,20,20,.3) 1.2px, transparent 1.8px); background-size: 14px 14px; color: #FFFFFF; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+          <h2 style="margin: 0; font-family: 'Bangers', Impact, sans-serif; font-weight: 400; font-size: 40px; line-height: .95; color: #FFD93B; -webkit-text-stroke: 2px #141414; paint-order: stroke fill; text-shadow: 4px 4px 0 #141414">Your shelf is empty</h2>
+          <p style="margin: 0">Start with the hero of the story.</p>
+          <button class="btn btn-primary">Make your first storybook</button>
+        </div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">library · loading / error</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px" aria-hidden="true">
+          <div style="aspect-ratio: 210 / 297; border: 4px solid #141414; background: #E4DDCF; border-radius: 4px"></div>
+          <div style="aspect-ratio: 210 / 297; border: 4px solid #141414; background: #E4DDCF; border-radius: 4px"></div>
+          <div style="aspect-ratio: 210 / 297; border: 4px solid #141414; background: #E4DDCF; border-radius: 4px"></div>
+        </div>
+        <div class="note note-err" style="flex-direction: column; gap: 8px">
+          <strong>We couldn't load your storybooks</strong>
+          <span>Your books are safe. This is usually a connection hiccup.</span>
+          <button class="btn btn-primary" style="align-self: flex-start">Try again</button>
+        </div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">sign in · error</span>
+        <div><label style="display: block; font-weight: 700; margin-bottom: 6px" for="s-email">Email</label><input class="input" id="s-email" value="you@example.com" readOnly="{{ true }}"></div>
+        <p role="alert" style="margin: 0; font-weight: 700; color: #B3261E">That email and password don't match. Try again or reset your password.</p>
+        <button class="btn btn-primary" style="align-self: flex-start">Sign in</button>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">page status</span>
+        <h2 class="h2">Queued · drawing · done · failed</h2>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <span class="badge" style="border-style: dashed">Queued</span>
+          <span class="badge" style="background: #1F4FB8; color: #FFFFFF"><span style="width: 10px; height: 10px; border-radius: 50%; background: #FFFFFF"></span>Drawing</span>
+          <span class="badge" style="background: #FFD93B">Done</span>
+          <span class="badge" style="background: #FFD3CE">Failed</span>
+        </div>
+        <p style="margin: 0; font-size: 15px">Each status also changes the picture area: dotted paper while queued, yellow stripes while drawing, red hatching when failed. The words always carry the meaning, so it never relies on colour alone.</p>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">privacy · delete photos</span>
+        <h2 class="h2" style="font-size: 28px">Delete all your photos?</h2>
+        <p style="margin: 0">Every photo you uploaded, in every storybook, will be deleted from our servers. Approved cartoon sheets and drawn pages stay.</p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap"><button class="btn">Keep it</button><button class="btn btn-red">Delete photos</button></div>
+      </section>
+
+      <section class="panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <span class="tag">toasts</span>
+        <div style="background: #141414; color: #FFFFFF; border-radius: 10px; box-shadow: 5px 5px 0 #FFD93B; padding: 12px 16px; display: flex; gap: 12px; font-weight: 700"><span style="flex: 1">Page deleted.</span><span style="color: #FFD93B; text-decoration: underline">Undo</span></div>
+        <div style="background: #FFFFFF; border: 4px solid #141414; border-radius: 10px; box-shadow: 5px 5px 0 #FF4A3D; padding: 12px 16px; font-weight: 700">That photo is over 10 MB. Try a smaller one.</div>
+      </section>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
