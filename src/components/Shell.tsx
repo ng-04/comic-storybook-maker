@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useSettings } from '../state/settings';
+import { updateSettings, useSettings } from '../state/settings';
 import { askConfirm, deleteAllReferenceImages, useStore } from '../state/store';
 import { IconOffline } from './Icons';
 import { MockPanel } from './MockPanel';
@@ -46,11 +46,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         <button className="tile wordmark" onClick={() => nav('/library')}>Comic Storybook Maker</button>
         <nav aria-label="Main" className="row gap-8 grow">
           <NavLink to="/library" className={({ isActive }) => `btn btn-sm ${isActive ? 'btn-primary' : ''}`}>My storybooks</NavLink>
-          {settings.demo && <span className="badge" style={{ background: '#141414', color: '#FFD93B' }}>Demo mode</span>}
         </nav>
         <SaveStatus />
         <Link to="/settings" className="btn btn-sm">Settings</Link>
       </header>
+      {settings.demo && (
+        <div className="no-print row gap-12" role="status" style={{ background: '#FFF4C2', borderBottom: '4px solid #141414', padding: '10px 20px', fontWeight: 700 }}>
+          <span className="badge" style={{ background: '#141414', color: '#FFD93B' }}>Demo mode</span>
+          <span className="grow">Stories and pictures are simulated placeholders. Nothing is sent to Claude or Gemini.</span>
+          <button className="btn btn-sm btn-primary" onClick={() => { updateSettings({ demo: false }); nav('/library'); }}>Use real AI</button>
+        </div>
+      )}
       {!online && (
         <div className="offline no-print" role="status">
           <IconOffline />
