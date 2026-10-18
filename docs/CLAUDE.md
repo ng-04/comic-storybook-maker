@@ -36,9 +36,9 @@ Library → **1 Desh** (main place + up to 6 sublocations + place reference imag
 - Front end: S3 (private) + CloudFront (OAC), SPA fallback to `index.html`.
 - Auth: Cognito user pool (email + Google), Hosted UI with PKCE; API Gateway JWT authorizer.
 - API: API Gateway HTTP API → Lambda (Node 20, TypeScript).
-- Jobs: SQS queue → worker Lambdas (story, sheet, page image, PDF export); job state in DynamoDB.
-- Data: DynamoDB (stories, characters, jobs, share tokens); S3 buckets for uploads (private), generated images and PDFs.
-- PDF export: server-side render (e.g. headless Chromium Lambda, or a PDF library) from the S3 images → presigned `pdfUrl`.
+- Jobs: one SQS queue (each job carries a `kind`) → one worker Lambda (story, rewrite, sheet, page image); job state in DynamoDB.
+- Data: DynamoDB (stories, characters, jobs, share tokens); S3 buckets for uploads (private) and generated images.
+- PDF export: in the browser, as in Phase 1 (no server rendering, no export endpoint).
 - IaC: AWS CDK (TypeScript). Environments: `dev` and `prod`. Region: ask me (default suggestion `ap-south-1`).
 - Secrets: Anthropic and Gemini API keys in Secrets Manager; per-user rate limits on the story and image endpoints.
 

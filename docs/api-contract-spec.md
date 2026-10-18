@@ -84,7 +84,7 @@ interface Story {
 interface StorySummary { storyId: string; title: string; status: StoryStatus; coverUrl: string | null; inspiration: string[]; deshMain: string; pagesDrawn: number; pageCount: number; updatedAt: string }
 interface ApiErrorBody { code: string; message: string; details?: Record<string, unknown> }
 type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
-interface Job<R> { jobId: string; kind: 'story' | 'rewrite' | 'sheet' | 'page-image' | 'export'; status: JobStatus; result?: R; error?: ApiErrorBody & { attempts?: string[] }; createdAt: string; updatedAt: string }
+interface Job<R> { jobId: string; kind: 'story' | 'rewrite' | 'sheet' | 'page-image'; status: JobStatus; result?: R; error?: ApiErrorBody & { attempts?: string[] }; createdAt: string; updatedAt: string }
 ```
 
 ## 4. Endpoints
@@ -107,25 +107,25 @@ Request (any subset):
   "pages": [ { "pageId": "pg_1", "caption": "…", "imagePrompt": "…", "bubble": "…", "layout": "grid",
                "panels": [ { "panelId": "pn_1", "prompt": "…", "bubble": "…", "speakerId": "c_1" } ],
                "activeVersionId": "v_9" } ],
+  "characters": [ { "characterId": "c_1", "name": "Chiku", "gender": "male", "form": "Animal", "role": "nayak", "isKey": true,
+                    "age": "", "appearance": "…", "purushartha": { "...": "…" }, "refIds": ["u_1"],
+                    "approveVersionId": "v_3", "activeVersionId": "v_3" } ],
   "pageOrder": ["pg_cover", "pg_3", "pg_2", "pg_end"],
   "addPages": [ { "afterPageId": "pg_3", "layout": "caption" } ],
   "deletePageIds": ["pg_5"] }
 ```
-→ `200 Story` · `400` · `404` · `409 STALE_REVISION`. Rules: cover stays first and end stays last; 1 ≤ middle pages; total ≤ 14; grid pages have exactly 6 panels (the server fills blanks when switching to grid).
+→ `200 Story` · `400` · `404` · `409 STALE_REVISION` · `422 VALIDATION_FAILED`. Rules: cover stays first and end stays last; 1 ≤ middle pages; total ≤ 14; grid pages have exactly 6 panels (the server fills blanks when switching to grid). `characters`, when sent, is the **complete** list (see §4.2).
 
 **`DELETE /stories/{storyId}`** [orig] → `204` (cascade: backend-spec §4.8)
 
 **`POST /stories/{storyId}/duplicate`** [new] (sequel) → `201 Story` (status `draft`, pages empty)
 
 ### 4.2 Characters
-**`POST /stories/{storyId}/characters`** [new] `{ role: Role, name?, gender?, form?, ... }` → `201 Character`
-
-**`PATCH /stories/{storyId}/characters/{characterId}`** [new]
-`{ name?, gender?, form?, role?, isKey?, age?, appearance?, purushartha?, refIds?: string[], approveVersionId?: string, activeVersionId?: string }` → `200 Character`
-- `approveVersionId` sets `sheet.status = approved` and `approvedVersionId`.
-- Errors: `400` (for example removing `isKey` from a nayak), `404`.
-
-**`DELETE /stories/{storyId}/characters/{characterId}`** [new] → `204` · `422 VALIDATION_FAILED` if it is the last nayak.
+Characters are part of the story and are saved with `PATCH /stories/{storyId}` (no separate character endpoints).
+- `characters` is the complete list: a character missing from it is deleted (its sheet media goes with it); a new `characterId` adds one. The client creates IDs (`c_` + 12 random characters); the server rejects duplicates and wrong prefixes with `400`.
+- `refIds` attaches uploads (purpose `character-reference`, same story).
+- `approveVersionId` sets `sheet.status = approved` and `approvedVersionId`; `activeVersionId` picks the version shown.
+- `422 VALIDATION_FAILED` if no character is a nayak, or a nayak loses `isKey`.
 
 **`POST /characters/{characterId}/sheet`** [orig] (`Idempotency-Key` recommended)
 Request: `{}` (the server reads the character, style and refs) → `202 { jobId }`
@@ -176,7 +176,7 @@ Then the client does `PUT uploadUrl` with header `Content-Type: <contentType>` a
 **`DELETE /me/images`** [new] → `204` (all reference uploads of the caller)
 
 ### 4.6 Export and share
-**`POST /stories/{storyId}/export`** [new] `{ paper: "a4" | "letter" }` → `202 { jobId }`; result `{ pdfUrl, pages, bytes, expiresAt }`. Errors: `422 STORY_INCOMPLETE` if no page is drawn, `INTERNAL`.
+PDF export has no endpoint: the browser builds the PDF from the same page data and images the reader shows (as in Phase 1), so reference images can't reach it.
 
 **`POST /stories/{storyId}/share`** [orig] → `201 { shareUrl, token, createdAt }` (idempotent: returns the existing active link)
 
@@ -196,7 +196,14 @@ Then the client does `PUT uploadUrl` with header `Content-Type: <contentType>` a
 | Sheet result `{ imageUrl }` | `{ versionId, imageUrl, fallbackNote }` | Sheet versions and fallback notes |
 | Page result `{ imageUrl, versionId, fallbackNote }` | + `fallbackStep`, `panelImageUrls` | 3×2 grid pages |
 | `POST /uploads { … }` | + `bytes`, `purpose`, `storyId`, `characterId` | Scoped presigned URLs, ownership |
-| — | characters CRUD, rewrite, export, duplicate, job cancel, upload delete, `/me/images`, share revoke, public share read | Journeys J2–J7 |
+| — | rewrite, duplicate, job cancel, upload delete, `/me/images`, share revoke, public share read | Journeys J2–J7 |
+
+**Simplified on 2026-10-18 (design review):**
+| Removed | Replaced by | Why it's safe |
+|---|---|---|
+| `POST/PATCH/DELETE /stories/{id}/characters…` | `characters` in `PATCH /stories/{id}` with client-made IDs | Sheets only need a stable `characterId`, which the client creates; ownership is checked once, through the story |
+| `POST /stories/{id}/export` and the `export` job | PDF built in the browser | Meets J5 and the Print acceptance; the browser only has page images, never reference uploads |
+| Composite grid image (`imageKey` on grid pages) | Thumbnails render the six panel images | Nothing reads a composite |
 
 ## 6. Contract tests (must exist)
 1. Every endpoint returns the error envelope on failure, with the documented codes.

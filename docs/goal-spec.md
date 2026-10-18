@@ -36,7 +36,7 @@ A web app that turns a family's own story idea into a personalised, printable ch
 - Character sheets with approve / regenerate; reference images (multiple, optional) for characters and places.
 - Outline review with full editing before any page image is drawn.
 - Page formats: **single scene** (picture + caption), **full picture** (caption overlaid), **3×2 comic grid** (six panels, one speech bubble each); **Auto** picks per story complexity.
-- Async generation for story, sheets, page images, rewrites and PDF export, with progress, cancel and failure states.
+- Async generation for story, sheets, page images and rewrites, with progress, cancel and failure states. PDF export runs in the browser.
 - Image refusal handling: the backend retries with references → without references → text only and reports which step worked; a clear recovery path when all fail.
 - Page editor with version history and Ctrl+Enter redraw.
 - Reader with page-turn and read-aloud (browser speech synthesis); PDF export; read-only share links.

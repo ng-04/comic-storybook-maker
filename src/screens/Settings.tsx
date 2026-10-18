@@ -5,7 +5,7 @@ import { testGeminiKey } from '../api/gemini';
 import { asApiError } from '../api/types';
 import { askDeleteImages } from '../components/Shell';
 import { Spinner } from '../components/Icons';
-import { DEFAULT_IMAGE_MODEL, forgetKeys, isConfigured, STORY_MODELS, updateSettings, useSettings, type Settings as S } from '../state/settings';
+import { forgetKeys, isConfigured, STORY_MODELS, updateSettings, useSettings, type Settings as S } from '../state/settings';
 import { askConfirm } from '../state/store';
 import { encryptKeys, passkeyProblem } from '../state/vault';
 
@@ -143,11 +143,6 @@ export function Settings() {
             id="gemini-key" label="Gemini API key (draws the pictures)" field="geminiKey" placeholder="Paste key from Google AI Studio" onTest={testGeminiKey}
             help={<>Create one at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key. Image generation needs billing enabled on the Google project. Test is free.</>}
           />
-          <div>
-            <label className="label" htmlFor="image-model">Image model</label>
-            <input className="input mono" id="image-model" spellCheck={false} value={s.imageModel} onChange={(e) => updateSettings({ imageModel: e.target.value.trim() || DEFAULT_IMAGE_MODEL })} />
-            <p className="hint">Default {DEFAULT_IMAGE_MODEL} ("Nano Banana").</p>
-          </div>
         </section>
 
         <SharePasskey />

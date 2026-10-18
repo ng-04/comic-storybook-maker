@@ -162,7 +162,7 @@ src/
 - Simulate latency (story 9 s, or 45 s with "real timings"), image refusals and fallback notes, offline, and an empty / slow / error library.
 - Seed two sample books (one finished grid book, one outline-stage single-scene book).
 - Show a floating **Mock mode** panel with switches: image results (Always works / Realistic refusals / Always refused), library (Normal / Slow / Empty / Error), Story job fails, Real timings, Offline, Jump to screen, Reset demo data.
-- Build a simple PDF in the browser for Export (production uses the backend).
+- PDF export is built in the browser in every mode (html-to-image + jsPDF from PagePanel); there is no export endpoint.
 
 ## 8. Visual design tokens
 - **Type:** Bangers (display, buttons, step numbers; never sentences), Comic Neue 400/700 (body, 17 px / 1.45), JetBrains Mono (prompts, 13–14 px).

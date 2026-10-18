@@ -12,16 +12,18 @@ Browser (S3 + CloudFront SPA)
 API Gateway (HTTP API, JWT authorizer)  ──►  API Lambdas (fast, < 10 s)
                                                │  enqueue
                                                ▼
-                                        SQS queues ──► Worker Lambdas (story, sheet, page-image, rewrite, export)
+                                        SQS queue  ──► Worker Lambda (story, rewrite, sheet, page-image)
                                                          │            │
                                        Claude API ◄──────┘            └──► Gemini image API
 DynamoDB (users, stories, characters, pages, versions, uploads, jobs, shares)
-S3: uploads (private) · media (generated images) · exports (PDFs)
+S3: uploads (private) · media (generated images)
 Secrets Manager (model API keys) · CloudWatch (logs, metrics, alarms)
 ```
 
 - **Runtime:** Node.js 20 + TypeScript Lambdas; AWS CDK for all infrastructure.
-- **Why queues:** API Gateway times out at 29 s; story writing takes 30–60 s and images can be slow. API Lambdas only validate, write a job record, enqueue and return `202`.
+- **Why a queue:** API Gateway times out at 29 s; story writing takes 30–60 s and images can be slow. API Lambdas only validate, write a job record, enqueue and return `202`.
+- **One queue, one worker:** every job carries a `kind`; the worker routes on it. Separate queues per kind add infrastructure without meeting any extra requirement.
+- **No server-side PDF:** the browser builds PDFs from the page images (frontend-spec §3.13), as in Phase 1.
 - **Model choice is server-side config** (`STORY_MODEL`, `IMAGE_MODEL`, …). The front end never sends or sees model names.
 
 ## 2. Data model
@@ -33,7 +35,7 @@ All records carry `ownerId` (Cognito `sub`), `createdAt`, `updatedAt` (ISO 8601 
 |---|---|
 | `userId` | = Cognito `sub` |
 | `email` | from token, not stored if not needed |
-| `quota` | counters per day: `stories`, `sheets`, `pageImages`, `exports` |
+| `quota` | counters per day: `stories`, `sheets`, `pageImages` |
 
 ### Story
 | Field | Type / rule |
@@ -106,7 +108,7 @@ All records carry `ownerId` (Cognito `sub`), `createdAt`, `updatedAt` (ISO 8601 
 `{ uploadId, ownerId, purpose: character-reference|place-reference, storyId, characterId?, key, contentType, bytes, status: pending|uploaded|deleted, createdAt }`.
 
 ### Job
-`{ jobId, ownerId, kind: story|rewrite|sheet|page-image|export, target: { storyId, characterId?, pageId? }, status: queued|running|done|failed|cancelled, input (redacted), result?, error?, attempts, createdAt, startedAt?, finishedAt?, ttl }`.
+`{ jobId, ownerId, kind: story|rewrite|sheet|page-image, target: { storyId, characterId?, pageId? }, status: queued|running|done|failed|cancelled, input (redacted), result?, error?, attempts, createdAt, startedAt?, finishedAt?, ttl }`.
 Job records expire 7 days after finishing *(default)* via DynamoDB TTL.
 
 ### ShareLink
@@ -118,7 +120,6 @@ uploads/{ownerId}/{uploadId}/{filename}        private; presigned PUT/GET only
 media/{ownerId}/{storyId}/sheets/{characterId}/{versionId}.png
 media/{ownerId}/{storyId}/pages/{pageId}/{versionId}.png
 media/{ownerId}/{storyId}/pages/{pageId}/{versionId}/panel-{0..5}.png
-exports/{ownerId}/{storyId}/{jobId}.pdf        lifecycle: delete after 7 days (default)
 ```
 All buckets: block public access, SSE-S3 (or KMS), CORS limited to the app origin for PUT on `uploads/`. The app serves media through presigned GET URLs (≤ 1 h) or CloudFront signed URLs.
 
@@ -129,7 +130,7 @@ All buckets: block public access, SSE-S3 (or KMS), CORS limited to the app origi
 4. **Jobs:** `GET /jobs/{id}` and `DELETE /jobs/{id}` only for the job's owner.
 5. **Uploads:** an upload ID may only be attached to the caller's own story and character. Presigned PUT URLs are scoped to one key, one content type and a max size, and expire in 5 minutes.
 6. **Share view:** resolves token → story, checks it isn't revoked or expired, and returns a **redacted** projection: title, starring names, page kinds and layouts, captions, bubbles, and presigned GET URLs for the active page images only. Never return reference images, prompts, setup, purushartha notes, emails or IDs other than the token.
-7. **Exports and share view never include reference uploads.**
+7. **The share view never includes reference uploads** (PDFs are made in the browser from page images only).
 8. Admin access, if any, goes through the AWS console, not the API.
 
 ## 4. Business rules
@@ -166,7 +167,7 @@ All buckets: block public access, SSE-S3 (or KMS), CORS limited to the app origi
 ### 4.4 Image generation (Gemini) and the retry ladder
 - **Sheets:** inputs are name, gender, form, appearance, style and the character's reference images. Output is a cartoon character sheet (front, side, action). No text in the image.
 - **Pages:** inputs are the prompt(s), the style, and the **approved sheet images of the characters on that page** (speakers + nayak at minimum).
-- **Grid pages:** 6 separate panel images in parallel (same references), returned as `panelImageKeys[0..5]`; `imageKey` may be a composite thumbnail.
+- **Grid pages:** 6 separate panel images in parallel (same references), returned as `panelImageKeys[0..5]`; there is no composite image (thumbnails render the six panels).
 - **Retry ladder** on `IMAGE_SAFETY` or `IMAGE_OTHER`:
   1. with all reference images
   2. without photo references (sheets only, or no images)
@@ -180,25 +181,25 @@ All buckets: block public access, SSE-S3 (or KMS), CORS limited to the app origi
 Claude rewrites one page given the story context, the page and the user's current text; returns `{ caption, imagePrompt, panels? }`. Cover rewrites keep the title.
 
 ### 4.6 PDF export
-Server-side render (headless Chromium Lambda with the same PagePanel CSS, or a PDF library), one page per sheet, A4 or Letter, embedding the active page images at print resolution and the comic fonts. Never includes reference images. Output to `exports/…`, returned as a presigned URL (1 h).
+No server work: the browser renders each page with the same PagePanel and builds the PDF (A4 or Letter, one page per sheet). The backend only serves the page images, so reference uploads can't reach a PDF.
 
 ### 4.7 Sequel
 `POST /stories/{id}/duplicate` copies setup (clearing paristhiti, stakes, katha, lesson), characters (new IDs) with their approved sheet versions (media copied or referenced), and no pages. New status `draft`; title "<title>: Part 2".
 
 ### 4.8 Deletion
-- Delete story: the story, characters, pages, versions, share links and jobs; all media and exports under the story prefix; uploads attached to it.
+- Delete story: the story, characters, pages, versions, share links and jobs; all media under the story prefix; uploads attached to it.
 - `DELETE /me/images`: every upload object and record for the user (status `deleted`); sheets and page images stay.
 - Delete one upload: removes the object and detaches it from its story or character.
 - Deletes are idempotent (`204` even if already gone).
 
 ### 4.9 Quotas and rate limits *(defaults; confirm)*
-Per user per day: 10 story writes, 40 sheet draws, 150 page images (grid = 6), 20 exports. Over quota → `429 QUOTA_EXCEEDED` with `resetAt`. API burst rate limit via API Gateway usage throttling → `429 RATE_LIMITED` with `Retry-After`.
+Per user per day: 10 story writes, 40 sheet draws, 150 page images (grid = 6). Over quota → `429 QUOTA_EXCEEDED` with `resetAt`. API burst rate limit via API Gateway usage throttling → `429 RATE_LIMITED` with `Retry-After`.
 
 ## 5. Operating constraints
 | Constraint | Rule |
 |---|---|
 | Latency | API Lambdas respond in < 3 s p95; never > 29 s |
-| Worker timeouts | story 120 s, sheet 90 s, page image 90 s per call, export 300 s; SQS visibility timeout ≥ worker timeout + 30 s |
+| Worker timeouts | story 120 s, sheet 90 s, page image 90 s per call; SQS visibility timeout ≥ worker timeout + 30 s |
 | Idempotency | Mutating POSTs accept `Idempotency-Key`; the same key + same body within 24 h returns the original response. Workers are idempotent by `jobId` |
 | Cancellation | `DELETE /jobs/{id}` marks it `cancelled`; workers check before each model call and before writing results |
 | Poison messages | SQS DLQ after 3 receives; the job is marked `failed` with `INTERNAL` |
@@ -209,11 +210,11 @@ Per user per day: 10 story writes, 40 sheet draws, 150 page images (grid = 6), 2
 | Environments | `dev` and `prod` stacks; separate buckets, tables and Cognito pools |
 | Region | `[CONFIRM]` (suggested `ap-south-1`) |
 | Backups | DynamoDB point-in-time recovery on; S3 versioning on the media bucket *(default)* |
-| Privacy | Reference uploads lifecycle-deleted after `[YOUR RETENTION POLICY]`; exports after 7 days |
+| Privacy | Reference uploads lifecycle-deleted after `[YOUR RETENTION POLICY]` |
 | Cost guard | AWS Budget alarm; per-user quotas; max image retries per job = 3 transient + 3 ladder steps |
 
 ## 6. Open questions
 1. When an outline is regenerated, keep old page versions (history) or discard them?
 2. Should share links expire by default (for example after 90 days)?
-3. Are composite page images needed at all, or only panels?
+3. ~~Are composite page images needed at all, or only panels?~~ Resolved 2026-10-18: panels only.
 4. Language support beyond English (fonts in the PDF, prompts)?

@@ -2,7 +2,7 @@
 // Implements the retry ladder from backend-spec §4.4: transient errors retry in place with
 // backoff; refusals (IMAGE_SAFETY, IMAGE_OTHER, …) step down to fewer reference images.
 
-import { getSettings } from '../state/settings';
+import { getSettings, IMAGE_MODEL } from '../state/settings';
 import { ApiError } from './types';
 
 export interface InlineImage {
@@ -47,7 +47,7 @@ function sleep(ms: number, signal?: AbortSignal) {
 }
 
 function endpoint(path = ':generateContent') {
-  return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(getSettings().imageModel || 'gemini-2.5-flash-image')}${path}`;
+  return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(IMAGE_MODEL)}${path}`;
 }
 
 function key(): string {
@@ -140,7 +140,7 @@ export async function drawWithLadder(rungs: Rung[], aspect: Aspect, signal?: Abo
 
 /** Free check: look up the image model with the key. */
 export async function testGeminiKey(): Promise<string> {
-  const model = getSettings().imageModel || 'gemini-2.5-flash-image';
+  const model = IMAGE_MODEL;
   let res: Response;
   try {
     res = await fetch(endpoint(''), { headers: { 'x-goog-api-key': key() } });

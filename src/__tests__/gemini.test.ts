@@ -15,7 +15,7 @@ const rungs: Rung[] = [
 describe('drawWithLadder (backend-spec §4.4)', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
   beforeEach(() => {
-    updateSettings({ geminiKey: 'test-key', imageModel: 'gemini-2.5-flash-image' });
+    updateSettings({ geminiKey: 'test-key' });
     fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     vi.useFakeTimers({ shouldAdvanceTime: true });

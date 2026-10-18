@@ -7,14 +7,14 @@ export const STORY_MODELS = [
   { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 (best stories)' },
   { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 (faster, cheaper)' },
 ];
-export const DEFAULT_IMAGE_MODEL = 'gemini-2.5-flash-image';
+/** Fixed image model (not user-editable). Supported until 2027-03-15; replacement: gemini-3.1-flash-lite-image. */
+export const IMAGE_MODEL = 'gemini-2.5-flash-image';
 
 export interface Settings {
   anthropicKey: string;
   workspaceId: string;
   geminiKey: string;
   storyModel: string;
-  imageModel: string;
   /** Demo mode swaps in the mock API: no keys, simulated stories and pictures. */
   demo: boolean;
   /** Keys came from the site's passkey-protected bundle rather than being typed in. */
@@ -24,7 +24,7 @@ export interface Settings {
 const KEY = 'csm2-settings';
 const DEFAULTS: Settings = {
   anthropicKey: '', workspaceId: '', geminiKey: '',
-  storyModel: STORY_MODELS[0].id, imageModel: DEFAULT_IMAGE_MODEL, demo: false, fromPasskey: false,
+  storyModel: STORY_MODELS[0].id, demo: false, fromPasskey: false,
 };
 
 // v1 (ng-04.github.io/comic/) runs on the same origin and saved its keys under these names.

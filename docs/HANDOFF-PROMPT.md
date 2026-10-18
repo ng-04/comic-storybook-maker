@@ -17,8 +17,8 @@ Then we'll go phase by phase. Stop after each phase for my review.
 
 **Phase 2 · Backend core** (backend-spec.md §2–4, api-contract-spec.md §4). Lambda handlers with ownership checks, the DynamoDB data model, the job pattern with SQS workers using stub AI clients, presigned uploads, share tokens, quotas, idempotency and `If-Match`. Contract tests from api-contract-spec.md §6, run locally.
 
-**Phase 3 · Real AI.** Claude story and rewrite workers (structured JSON validated against the schema, child-safety rules, output check). Gemini sheet and page workers (approved sheets as references, 6 panels for grids, the retry ladder with fallbackNote and fallbackStep). Server-side PDF export. Model names from config; keys from Secrets Manager.
+**Phase 3 · Real AI.** Claude story and rewrite workers (structured JSON validated against the schema, child-safety rules, output check). Gemini sheet and page workers (approved sheets as references, 6 panels for grids, the retry ladder with fallbackNote and fallbackStep). Model names from config; keys from Secrets Manager.
 
-**Phase 4 · Infrastructure** (backend-spec.md §1, §5). AWS CDK stacks for dev and prod: S3 + CloudFront, Cognito (email + Google), HTTP API + JWT authorizer, Lambdas, SQS + DLQs, DynamoDB (TTL, PITR), S3 buckets with lifecycle rules, Secrets Manager, alarms and a budget. Show me `cdk diff`; don't deploy until I say so.
+**Phase 4 · Infrastructure** (backend-spec.md §1, §5). AWS CDK stacks for dev and prod: S3 + CloudFront, Cognito (email + Google), HTTP API + JWT authorizer, Lambdas, one SQS queue + DLQ, DynamoDB (TTL, PITR), S3 buckets with lifecycle rules, Secrets Manager, alarms and a budget. Show me `cdk diff`; don't deploy until I say so.
 
 **Phase 5 · Deploy and CI.** Deploy to dev with my approval and run the acceptance checklist from goal-spec.md §6 against it. Then add GitHub Actions (build, test, bundle secret-grep, `cdk deploy` dev/prod) and a short runbook.
