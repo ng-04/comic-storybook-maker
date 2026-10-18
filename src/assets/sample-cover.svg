@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 440" width="400" height="440">
+  <!-- Sample cover art for the home page: Chiku the monkey on a jamun tree, Neela the crocodile
+       in the river and Kurma Dada the tortoise on a rock. Flat comic style, no text. -->
+  <defs>
+    <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.3" fill="#141414" opacity="0.10" />
+    </pattern>
+  </defs>
+  <g stroke="#141414" stroke-linejoin="round" stroke-linecap="round">
+    <!-- sky -->
+    <rect width="400" height="440" fill="#9FD3FF" stroke="none" />
+    <rect width="400" height="440" fill="url(#dots)" stroke="none" />
+    <circle cx="330" cy="70" r="36" fill="#FFD93B" stroke-width="5" />
+    <path d="M40 88 a20 20 0 0 1 32 -14 a24 24 0 0 1 44 6 a16 16 0 0 1 2 32 h-74 a15 15 0 0 1 -4 -24 z" fill="#FFFFFF" stroke-width="4" />
+    <path d="M196 54 a14 14 0 0 1 24 -8 a18 18 0 0 1 32 6 a12 12 0 0 1 0 24 h-52 a12 12 0 0 1 -4 -22 z" fill="#FFFFFF" stroke-width="4" />
+
+    <!-- far bank -->
+    <path d="M0 230 Q90 196 190 222 T400 210 V270 H0 Z" fill="#8FCB5A" stroke-width="5" />
+
+    <!-- river -->
+    <path d="M0 262 Q100 250 200 262 T400 258 V440 H0 Z" fill="#3E8EDE" stroke-width="5" />
+    <path d="M30 300 q14 -8 28 0 M120 330 q14 -8 28 0 M250 300 q14 -8 28 0 M320 352 q14 -8 28 0 M70 392 q14 -8 28 0 M200 410 q14 -8 28 0" fill="none" stroke="#FFFFFF" stroke-width="4" />
+
+    <!-- island with jamun tree -->
+    <path d="M10 286 Q70 262 150 280 Q170 300 140 314 Q70 326 14 314 Z" fill="#C9A15B" stroke-width="5" />
+    <path d="M78 284 Q72 220 86 160" fill="none" stroke-width="16" />
+    <path d="M78 284 Q72 220 86 160" fill="none" stroke="#8A5A2B" stroke-width="9" />
+    <path d="M84 196 Q120 186 150 196" fill="none" stroke-width="12" />
+    <path d="M84 196 Q120 186 150 196" fill="none" stroke="#8A5A2B" stroke-width="6" />
+    <path d="M30 150 C10 110 50 70 92 84 C110 56 170 62 176 104 C206 112 200 160 166 162 C150 184 104 182 92 166 C56 180 22 172 30 150 Z" fill="#2E9C5A" stroke-width="5" />
+    <g fill="#6B2E8F" stroke-width="2.5">
+      <circle cx="60" cy="122" r="6" /><circle cx="110" cy="100" r="6" /><circle cx="150" cy="128" r="6" /><circle cx="96" cy="146" r="6" /><circle cx="134" cy="88" r="5" /><circle cx="70" cy="96" r="5" />
+    </g>
+
+    <!-- Chiku the monkey, sitting on the branch -->
+    <path d="M150 214 Q176 236 160 254 Q148 266 160 274" fill="none" stroke="#7D7D86" stroke-width="7" />
+    <ellipse cx="132" cy="196" rx="20" ry="24" fill="#9A9AA3" stroke-width="4.5" />
+    <ellipse cx="132" cy="202" rx="11" ry="14" fill="#E9CFB2" stroke-width="3" />
+    <path d="M114 196 Q100 184 104 168" fill="none" stroke-width="11" />
+    <path d="M114 196 Q100 184 104 168" fill="none" stroke="#9A9AA3" stroke-width="6" />
+    <path d="M101 175 l7 4" stroke="#FF4A3D" stroke-width="5" />
+    <path d="M122 216 q-6 10 4 12 M142 216 q6 10 -4 12" fill="#9A9AA3" stroke-width="4" />
+    <circle cx="110" cy="152" r="9" fill="#9A9AA3" stroke-width="4" />
+    <circle cx="154" cy="152" r="9" fill="#9A9AA3" stroke-width="4" />
+    <circle cx="132" cy="156" r="22" fill="#9A9AA3" stroke-width="4.5" />
+    <ellipse cx="132" cy="162" rx="15" ry="13" fill="#E9CFB2" stroke-width="3" />
+    <circle cx="126" cy="156" r="3" fill="#141414" stroke="none" /><circle cx="138" cy="156" r="3" fill="#141414" stroke="none" />
+    <path d="M125 167 Q132 173 139 167" fill="none" stroke-width="3" />
+
+    <!-- Neela the crocodile, smiling in the river -->
+    <path d="M176 330 Q180 304 214 302 L300 304 Q318 306 318 318 Q318 330 300 332 L214 336 Q186 338 176 330 Z" fill="#4FB06A" stroke-width="4.5" />
+    <path d="M214 322 Q260 328 306 320" fill="none" stroke-width="3.5" />
+    <circle cx="300" cy="312" r="2.5" fill="#141414" stroke="none" />
+    <path d="M226 304 l6 -8 l6 8 M246 304 l6 -8 l6 8" fill="#4FB06A" stroke-width="3" />
+    <circle cx="200" cy="300" r="13" fill="#4FB06A" stroke-width="4.5" />
+    <circle cx="224" cy="298" r="13" fill="#4FB06A" stroke-width="4.5" />
+    <circle cx="202" cy="300" r="6.5" fill="#FFFFFF" stroke-width="2.5" /><circle cx="226" cy="298" r="6.5" fill="#FFFFFF" stroke-width="2.5" />
+    <circle cx="203" cy="301" r="3" fill="#141414" stroke="none" /><circle cx="227" cy="299" r="3" fill="#141414" stroke="none" />
+    <path d="M168 338 q16 -8 30 0 q16 -8 30 0 q16 -8 30 0 q16 -8 30 0 q16 -8 30 0 q12 -6 24 0" fill="none" stroke="#FFFFFF" stroke-width="4" />
+
+    <!-- Kurma Dada the tortoise, on a rock -->
+    <path d="M270 400 Q272 362 316 360 Q376 358 392 396 Q394 414 370 418 L290 420 Q268 418 270 400 Z" fill="#8E8E96" stroke-width="5" />
+    <ellipse cx="340" cy="356" rx="9" ry="7" fill="#7FA35A" stroke-width="3.5" />
+    <path d="M306 362 Q292 352 284 342" fill="none" stroke-width="13" />
+    <path d="M306 362 Q292 352 284 342" fill="none" stroke="#A3C26B" stroke-width="7" />
+    <ellipse cx="276" cy="336" rx="15" ry="12" fill="#A3C26B" stroke-width="4" />
+    <circle cx="271" cy="333" r="2.8" fill="#141414" stroke="none" />
+    <path d="M266 341 q5 4 11 1" fill="none" stroke-width="2.5" />
+    <path d="M262 324 q6 -4 12 -2" fill="none" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M300 366 Q304 318 340 316 Q378 318 382 366 Z" fill="#B07A3E" stroke-width="5" />
+    <path d="M318 330 l12 -6 l14 4 l2 14 l-12 8 l-14 -4 z M300 362 l12 -16 M346 346 l18 4 l10 14 M316 346 l-2 18 M342 352 l4 12" fill="none" stroke-width="3" />
+    <path d="M326 322 q8 -4 16 0 q-4 6 -8 4 q-4 4 -8 -4 z M360 340 q6 -2 10 4 q-6 2 -10 -4 z" fill="#2E9C5A" stroke-width="2" />
+  </g>
+</svg>

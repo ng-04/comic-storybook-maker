@@ -3,8 +3,9 @@ import { IconShield } from '../components/Icons';
 import { PagePanel } from '../components/PagePanel';
 import { newCharacter, newPage, newStory } from '../domain/model';
 import { updateSettings } from '../state/settings';
+import coverArt from '../assets/sample-cover.svg';
 
-// A sample cover for the hero: a real PagePanel with no picture drawn, so it shows the layout.
+// A sample cover for the hero: a real PagePanel with a fixed sample picture.
 const sample = (() => {
   const st = newStory();
   st.title = 'Chiku and the River Promise';
@@ -28,14 +29,14 @@ export function Landing() {
           <div className="stack gap-20" style={{ flex: '999 1 420px', minWidth: 0 }}>
             <p className="kicker">Panchatantra · Jataka · Itihasa</p>
             <h1 className="display" style={{ fontSize: 'clamp(52px, 9vw, 92px)' }}>Comic books with a lesson at heart</h1>
-            <p style={{ margin: 0, fontSize: 21, maxWidth: '40ch' }}>Build a katha the way the old storytellers did: choose the desh and kaal, bring in your paatra, set the paristhiti, and turn it into a comic your children can read, print and remember.</p>
+            <p style={{ margin: 0, fontSize: 21, maxWidth: '40ch' }}>Make a colourful comic book starring your grandchildren. Share a story idea and a lesson you'd like them to learn, then read it together, print it and keep it.</p>
             <div className="row gap-14">
-              <button className="btn btn-primary btn-lg" onClick={start}>Start a katha</button>
+              <button className="btn btn-primary btn-lg" onClick={start}>Start a story</button>
               <button className="btn" onClick={demo}>Try the demo (no keys)</button>
             </div>
           </div>
           <div style={{ flex: '1 1 280px', maxWidth: 360, margin: '0 auto', transform: 'rotate(2deg)', boxShadow: '8px 8px 0 #141414' }}>
-            <PagePanel story={sample.st} page={sample.cover} />
+            <PagePanel story={sample.st} page={sample.cover} artSrc={coverArt} />
           </div>
         </section>
         <section style={{ maxWidth: 1160, margin: '0 auto', padding: '0 20px 64px' }}>

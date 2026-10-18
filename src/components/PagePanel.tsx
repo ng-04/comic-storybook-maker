@@ -69,11 +69,13 @@ export interface PagePanelProps {
   pageNo?: number;
   /** Show this version instead of the active one (version strip). */
   version?: PageVersion;
+  /** A fixed picture (the home page's sample cover), shown instead of a drawn version. */
+  artSrc?: string;
 }
 
-export function PagePanel({ story, page: p, pageNo, version }: PagePanelProps) {
+export function PagePanel({ story, page: p, pageNo, version, artSrc }: PagePanelProps) {
   const v = version || activeVersion(p);
-  const status = statusOf(p, v, !!version);
+  const status = artSrc ? 'done' : statusOf(p, v, !!version);
   const done = status === 'done';
   const isMiddle = p.kind === 'middle';
   const isGrid = isMiddle && p.layout === 'grid';
@@ -118,7 +120,8 @@ export function PagePanel({ story, page: p, pageNo, version }: PagePanelProps) {
         </>
       ) : (
         <div style={{ flex: '1 1 auto', minHeight: 0, position: 'relative', border: `max(2px, 1.2cqw) solid ${ink}`, background: '#FFFFFF', overflow: 'hidden', boxShadow: `1.4cqw 1.4cqw 0 ${ink}` }}>
-          {done && v?.blobId ? <Art blobId={v.blobId} alt={p.caption} /> : null}
+          {artSrc ? <img src={artSrc} alt={p.caption} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+            : done && v?.blobId ? <Art blobId={v.blobId} alt={p.caption} /> : null}
           <Overlay status={status} />
           {done && isMiddle && p.bubble.trim() && (
             <div style={{ position: 'absolute', top: '3cqw', left: '3cqw', maxWidth: '62%', background: '#FFFFFF', border: `max(2px, 0.9cqw) solid ${ink}`, borderRadius: '5cqw', padding: '2cqw 3.2cqw', fontWeight: 700, fontSize: '3.9cqw', lineHeight: 1.25, boxShadow: `0.9cqw 0.9cqw 0 ${ink}` }}>
