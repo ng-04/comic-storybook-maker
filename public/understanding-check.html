@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding check · Comic Storybook Maker</title>
+<meta name="description" content="Questions that need the code to answer, used alongside the design-decision walkthrough.">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=JetBrains+Mono&display=swap">
+<style>
+  :root { --ink:#141414; --yellow:#FFD93B; --blue:#1F4FB8; --paper:#F3EEE4; --card:#FFFFFF; --muted:#4A4A4A; --code:#FFF4C2; }
+  * { box-sizing: border-box; }
+  body { margin:0; background-color:var(--paper); background-image:radial-gradient(rgba(20,20,20,.10) 1.2px,transparent 1.7px); background-size:14px 14px;
+         color:var(--ink); font-family:'Comic Neue','Comic Sans MS',sans-serif; font-size:18px; line-height:1.55; }
+  header { background:var(--yellow); border-bottom:5px solid var(--ink); padding:12px 20px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+  header a.brand { font-family:'Bangers',Impact,sans-serif; font-size:26px; letter-spacing:.04em; color:var(--ink); text-decoration:none; }
+  header a.back { font-weight:700; color:var(--ink); }
+  main { max-width:860px; margin:0 auto; padding:32px 16px 80px; }
+  .kicker { font-family:'Bangers',Impact,sans-serif; letter-spacing:.08em; font-size:20px; color:var(--blue); margin:0; }
+  h1 { font-family:'Bangers',Impact,sans-serif; font-weight:400; letter-spacing:.03em; font-size:clamp(36px,7vw,52px); line-height:1; margin:6px 0 12px; }
+  h2 { font-family:'Bangers',Impact,sans-serif; font-weight:400; letter-spacing:.04em; font-size:30px; margin:0 0 8px; }
+  .lede { color:var(--muted); margin:0 0 24px; max-width:62ch; }
+  .panel { background:var(--card); border:5px solid var(--ink); border-radius:6px; box-shadow:6px 6px 0 var(--ink); padding:20px 24px; margin:0 0 28px; }
+  ol { margin:0; padding-left:1.4em; }
+  ol > li { margin:0 0 16px; }
+  ol > li:last-child { margin-bottom:0; }
+  ul { margin:8px 0 0; padding-left:1.2em; }
+  ul li { margin:4px 0; }
+  code { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.85em; background:var(--code); border:1.5px solid var(--ink); border-radius:4px; padding:0 4px; overflow-wrap:anywhere; }
+  details > summary { cursor:pointer; font-family:'Bangers',Impact,sans-serif; font-size:26px; letter-spacing:.04em; list-style:none; display:inline-flex; align-items:center; gap:10px; min-height:44px;
+         background:var(--yellow); border:4px solid var(--ink); border-radius:10px; box-shadow:4px 4px 0 var(--ink); padding:4px 18px; }
+  details > summary::-webkit-details-marker { display:none; }
+  details[open] > summary { margin-bottom:20px; }
+  summary:focus-visible, a:focus-visible { outline:4px solid var(--blue); outline-offset:3px; }
+  .note { font-size:15px; color:var(--muted); margin:12px 0 0; }
+  @media (max-width:480px) { .panel { padding:16px; box-shadow:4px 4px 0 var(--ink); } body { font-size:17px; } }
+  @media print { body { background:#fff; } header { display:none; } .panel { box-shadow:none; } details > summary { display:none; } details { display:block; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="./">Comic Storybook Maker</a>
+  <a class="back" href="./">Open the app</a>
+</header>
+<main>
+  <p class="kicker">Design review</p>
+  <h1>Understanding check</h1>
+  <p class="lede">Eight questions that need the code to answer, not the README or the specs. Used alongside the design-decision walkthrough. Source: <a href="https://github.com/ng-04/comic-storybook-maker/tree/main/src">github.com/ng-04/comic-storybook-maker</a>.</p>
+
+  <section class="panel" aria-labelledby="q">
+    <h2 id="q">Questions</h2>
+    <ol>
+<li><strong>The refusal ladder.</strong> In Simple mode, a family photo is attached and Gemini refuses every request with <code>IMAGE_OTHER</code>. List, in order, the requests sent for the <strong>cover</strong> and for <strong>page 3</strong>, the image or images attached to each, and the note the user finally sees on each page if the last step succeeds.
+</li>
+<li><strong>A stuck queue.</strong> Three Gemini requests hang and never return. The user opens another page and presses Redraw. What happens, and which line of code explains it? What should the user do?
+</li>
+<li><strong>Reopening the tab.</strong> The user closes the tab while two pages show "Drawing…" and a character sheet is mid-draw, then reopens it. What state are those pages and that sheet in, which function decides that, and why can't it simply resume the old requests?
+</li>
+<li><strong>A new draft during drawing.</strong> In Advanced mode, pages are drawing when the user writes a new draft. Explain the two mechanisms that stop a picture from the old outline attaching to the new pages, and the one side effect that can still happen.
+</li>
+<li><strong>A failed redraw.</strong> A page already has a picture. The user redraws it and Gemini refuses at every step. What status does the page end with, what does the Pictures grid show, what does the page editor show, and why was it designed that way rather than marking the page failed?
+</li>
+<li><strong>Every path to spending.</strong> Name every code path that can send a billed request to Gemini, and the user action or event that triggers each. Which one fires without the user clicking anything?
+</li>
+<li><strong>The passkey's real protection.</strong> <code>passkeyProblem()</code> runs only in the browser of whoever creates <code>keys.enc.json</code>. Why does rejecting <code>admin</code> still matter? What exactly protects the keys, and what can't it protect against once someone has unlocked them?
+</li>
+<li><strong>Grid pages.</strong> In a 3×2 grid page, panel 4 is refused at every step. What happens to the requests for panels 1, 2, 3, 5 and 6, is any version saved for the page, and why?
+</li>
+</ol>
+  </section>
+
+  <details>
+    <summary>Show the answer key</summary>
+    <section class="panel" aria-labelledby="a">
+      <h2 id="a">Answer key (for the reviewer)</h2>
+      <ol>
+<li><code>api/direct.ts</code> → <code>drawSimplePage</code>, with <code>drawWithLadder</code> in <code>api/gemini.ts</code>.
+<ul><li><strong>Cover:</strong> the page itself is the cover, so there is no cover reference. First a request with the photo (step 1), then text only. The note is the "drawn from the text only" message (<code>FALLBACK_NOTES.textOnly</code>), and the step jumps from 1 to 3 because there is no middle step.</li><li><strong>Page 3:</strong> photo + cover → cover only, with the "without your reference photos, matching the cover" note → text only.</li><li>In both cases each step is tried once, because a refusal moves straight to the next step without the transient retries.</li></ul>
+</li>
+<li><code>gemini.ts</code> → <code>slot()</code>: at most 3 Gemini requests run at once (<code>MAX_CONCURRENT = 3</code>) across the whole app, and <code>requestOnce</code> has no time limit. The redraw waits forever for a free slot. Reloading the page is the only way out; <code>revive</code> then puts the pages back in the queue. This is the "slow provider" gap from the design review.
+</li>
+<li><code>state/store.ts</code> → <code>revive()</code>, called by <code>loadLibrary</code>. Pages that were <code>drawing</code> become <code>queued</code>. The sheet becomes <code>review</code> if it has an earlier version, otherwise <code>none</code>. The old requests lived only in the closed tab: their <code>AbortController</code>s and promises are in memory, and nothing on a server holds the result.
+</li>
+<li>In <code>store.ts</code>:
+<ul><li><strong>Mechanism 1:</strong> <code>writeOutline</code> aborts the previous story request, and on success calls <code>stopIllustrating</code>, which aborts every drawing on the old pages.</li><li><strong>Mechanism 2:</strong> the new outline creates new page IDs, so a late <code>updatePage</code> for an old page ID matches nothing and does nothing.</li><li><strong>Side effect:</strong> if an old picture had already arrived and was being saved, its image file stays in IndexedDB with nothing using it. Storage is wasted, but the user doesn't see it.</li></ul>
+</li>
+<li><code>store.ts</code> → <code>drawPage</code> catch block: the status becomes <code>done</code> because the page has versions, and <code>error</code> is set.
+<ul><li>The grid still shows the earlier picture as Done.</li><li>The page editor shows the red "We couldn't draw this page" box from <code>p.error</code>.</li><li>Why: a finished book shouldn't become unreadable, or "not done", because an optional redraw failed. The earlier picture is still valid.</li></ul>
+</li>
+<li>The paths:
+<ul><li><strong><code>drawSheet</code>:</strong> from "Draw character sheet", "Regenerate" or "Draw all sheets" (Advanced only).</li><li><strong><code>drawPage</code> via <code>pump</code>:</strong> from <code>startIllustrating</code> ("Draw the pictures" or "Looks good, draw it") and <code>retryFailed</code>.</li><li><strong><code>drawPage</code> directly:</strong> Redraw or Ctrl+Enter in the page editor.</li><li><strong>The <code>online</code> event listener at the bottom of <code>store.ts</code>:</strong> it calls <code>pump</code> for books that are still drawing when the connection returns. This is the one that fires without a click.</li><li><code>testGeminiKey</code> only looks up the model, which is free.</li></ul>
+</li>
+<li>Anyone can download the encrypted file, so an attacker can guess passkeys offline as fast as their computer allows. A short or common passkey would be found quickly.
+<ul><li>The real protection is AES-256-GCM, with the key derived from the passkey by PBKDF2-SHA256 over 600,000 rounds (<code>state/vault.ts</code>), which slows down each guess. The unlock screen and the gate on page load are just navigation; they protect nothing.</li><li>Once unlocked, the keys sit in that browser's localStorage as full-access keys. Anyone with access to that browser, or a malicious extension, can read them. Revoking them means replacing the keys at Anthropic and Google, not just publishing a new file.</li></ul>
+</li>
+<li><code>direct.ts</code> grid branch: the panels share a local <code>AbortController</code> (<code>group</code>). When panel 4's final refusal rejects, <code>.catch</code> calls <code>group.abort()</code>. Panels still waiting or retrying stop with "Cancelled", and <code>Promise.all</code> rejects with panel 4's error.
+<ul><li>Panels that had already finished are discarded and not saved, because a version is only recorded once all six exist. The page shows Failed if it had no earlier version.</li><li>Why: a grid version must have exactly six panel images, and stopping the rest avoids paying for panels that will be thrown away.</li></ul>
+</li>
+</ol>
+      <p class="note">Each answer names the file and function where it can be checked.</p>
+    </section>
+  </details>
+</main>
+</body>
+</html>
