@@ -23,7 +23,7 @@ export function Unlock() {
       if (!bundle) { setError('This site has no shared keys any more. Add your own keys in Settings.'); return; }
       const keys = await decryptKeys(bundle, passkey);
       updateSettings({ ...keys, demo: false, fromPasskey: true });
-      nav('/library', { replace: true });
+      nav('/', { replace: true });
     } catch (err) {
       setError(err instanceof Error && err.message === 'WRONG_PASSKEY' ? "That passkey didn't work. Check it and try again." : "Couldn't unlock the keys in this browser.");
     } finally {
