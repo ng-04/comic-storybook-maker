@@ -25,10 +25,17 @@ const DEFAULTS: Settings = {
   storyModel: STORY_MODELS[0].id, imageModel: DEFAULT_IMAGE_MODEL, demo: false,
 };
 
+// v1 (ng-04.github.io/comic/) runs on the same origin and saved its keys under these names.
+// On first visit, carry them over so people don't have to paste them again.
+const V1_KEYS = { anthropicKey: 'comicAnthropicKey', workspaceId: 'comicWorkspaceId', geminiKey: 'comicGeminiKey' } as const;
+
 function read(): Settings {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+    if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
+    const fromV1 = { ...DEFAULTS };
+    for (const [field, v1] of Object.entries(V1_KEYS)) fromV1[field as keyof typeof V1_KEYS] = (localStorage.getItem(v1) || '').trim();
+    return fromV1;
   } catch {
     return { ...DEFAULTS };
   }
