@@ -1,6 +1,6 @@
 // Simple mode in demo: one form, writing, then every page drawn without sheets or outline review.
-import { beforeAll, describe, expect, it } from 'vitest';
-import { mockConfig } from '../api/mock';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { mockApi, mockConfig } from '../api/mock';
 import { simpleCharacters, blankSimple } from '../domain/model';
 import { db } from '../state/db';
 import { updateSettings } from '../state/settings';
@@ -31,9 +31,17 @@ describe('simple mode', () => {
     expect(w.characters[0].name).toBe('Avyay');
     expect(w.simple!.characters).toContain('Avyay');
     expect(pendingSheets(w)).toHaveLength(0);
+
+    // Review before spend: writing the story draws nothing; only the user's approval does.
+    const drawSpy = vi.spyOn(mockApi, 'drawPage');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(drawSpy).not.toHaveBeenCalled();
+    expect(w.status).toBe('outline');
+    expect(w.pages.every((p) => p.status === 'none' && p.versions.length === 0)).toBe(true);
     startIllustrating(st.id);
     await until(() => storyById(st.id)!.status === 'done');
     expect(storyById(st.id)!.pages.every((p) => p.versions.length === 1 && p.layout === 'caption')).toBe(true);
+    expect(drawSpy).toHaveBeenCalledTimes(12);
     await deleteAllReferenceImages();
     expect(storyById(st.id)!.simple!.photo).toBeNull();
     expect(await db.blobIdsOfKind('reference')).toHaveLength(0);

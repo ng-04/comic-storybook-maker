@@ -16,6 +16,7 @@ import { Settings } from './screens/Settings';
 import { Unlock } from './screens/Unlock';
 import { NewBook } from './screens/NewBook';
 import { SimpleForm } from './screens/SimpleForm';
+import { SimpleReview } from './screens/SimpleReview';
 import { loadBundle } from './state/vault';
 import { Writing } from './screens/Writing';
 import { Katha } from './screens/setup/Katha';
@@ -59,6 +60,7 @@ function RequireSetup({ children }: { children: ReactNode }) {
 
 const SCREENS: Record<string, { step: StepKey; render: (st: Story) => ReactNode }> = {
   simple: { step: 'simple', render: (st) => <SimpleForm st={st} /> },
+  check: { step: 'check', render: (st) => <SimpleReview st={st} /> },
   desh: { step: 'desh', render: (st) => <Desh st={st} /> },
   kaal: { step: 'kaal', render: (st) => <Kaal st={st} /> },
   paatra: { step: 'paatra', render: (st) => <Paatra st={st} /> },

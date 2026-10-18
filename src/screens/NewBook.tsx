@@ -12,7 +12,7 @@ export function NewBook() {
   const cards = [
     {
       mode: 'simple' as const, title: 'Simple', time: 'About 2 minutes to set up',
-      points: ["Your child's name, age and the people in the story", 'One story idea, a tone and a page count', 'Optional family photo', 'Claude writes it and every page is drawn straight away'],
+      points: ["Your child's name, age and the people in the story", 'One story idea, a tone and a page count', 'Optional family photo', 'Claude writes it; you check the words, then every page is drawn'],
       cta: 'Make a simple comic', cls: 'btn-primary', bg: '#FFD93B',
     },
     {

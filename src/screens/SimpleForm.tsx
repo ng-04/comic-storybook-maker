@@ -32,7 +32,7 @@ export function SimpleForm({ st }: { st: Story }) {
       <div>
         <p className="kicker">Simple comic</p>
         <h1 className="h1">Who's the hero, and what happens?</h1>
-        <p className="muted" style={{ margin: '8px 0 0', maxWidth: '62ch' }}>Fill in the basics. Claude writes the story and every page is drawn straight away; you can redraw any page afterwards.</p>
+        <p className="muted" style={{ margin: '8px 0 0', maxWidth: '62ch' }}>Fill in the basics. Claude writes the story, you check the words, then every page is drawn. You can redraw any page afterwards.</p>
       </div>
       <div className="panel stack gap-20" style={{ padding: 20 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: 16 }}>

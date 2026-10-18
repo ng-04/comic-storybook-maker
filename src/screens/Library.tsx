@@ -8,7 +8,7 @@ import { askConfirm, createSequel, deleteStory, loadLibrary, useStore } from '..
 export function openPath(st: Story): string {
   const simple = st.mode === 'simple';
   const screen = st.status === 'done' ? 'read' : st.status === 'illustrating' ? 'pictures'
-    : st.status === 'outline' ? (simple ? 'pictures' : 'outline') : (simple ? 'simple' : 'desh');
+    : st.status === 'outline' ? (simple ? 'check' : 'outline') : (simple ? 'simple' : 'desh');
   return `/s/${st.id}/${screen}`;
 }
 

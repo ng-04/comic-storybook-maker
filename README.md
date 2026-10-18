@@ -13,7 +13,7 @@ A parent builds a *katha* in five steps (Desh, Kaal, Paatra, Paristhiti, Katha) 
 
 Every new book starts with a choice of two modes:
 
-- **Simple:** one form like the first version (hero, age, other characters, story idea, tone, pages, family photo). Claude writes the story and every page is drawn straight away, cover first, the rest matching the cover. No character sheets or outline review.
+- **Simple:** one form like the first version (hero, age, other characters, story idea, tone, pages, family photo). Claude writes the story, the user checks and edits the words on one screen, then every page is drawn, cover first, the rest matching the cover. No character sheets. As in Advanced mode, no picture is drawn before the user approves the text.
 - **Advanced:** the five-step katha builder below.
 
 The specs in `docs/` describe the Phase 2 product. Phase 1 builds the same screens and flow, with these differences:

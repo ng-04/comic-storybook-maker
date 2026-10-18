@@ -63,7 +63,7 @@ textarea.input{resize:vertical;line-height:1.4}
 .reftile{display:flex;gap:8px;align-items:center;border:3px solid #141414;border-radius:8px;background:#FFFFFF;padding:6px 6px 6px 10px;font-size:15px;max-width:100%}
 details > summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
 details > summary::-webkit-details-marker{display:none}
-details > summary::before{content:'+';font-family:'Bangers',Impact,sans-serif;font-size:22px;width:28px;height:28px;border:3px solid #141414;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:#FFD93B}
+details > summary::before{content:'+';font-family:'Comic Neue',sans-serif;font-weight:700;font-size:22px;line-height:1;width:28px;height:28px;border:3px solid #141414;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:#FFD93B}
 details[open] > summary::before{content:'–'}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 .file-in:focus-visible + label{outline:4px solid #1F4FB8;outline-offset:3px}
