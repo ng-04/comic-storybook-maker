@@ -17,12 +17,6 @@ export function Landing() {
   // /library redirects to Unlock (site has shared keys) or Settings (it doesn't) when no keys are set.
   const start = () => nav('/new');
   const demo = () => { updateSettings({ demo: true }); nav('/library'); };
-  const steps = [
-    ['Desh & Kaal', 'Where and when: a forest by the Narmada, a kingdom in the Treta Yuga, a village at Diwali.'],
-    ['Paatra', 'The characters, human or animal, and what drives each one: dharma, artha, kaam or moksh.'],
-    ['Paristhiti & Katha', 'The situation, the plot and the lesson. Review every page before any picture is drawn.'],
-    ['Read & print', 'Single scenes for simple tales, six-panel comic pages for richer ones. Read aloud or print as a PDF.'],
-  ];
   return (
     <>
       <header className="appheader" style={{ justifyContent: 'space-between' }}>
@@ -38,24 +32,11 @@ export function Landing() {
             <div className="row gap-14">
               <button className="btn btn-primary btn-lg" onClick={start}>Start a katha</button>
               <button className="btn" onClick={demo}>Try the demo (no keys)</button>
-              <a className="btn btn-quiet" href="#how" onClick={(e) => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }}>How it works</a>
             </div>
           </div>
           <div style={{ flex: '1 1 280px', maxWidth: 360, margin: '0 auto', transform: 'rotate(2deg)', boxShadow: '8px 8px 0 #141414' }}>
             <PagePanel story={sample.st} page={sample.cover} />
           </div>
-        </section>
-        <section id="how" style={{ maxWidth: 1160, margin: '0 auto', padding: '8px 20px 40px' }}>
-          <h2 className="h1" style={{ marginBottom: 20 }}>How a katha comes together</h2>
-          <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 24 }}>
-            {steps.map(([h, t], i) => (
-              <li key={h} className="panel stack gap-8" style={{ padding: 20 }}>
-                <span className="h2" style={{ fontSize: 40, color: '#1F4FB8' }}>{i + 1}</span>
-                <h3 className="h2">{h}</h3>
-                <p className="m0">{t}</p>
-              </li>
-            ))}
-          </ol>
         </section>
         <section style={{ maxWidth: 1160, margin: '0 auto', padding: '0 20px 64px' }}>
           <div className="panel row gap-16" style={{ padding: 20, background: '#E6EEFF' }}>
