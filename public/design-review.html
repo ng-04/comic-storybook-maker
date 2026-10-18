@@ -339,11 +339,26 @@
         <dt>Spec change</dt><dd>Add a per-browser spend log in localStorage, kept by day.
           <ul>
             <li>Before <em>every</em> billed request, <code>gemini.ts</code> and <code>claude.ts</code> add an estimate to the log (image ₹3.5; story at its token estimate). If that would pass the limit, they refuse with <code>QUOTA_EXCEEDED</code> without sending anything.</li>
-            <li>"Draw the pictures" shows the estimated cost of the book and today's remaining amount.</li>
+            <li><strong>When the limit is reached (decision D1: draw until the limit, then pause):</strong>
+              <ul>
+                <li>Requests already sent are allowed to finish, because they're already paid for.</li>
+                <li>Queued pages get a new status, <code>paused</code>, shown as "Paused until tomorrow". The book stays readable with the pages already drawn.</li>
+                <li>Redraw, Retry and Draw sheet are disabled, with the same message.</li>
+                <li>When the day changes (local midnight), paused pages go back to <code>queued</code>. Whether they then draw on their own or after a click is decision D3.</li>
+                <li><code>revive</code> keeps <code>paused</code> as it is when the tab is reopened.</li>
+              </ul>
+            </li>
+            <li>"Draw the pictures" shows the estimated cost and today's remaining amount, for information only. It doesn't block.</li>
             <li>The hard limit for everyone together is set outside the app: an Anthropic workspace spend limit, and a requests-per-day quota on the Gemini API in Google Cloud.</li>
           </ul>
         </dd>
-        <dt>Acceptance</dt><dd>With today's log at ₹98, pressing Redraw shows "Today's limit is reached" and the network panel shows <strong>no</strong> request to <code>generativelanguage.googleapis.com</code>.</dd>
+        <dt>Acceptance</dt><dd>
+          <ul>
+            <li>With today's log at ₹98, pressing Redraw shows "Today's limit is reached" and the network panel shows <strong>no</strong> request to <code>generativelanguage.googleapis.com</code>.</li>
+            <li>With the log at ₹93 and pictures counted at ₹3.5, starting an 8-page Simple book sends exactly <strong>2</strong> picture requests. The other 6 pages show "Paused until tomorrow", and no more requests go out.</li>
+            <li>Moving the clock past midnight puts those 6 pages back to <code>queued</code>.</li>
+          </ul>
+        </dd>
       </dl>
     </div>
 
@@ -522,17 +537,23 @@
   <section class="panel" id="decide" aria-labelledby="h-decide">
     <h2 id="h-decide">8. Open product decision</h2>
     <p>Decisions are taken one at a time. Each answer changes the spec above before the next question is asked.</p>
-    <h3>D1 of 7: What happens when a book costs more than what's left of today's ₹100?</h3>
-    <p>A Simple 8-page book is about ₹26 in pictures. An Advanced grid book is ₹86–205 before any redraws. So the limit can stop a book partway through.</p>
+    <div class="ok"><strong>D1, decided: draw until the limit, then pause.</strong> Pages that don't fit in today's ₹100 show "Paused until tomorrow" and continue the next day. G1 above has been updated to match.</div>
+    <h3>D2 of 7: Is the ₹100 per browser, or one limit for everyone who has the passkey?</h3>
+    <p>In Phase 1 the app can only count what <em>this</em> browser spends. If 4 family members unlock with the passkey, they can spend ₹400 a day between them on the same accounts.</p>
     <ul>
-      <li><strong>A. Check before drawing (recommended).</strong> "Draw the pictures" shows the book's estimated cost. If that is more than today's remaining amount, it won't start, and suggests fewer pages or single-scene pages. A book never stops halfway.</li>
-      <li><strong>B. Draw until the limit, then pause.</strong> The remaining pages show "Paused until tomorrow" and carry on the next day.</li>
-      <li><strong>C. Raise the limit.</strong> For example, ₹250 a day, so that any one book fits.</li>
+      <li><strong>A. Per browser in the app, plus a hard total set at the providers (recommended).</strong>
+        <ul>
+          <li>The app pauses each browser at ₹100, as in D1.</li>
+          <li>You also set a hard ceiling for everyone together, outside the app: a requests-per-day quota on the Gemini API in Google Cloud Console (about 30 pictures a day ≈ ₹100), and a monthly spend limit on the Anthropic workspace.</li>
+          <li>If the provider ceiling is hit first, those pages fail with "the image service's daily limit is reached", and the app treats that like the pause.</li>
+        </ul>
+      </li>
+      <li><strong>B. Per browser only.</strong> Simplest. The total is ₹100 × the number of people using the passkey.</li>
+      <li><strong>C. One shared total, counted by the app.</strong> This needs a server that every browser reports to, which means bringing part of Phase 2 forward.</li>
     </ul>
-    <div class="ok"><strong>Next, once D1 is decided:</strong>
+    <div class="ok"><strong>Next, once D2 is decided:</strong>
       <ul>
-        <li>D2: per-browser limit or one limit for everyone with the passkey;</li>
-        <li>D3: resume drawing on its own, or after a click;</li>
+                <li>D3: resume drawing on its own, or after a click;</li>
         <li>D4: what to do with an out-of-date reply;</li>
         <li>D5: its own domain, or stay on ng-04.github.io;</li>
         <li>D6: children's photos and the Gemini paid tier, plus the consent wording;</li>
