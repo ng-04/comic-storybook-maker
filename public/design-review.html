@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design review · Comic Storybook Maker</title>
+<meta name="description" content="A paper review of the Phase 1 design: one request traced end to end, four failure scenarios, removable parts, unenforced boundaries and the open product decisions.">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=JetBrains+Mono&display=swap">
+<style>
+  :root { --ink:#141414; --yellow:#FFD93B; --blue:#1F4FB8; --paper:#F3EEE4; --card:#FFFFFF; --muted:#4A4A4A; --code:#FFF4C2; }
+  * { box-sizing: border-box; }
+  body { margin:0; background-color:var(--paper); background-image:radial-gradient(rgba(20,20,20,.10) 1.2px,transparent 1.7px); background-size:14px 14px;
+         color:var(--ink); font-family:'Comic Neue','Comic Sans MS',sans-serif; font-size:18px; line-height:1.55; }
+  header { background:var(--yellow); border-bottom:5px solid var(--ink); padding:12px 20px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+  header a.brand { font-family:'Bangers',Impact,sans-serif; font-size:26px; letter-spacing:.04em; color:var(--ink); text-decoration:none; }
+  header a.back { font-weight:700; color:var(--ink); }
+  main { max-width:860px; margin:0 auto; padding:32px 16px 80px; }
+  .kicker { font-family:'Bangers',Impact,sans-serif; letter-spacing:.08em; font-size:20px; color:var(--blue); margin:0; }
+  h1 { font-family:'Bangers',Impact,sans-serif; font-weight:400; letter-spacing:.03em; font-size:clamp(36px,7vw,52px); line-height:1; margin:6px 0 12px; }
+  h2 { font-family:'Bangers',Impact,sans-serif; font-weight:400; letter-spacing:.04em; font-size:30px; margin:0 0 8px; }
+  .lede { color:var(--muted); margin:0 0 24px; max-width:62ch; }
+  .panel { background:var(--card); border:5px solid var(--ink); border-radius:6px; box-shadow:6px 6px 0 var(--ink); padding:20px 24px; margin:0 0 28px; }
+  ol { margin:0; padding-left:1.4em; }
+  ol > li { margin:0 0 16px; }
+  ol > li:last-child { margin-bottom:0; }
+  ul { margin:8px 0 0; padding-left:1.2em; }
+  ul li { margin:4px 0; }
+  code { font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.85em; background:var(--code); border:1.5px solid var(--ink); border-radius:4px; padding:0 4px; overflow-wrap:anywhere; }
+  details > summary { cursor:pointer; font-family:'Bangers',Impact,sans-serif; font-size:26px; letter-spacing:.04em; list-style:none; display:inline-flex; align-items:center; gap:10px; min-height:44px;
+         background:var(--yellow); border:4px solid var(--ink); border-radius:10px; box-shadow:4px 4px 0 var(--ink); padding:4px 18px; }
+  details > summary::-webkit-details-marker { display:none; }
+  details[open] > summary { margin-bottom:20px; }
+  summary:focus-visible, a:focus-visible { outline:4px solid var(--blue); outline-offset:3px; }
+  .note { font-size:15px; color:var(--muted); margin:12px 0 0; }
+  @media (max-width:480px) { .panel { padding:16px; box-shadow:4px 4px 0 var(--ink); } body { font-size:17px; } }
+  @media print { body { background:#fff; } header { display:none; } .panel { box-shadow:none; } details > summary { display:none; } details { display:block; } }
+
+  h3 { font-size:20px; margin:22px 0 6px; }
+  h3:first-of-type { margin-top:8px; }
+  p { margin:0 0 12px; }
+  .tbl { overflow-x:auto; margin:8px 0 4px; -webkit-overflow-scrolling:touch; }
+  table { border-collapse:collapse; width:100%; font-size:16px; min-width:640px; }
+  th, td { border:2px solid var(--ink); padding:6px 8px; text-align:left; vertical-align:top; }
+  th { background:var(--yellow); font-weight:700; }
+  .warn { background:#FFE3E0; border:3px solid var(--ink); border-radius:6px; padding:10px 14px; margin:12px 0; }
+  .ok { background:#E6EEFF; border:3px solid var(--ink); border-radius:6px; padding:10px 14px; margin:12px 0; }
+  .tag { display:inline-block; font-weight:700; font-size:14px; border:2px solid var(--ink); border-radius:4px; padding:0 6px; background:var(--yellow); }
+  .gap { border-top:3px dashed var(--ink); padding-top:14px; margin-top:16px; }
+  .gap:first-of-type { border-top:0; padding-top:0; margin-top:0; }
+  dl { margin:6px 0 0; }
+  dt { font-weight:700; margin-top:8px; }
+  dd { margin:0 0 0 0; }
+  nav.toc ol { columns:2 260px; }
+  nav.toc li { margin:0 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="./">Comic Storybook Maker</a>
+  <a class="back" href="./">Open the app</a>
+</header>
+<main>
+  <p class="kicker">Design review · Phase 1</p>
+  <h1>Design review on paper</h1>
+  <p class="lede">The Phase 1 build checked against the agreed user journey and constraints. It follows one request from the screen to the finished book, then works through four failure cases.</p>
+
+  <div class="warn"><strong>Nothing on this page has been run.</strong> Every behaviour below comes from reading the code at commit <code>f68a362</code> (<a href="https://github.com/ng-04/comic-storybook-maker/tree/f68a362/src">source</a>). Paper tests are predictions, not test results. Costs use Google's published price for <code>gemini-2.5-flash-image</code>, about US$0.039 (≈ ₹3.3) per image; check the Google Cloud billing page for the real figure.</div>
+
+  <nav class="toc panel" aria-labelledby="toc">
+    <h2 id="toc">Contents</h2>
+    <ol>
+      <li><a href="#basis">What it is checked against</a></li>
+      <li><a href="#trace">One request, screen to book</a></li>
+      <li><a href="#effects">Everything that changes the outside world</a></li>
+      <li><a href="#tests">Four paper tests</a></li>
+      <li><a href="#remove">What could be removed</a></li>
+      <li><a href="#gaps">Claimed but not enforced</a></li>
+      <li><a href="#correction">A correction to the understanding check</a></li>
+      <li><a href="#decide">Open product decision</a></li>
+    </ol>
+  </nav>
+
+  <section class="panel" id="basis" aria-labelledby="h-basis">
+    <h2 id="h-basis">1. What it is checked against</h2>
+    <ul>
+      <li><strong>Journeys:</strong> J1–J7 in <code>docs/goal-spec.md</code>, plus Simple mode (form → Check the words → draw), which was added later.</li>
+      <li><strong>Principles:</strong> review before spend, child-safe by default, private by default, honest about AI.</li>
+      <li><strong>Phase 1 constraints:</strong>
+        <ul>
+          <li>Static site on GitHub Pages, with each visitor's browser calling Claude and Gemini directly.</li>
+          <li>Keys come from the passkey file <code>keys.enc.json</code> or Settings, and are never in the bundle.</li>
+          <li>Demo mode needs no keys.</li>
+        </ul>
+      </li>
+      <li><strong>Agreed in the last design review:</strong>
+        <ul>
+          <li>A daily limit of about ₹100.</li>
+          <li>The owner restricts the Gemini key in Google Cloud Console.</li>
+          <li>Two tabs open on the same book are out of scope.</li>
+        </ul>
+      </li>
+      <li><strong>Phase 2 (AWS) is a plan, not code.</strong> When an answer depends on Phase 2, it says so.</li>
+    </ul>
+  </section>
+
+  <section class="panel" id="trace" aria-labelledby="h-trace">
+    <h2 id="h-trace">2. One request, screen to book</h2>
+    <p>Example: a grandparent makes an 8-page Simple comic with a family photo. The two places where Advanced mode differs follow the table.</p>
+    <p>"Authoritative" means the copy that wins if two disagree. "Memory" means the JavaScript state in the open tab.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>#</th><th>Screen and action</th><th>Code</th><th>Authoritative data at this step</th><th>Leaves the browser?</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Open the site, type the passkey</td><td><code>PasskeyGate</code>, <code>Unlock</code> → <code>decryptKeys</code> → <code>updateSettings</code></td><td><code>keys.enc.json</code> in the repo until unlock. After that, <code>localStorage['csm2-settings']</code> holds the plain keys for this browser.</td><td>A GET for <code>keys.enc.json</code> (free). Writes the keys to localStorage.</td></tr>
+        <tr><td>2</td><td>Start a story → Simple</td><td><code>createStory</code></td><td>Memory. IndexedDB catches up within 400 ms (<code>scheduleSave</code>, store.ts:72).</td><td>Writes to IndexedDB.</td></tr>
+        <tr><td>3</td><td>Fill in the form, choose a photo</td><td><code>updateSimple</code>, <code>setSimplePhoto</code> → <code>prepareImage</code></td><td>The photo goes straight into the IndexedDB <code>blobs</code> store as kind <code>reference</code>. The form fields are in memory, then IndexedDB.</td><td>Writes to IndexedDB.</td></tr>
+        <tr><td>4</td><td>"Make my comic!"</td><td><code>Writing</code> → <code>writeOutline</code> (store.ts:328) → <code>claudeJson</code></td><td>The <strong>copy of the story taken when the request started</strong> is what Claude writes from. The job itself (<code>writing</code>, <code>writeControllers</code>) is only in memory.</td><td><strong>Billed:</strong> the hero's name, the other characters and the idea go to Anthropic. A worst case of 2 attempts × 3 SDK tries = 6 requests.</td></tr>
+        <tr><td>5</td><td>The story arrives</td><td><code>writeOutline</code>: <code>stopIllustrating</code>, then the pages are replaced with new IDs</td><td>Claude's reply becomes <code>story.pages</code> in memory, then IndexedDB. The earlier pages and their versions are dropped.</td><td>Writes to IndexedDB.</td></tr>
+        <tr><td>6</td><td>Check the words, then "Looks good, draw it"</td><td><code>SimpleReview</code> → <code>startIllustrating</code> → <code>pump</code></td><td>The edited pages in memory. <code>story.status = 'illustrating'</code> is now what keeps drawing going.</td><td>None until the cover request.</td></tr>
+        <tr><td>7</td><td>The cover draws</td><td><code>drawPage</code> → <code>drawSimplePage</code> → <code>drawWithLadder</code> → <code>requestOnce</code></td><td>The page's <code>status</code> in memory. Once Google replies, the image is saved to IndexedDB <em>first</em> (store.ts:483). The story record that points to it is saved up to 400 ms later.</td><td><strong>Billed:</strong> the prompt and the <strong>family photo</strong> go to Google. Up to 3 steps × 3 tries = 9 requests.</td></tr>
+        <tr><td>8</td><td>The other 7 pages, 3 at a time</td><td><code>pump</code> (store.ts:451). The <code>slot()</code> semaphore allows 3 Gemini requests at once.</td><td>For every page, the cover's active version is the style reference.</td><td><strong>Billed:</strong> 7 images, each sent with the photo and the cover.</td></tr>
+        <tr><td>9</td><td>Redraw a page or pick a version</td><td>PageEditor → <code>drawPage</code>, <code>updatePage({activeVersionId})</code></td><td><code>page.versions</code> are never changed after they're made. <code>activeVersionId</code> says which one shows.</td><td>A redraw is <strong>billed</strong>. Picking a version stays on this device.</td></tr>
+        <tr><td>10</td><td>Read, save as PDF</td><td><code>Reader</code> → <code>exportPdf</code> (html-to-image + jsPDF)</td><td>Rendered from the story record and the page images. The PDF is a copy that is never updated afterwards.</td><td>Writes a file to the user's disk.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Where Advanced mode differs</h3>
+    <ul>
+      <li><strong>Character sheets.</strong> Before step 4, each character's sheet is drawn and then approved. Each sheet is <strong>billed</strong>, and the character's reference photos go to Google.
+        <ul>
+          <li>The approved sheet then becomes the reference image for every page that character is on.</li>
+        </ul>
+      </li>
+      <li><strong>Outline review.</strong> Step 6 is the Outline screen, which adds "Rewrite this page". Each rewrite is <strong>billed</strong> by Anthropic.</li>
+      <li><strong>Grid pages.</strong> A grid page is 6 images, so a 12-page grid book is 62 images, about ₹205.</li>
+    </ul>
+    <p class="note">No share link is built in Phase 1. J5 counts as done once a PDF is downloaded, as goal-spec allows.</p>
+  </section>
+
+  <section class="panel" id="effects" aria-labelledby="h-effects">
+    <h2 id="h-effects">3. Everything that changes the outside world</h2>
+    <p>This covers every operation that costs money, sends data to someone else, or leaves something behind after the tab closes.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Operation</th><th>Started by</th><th>Goes to</th><th>Cost</th><th>Worst-case requests</th></tr></thead>
+      <tbody>
+        <tr><td><code>writeOutline</code> → <code>claudeJson</code></td><td>"Make my comic!", "Write my katha", "Try again"</td><td>Anthropic: names, setup, idea</td><td>Billed</td><td>6. The server-side fallback (claude.ts:57) can also move it to a different model without saying so.</td></tr>
+        <tr><td><code>rewritePage</code></td><td>"Rewrite this page" (Advanced)</td><td>Anthropic</td><td>Billed</td><td>3</td></tr>
+        <tr><td><code>testAnthropicKey</code></td><td>Settings → Test</td><td>Anthropic</td><td>Billed (tiny)</td><td>3</td></tr>
+        <tr><td><code>drawSheet</code></td><td>Draw sheet, Regenerate, "Draw all sheets"</td><td>Google: character photos</td><td>Billed</td><td>6</td></tr>
+        <tr><td><code>drawPage</code>, single picture</td><td>The queue (<code>pump</code>), Redraw, Ctrl+Enter</td><td>Google: photos, sheets, cover</td><td>Billed</td><td>9</td></tr>
+        <tr><td><code>drawPage</code>, grid page</td><td>The same</td><td>Google</td><td>Billed ×6</td><td>54</td></tr>
+        <tr><td><code>pump</code> with no click</td><td>Opening the Pictures screen (Illustrate.tsx:21) or the <code>online</code> event (store.ts:510)</td><td>Google</td><td>Billed</td><td>Every queued page</td></tr>
+        <tr><td>The offline re-queue loop</td><td><code>drawPage</code> catches <code>OFFLINE</code> → <code>queued</code> → <code>pump</code> (store.ts:497)</td><td>Google</td><td>Billed if any request got through</td><td><strong>No limit</strong> (see test D)</td></tr>
+        <tr><td><code>testGeminiKey</code></td><td>Settings → Test</td><td>Google</td><td>Free (looks up the model)</td><td>1</td></tr>
+        <tr><td>Saving keys, stories and images</td><td>Unlock, Settings, any edit</td><td>This browser's localStorage and IndexedDB</td><td>Free</td><td>—</td></tr>
+        <tr><td>Create <code>keys.enc.json</code></td><td>Settings, owner only</td><td>A downloaded file. The owner then pushes it to the public repo.</td><td>Free</td><td>—</td></tr>
+        <tr><td>Export the PDF</td><td>Reader</td><td>The user's disk</td><td>Free</td><td>—</td></tr>
+        <tr><td>Load fonts</td><td>Every page load</td><td>Google Fonts (sees the visitor's IP)</td><td>Free</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The app keeps <strong>no record of what it has spent</strong>. Only the Anthropic Console and Google Cloud billing know. Refused image requests may still be charged for their input. Check that on Google's billing page; don't assume it.</p>
+  </section>
+
+  <section class="panel" id="tests" aria-labelledby="h-tests">
+    <h2 id="h-tests">4. Four paper tests</h2>
+    <p>Each test describes what the user would see and which part of the code is responsible. None of these has been run.</p>
+
+    <h3>A. The image service is slow</h3>
+    <p>Gemini takes several minutes to answer, or never answers.</p>
+    <ul>
+      <li><strong>What the user sees:</strong>
+        <ul>
+          <li>Pages stay on "Drawing…" with no time limit.</li>
+          <li>Other pages stay "Queued", and Redraw in the page editor waits silently.</li>
+          <li>There is no Stop button for drawing.</li>
+          <li>Reloading the page is the only way out. Afterwards, opening the Pictures screen starts the same pages drawing again, and those requests are billed.</li>
+        </ul>
+      </li>
+      <li><strong>Who is responsible:</strong> nothing enforces a time limit.
+        <ul>
+          <li><code>requestOnce</code> (gemini.ts:66) has no timeout.</li>
+          <li><code>slot()</code> (gemini.ts:28) holds its 3 places for as long as a request is open.</li>
+          <li>The only abort signals come from a new outline (<code>writeOutline</code> → <code>stopIllustrating</code>) and from deleting the book.</li>
+        </ul>
+      </li>
+      <li><strong>Claude being slow:</strong> this case behaves better.
+        <ul>
+          <li>The Writing screen shows the time taken, and its progress bar stops at 96%.</li>
+          <li><strong>Cancel</strong> works, because <code>cancelWriting</code> aborts the stream.</li>
+          <li>There is no time limit of our own, though: the SDK's default timeout applies, with 2 retries (claude.ts:18).</li>
+        </ul>
+      </li>
+      <li><strong>What the spec requires:</strong> backend-spec §5 limits a page image to 90 s and a story to 120 s.</li>
+      <li><strong>Phase 2:</strong> the worker Lambda timeout would enforce these limits, and job polling would show "failed" when one runs out.</li>
+    </ul>
+
+    <h3>B. The model returns a valid but wrong answer</h3>
+    <p>Examples:</p>
+    <ul>
+      <li>Claude returns 8 well-formed pages, but the hero has the wrong name, the ending has no "Seekh:", or a caption is 600 characters.</li>
+      <li>Gemini returns a picture with writing in it, the wrong child, or a scary scene.</li>
+    </ul>
+    <ul>
+      <li><strong>What the user sees:</strong> the story appears on the Check screen (Simple) or the Outline screen (Advanced), and looks normal.
+        <ul>
+          <li>A wrong picture shows as Done.</li>
+          <li>A long caption overflows the page panel.</li>
+          <li>On a grid page, a panel whose speaker doesn't exist quietly loses its speaker, because <code>toPanels</code> sets it to <code>''</code> (direct.ts).</li>
+        </ul>
+      </li>
+      <li><strong>Who is responsible:</strong>
+        <ul>
+          <li>The <strong>person</strong> is the only content check. That is the Check or Outline screen before drawing, and Redraw or "pick a version" after.</li>
+          <li>The JSON schema guarantees the shape of Claude's reply, not what it means.</li>
+          <li>The code only checks the page count, and the panel count on grid pages (direct.ts:41, :82).</li>
+        </ul>
+      </li>
+      <li><strong>What the spec requires:</strong> backend-spec §4.3 asks for length checks, a check that each speaker exists, and an output safety check (keyword list plus an LLM classifier). <strong>None of these is built.</strong></li>
+      <li><strong>Pictures:</strong> nothing checks the images at all.</li>
+    </ul>
+
+    <h3>C. An old reply arrives after the user has corrected something</h3>
+    <ul>
+      <li><strong>Case C1, a page redraw.</strong> In the page editor the user presses Redraw, then corrects the prompt while it is still drawing. The prompt box stays editable during drawing (PageEditor.tsx:99).
+        <ul>
+          <li>The picture drawn from the old prompt arrives. It is added as a new version and <strong>made the active one</strong>.</li>
+          <li>The box shows the new prompt and the picture matches the old one, and nothing on screen says so.</li>
+          <li><code>drawPage</code> drew from a copy of the story taken at the start (store.ts:482). The version doesn't record which prompt it was drawn from, although backend-spec asks for <code>promptSnapshot</code>.</li>
+          <li><strong>Nothing prevents this.</strong></li>
+        </ul>
+      </li>
+      <li><strong>Case C2, the story.</strong> While "Writing your story…" is showing, the user goes back to the form and fixes the hero's name. The Writing screen says they can look at other steps meanwhile.
+        <ul>
+          <li>The story written from the old form arrives, replaces the pages, and opens the Check screen with the old name.</li>
+          <li>The <strong>Check screen</strong> is the only safeguard, because the person might notice. Nothing compares the form to what was sent.</li>
+        </ul>
+      </li>
+      <li><strong>Case C3, a new draft or a deleted page.</strong> This one is safe.
+        <ul>
+          <li>The new outline gets new page IDs, so a late <code>updatePage</code> for an old page finds nothing and does nothing.</li>
+          <li>Rewrite locks that page's text boxes while it runs (Outline.tsx).</li>
+          <li>The one side effect: an image file that arrives late stays in IndexedDB with nothing using it.</li>
+        </ul>
+      </li>
+      <li><strong>Case C4, Simple mode cover.</strong> If the cover is redrawn while other pages are still drawing, those pages keep the old cover as their style reference.</li>
+      <li><strong>Phase 2:</strong> the plan's <code>If-Match: revision</code> catches conflicting saves of the story. It does <em>not</em> catch C1, because a job result isn't a save from the browser. That needs the change proposed in gap G6 below.</li>
+    </ul>
+
+    <h3>D. A save succeeds but its reply is lost</h3>
+    <ul>
+      <li><strong>Case D1, Google draws the picture but the reply never arrives.</strong> The connection drops after Google has started generating, and Google bills for the picture.
+        <ul>
+          <li><code>fetch</code> fails, which counts as <code>OFFLINE</code> and can be retried, so the same step is tried up to 3 times. Every attempt that reaches Google is billed again.</li>
+          <li>If all 3 attempts fail, <code>drawPage</code> marks the page <code>queued</code> with no error (store.ts:497), and <code>finally → pump</code> starts it again straight away.</li>
+          <li>The browser still says it is online (<code>navigator.onLine</code>), so this <strong>repeats with no limit</strong> for as long as Google can't be reached.</li>
+          <li>What the user sees: the page keeps flipping between "Drawing" and "Queued". Nothing says it is spending.</li>
+          <li><strong>Nothing limits it.</strong></li>
+        </ul>
+      </li>
+      <li><strong>Case D2, Claude writes the story but the reply is lost.</strong> The SDK resends the request up to 2 more times (claude.ts:18), and each one is billed.
+        <ul>
+          <li>Then the user sees "Couldn't reach Anthropic" with a <em>Try again</em> button.</li>
+        </ul>
+      </li>
+      <li><strong>Case D3, a local save is lost.</strong>
+        <ul>
+          <li>The picture is saved to IndexedDB, but the story record that points to it is only written up to 400 ms later.</li>
+          <li>If the tab closes in that gap, the picture is lost. The file is still stored, but nothing points to it.</li>
+          <li><code>revive</code> then puts the page back to <code>queued</code>, and opening the Pictures screen <strong>pays for it again</strong>.</li>
+        </ul>
+      </li>
+      <li><strong>Who should prevent it:</strong> in Phase 1, no component does.
+        <ul>
+          <li>Phase 2 plans <code>Idempotency-Key</code> on POST requests and workers that do each <code>jobId</code> only once (backend-spec §5).</li>
+          <li>That stops <em>our</em> repeats. It cannot stop Google billing for a reply that was lost, because the Gemini API has no idempotency key.</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section class="panel" id="remove" aria-labelledby="h-remove">
+    <h2 id="h-remove">5. What could be removed</h2>
+    <p><strong>There are no agents in this design.</strong> Every model call is a single request: one story, one rewrite, one image. So there are no agents to remove. These parts can go without breaking a requirement:</p>
+    <ul>
+      <li><strong>v1 key import</strong> (<code>V1_KEYS</code>, settings.ts:32).
+        <ul>
+          <li>No requirement needs it now that the passkey and Settings exist.</li>
+          <li>It copies keys from another app on the same origin, which spreads them further (see gap G4).</li>
+          <li><em>Acceptance:</em> with only the <code>comic*</code> v1 keys in localStorage, the first visit opens Unlock or Settings, not the library.</li>
+        </ul>
+      </li>
+      <li><strong>Simple-mode rewrite.</strong> This is <code>simpleRewritePrompt</code> and the Simple branch of <code>rewritePage</code> (direct.ts:111).
+        <ul>
+          <li>No Simple screen can reach it, because the step bar has no Outline step for Simple books.</li>
+        </ul>
+      </li>
+      <li><strong>The Claude server-side fallback</strong> (<code>fallbacks: 'default'</code>, claude.ts:57).
+        <ul>
+          <li>No requirement asks for it.</li>
+          <li>When a request is refused, it quietly moves the story to another model. That works against "honest about AI" and against a cost you can predict.</li>
+          <li>Without it, a refusal shows "Claude declined to write this story", which the app already handles.</li>
+        </ul>
+      </li>
+      <li><strong>Phase 2: SQS.</strong> The spec keeps the queue only to get past API Gateway's 29 s limit. An asynchronous Lambda call (<code>InvocationType: Event</code>) with an on-failure destination still gives a 202 with a job ID, retries and a dead-letter place.
+        <ul>
+          <li>That is one fewer service. CLAUDE.md says to confirm the architecture before building, so this is a proposal.</li>
+        </ul>
+      </li>
+    </ul>
+    <h3>Looked at and kept</h3>
+    <ul>
+      <li><strong>The two concurrency limits.</strong> These are <code>PAGE_CONCURRENCY</code> in the store and <code>slot()</code> in gemini.ts.
+        <ul>
+          <li>The store limits how many pages show "Drawing".</li>
+          <li><code>slot()</code> limits requests overall, which grid pages (6 each) and sheets need.</li>
+        </ul>
+      </li>
+      <li><strong>jsPDF and html-to-image.</strong> The browser's Print could replace them, but "Save as PDF" in a print dialog is hard for grandparents, especially on phones.</li>
+      <li><strong>Mock or demo mode.</strong> goal-spec requires it.</li>
+      <li><strong>Version history.</strong> J4 requires it.</li>
+    </ul>
+    <p class="note">Doc drift: the comment at the top of <code>src/pdf/exportPdf.ts</code> says "Phase 2 renders server-side". backend-spec §4.6 says the PDF is never made on the server.</p>
+  </section>
+
+  <section class="panel" id="gaps" aria-labelledby="h-gaps">
+    <h2 id="h-gaps">6. Claimed but not enforced</h2>
+    <p>Each gap is a boundary for isolation, cost or permission that the spec or an earlier decision promises, but the code doesn't yet enforce. For each one there is a proposed change to the spec and a test you can watch pass or fail. All of these are proposals; none is built.</p>
+
+    <div class="gap">
+      <p><span class="tag">G1 · cost</span> <strong>The ₹100-a-day limit</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>Agreed in the last design review.</dd>
+        <dt>Actually</dt><dd>No code counts spending.
+          <ul>
+            <li>An 8-page grid book in Advanced mode is 38 images (≈ ₹126), and a 12-page one is 62 (≈ ₹205). Either one goes over the limit before any retries.</li>
+            <li>A shared passkey means every browser that unlocks it spends on the same accounts.</li>
+          </ul>
+        </dd>
+        <dt>Spec change</dt><dd>Add a per-browser spend log in localStorage, kept by day.
+          <ul>
+            <li>Before <em>every</em> billed request, <code>gemini.ts</code> and <code>claude.ts</code> add an estimate to the log (image ₹3.5; story at its token estimate). If that would pass the limit, they refuse with <code>QUOTA_EXCEEDED</code> without sending anything.</li>
+            <li>"Draw the pictures" shows the estimated cost of the book and today's remaining amount.</li>
+            <li>The hard limit for everyone together is set outside the app: an Anthropic workspace spend limit, and a requests-per-day quota on the Gemini API in Google Cloud.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>With today's log at ₹98, pressing Redraw shows "Today's limit is reached" and the network panel shows <strong>no</strong> request to <code>generativelanguage.googleapis.com</code>.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G2 · cost</span> <strong>Retries have no limit</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>"Max image retries per job = 3 transient + 3 ladder steps" (backend-spec §5).</dd>
+        <dt>Actually</dt><dd>Each image does stop at 9 requests, but the <code>OFFLINE</code> → <code>queued</code> → <code>pump</code> loop starts the page again with no limit (test D1).</dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li>Keep a per-page count of attempts in memory. After 2 full rounds that ended <code>OFFLINE</code>, mark the page <code>failed</code> with "Couldn't reach Google's image service", even if <code>navigator.onLine</code> says online.</li>
+            <li>Set Claude's <code>maxRetries</code> to 0 for story writing, so a repeat only happens when the user presses <em>Try again</em>, and every repeat counts toward G1.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>In a test where every <code>fetch</code> to Google throws while the browser reports online, one page sends <strong>at most 6 requests</strong> (2 rounds of 3) and then shows Failed.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G3 · cost</span> <strong>Time limits</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>Page images 90 s, sheets 90 s and stories 120 s (backend-spec §5).</dd>
+        <dt>Actually</dt><dd>No time limit on Gemini. Claude uses the SDK default (test A).</dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li><code>requestOnce</code> combines the caller's signal with <code>AbortSignal.timeout(90_000)</code>. Running out of time counts as a transient error, so it is retried and then fails.</li>
+            <li><code>claudeJson</code> passes <code>timeout: 120_000</code>.</li>
+            <li>The Pictures screen gets a <strong>Stop drawing</strong> button that calls <code>stopIllustrating</code> and puts queued pages back to "Not drawn".</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>With a fake Gemini that never answers, the page shows Failed with "took too long" after the retries. A Redraw on another page starts within 1 s, because its place in the queue has been freed.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G4 · isolation</span> <strong>Keys and children's photos are shared with every site at ng-04.github.io</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>"Private by default". settings.ts says the keys are "sent only to Anthropic and Google".</dd>
+        <dt>Actually</dt><dd>Every GitHub Pages site under <code>ng-04.github.io/*</code> is the same origin. That includes v1 at <code>/comic</code>, the homepage and every future repo.
+          <ul>
+            <li>Any script on any of those pages can read <code>localStorage['csm2-settings']</code>, which holds the plain keys, and the IndexedDB photos.</li>
+            <li>There is no Content-Security-Policy, so nothing limits where code on this page can send them.</li>
+          </ul>
+        </dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li>Serve the app from its own origin: a custom subdomain such as <code>comics.&lt;your-domain&gt;</code>, or Phase 2 on CloudFront.</li>
+            <li>Add a CSP <code>&lt;meta&gt;</code> tag with <code>connect-src 'self' https://api.anthropic.com https://generativelanguage.googleapis.com</code>.</li>
+            <li>Drop the v1 key import.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>
+          <ul>
+            <li>A test page at <code>ng-04.github.io/anything/</code> reads <code>localStorage.getItem('csm2-settings')</code> and gets <code>null</code>.</li>
+            <li>On the app, <code>fetch('https://example.com')</code> in the console is blocked by CSP.</li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G5 · permission</span> <strong>Review before spend is only enforced by buttons</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>
+          <ul>
+            <li>"Zero page-image jobs before <em>Draw the pictures</em>".</li>
+            <li>"Every character sheet approved", otherwise <code>422 SHEETS_NOT_APPROVED</code>.</li>
+          </ul>
+        </dd>
+        <dt>Actually</dt><dd>
+          <ul>
+            <li>The only check is the disabled button on the Outline screen (Outline.tsx:145).</li>
+            <li><code>startIllustrating</code> and <code>drawPage</code> don't check anything themselves. A page opened directly in the page editor can be drawn before approval.</li>
+            <li>Opening the Pictures screen, or coming back online, also spends without a click.</li>
+          </ul>
+        </dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li><code>drawPage</code> refuses unless <code>story.status</code> is <code>illustrating</code> or <code>done</code> and <code>pendingSheets(st)</code> is empty.</li>
+            <li><code>startIllustrating</code> checks the same.</li>
+            <li>Whether to resume on its own is decision D3.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>A unit test calls <code>drawPage</code> on an <code>outline</code> story that has an unapproved sheet. The Gemini mock gets zero calls and the page status doesn't change.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G6 · correctness</span> <strong>Old replies win</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd><code>PageVersion.promptSnapshot</code> (backend-spec §2). Also "no lost edits".</dd>
+        <dt>Actually</dt><dd>Neither is in the code (test C1, C2).</dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li>Each request records a fingerprint of what it was made from. For a page that is the prompt and panels; for a story it is the form or setup.</li>
+            <li>Each version stores the prompt it was drawn from.</li>
+            <li>If a reply arrives and the fingerprint no longer matches, a picture is <em>saved as a version but not made active</em>, and a story is shown with "Your story idea changed while this was being written", so the user can either write it again or keep it. Decision D4 is about this.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>Start a redraw with a mock that takes 2 s, change the prompt after 1 s, and wait. The active version stays the same, a new version appears with "drawn from your earlier prompt", and that version stores the old prompt.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G7 · safety</span> <strong>Nothing checks what the story says</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>"Child-safe by default". Validate lengths and speakers, and run an output safety check (backend-spec §4.3).</dd>
+        <dt>Actually</dt><dd>Only the shape of the reply and the page and panel counts are checked (test B).</dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li>Add a free check, <code>validateOutline</code>, in direct.ts. It checks:
+              <ul>
+                <li>captions are 400 characters or fewer, and bubbles 90 or fewer;</li>
+                <li>the hero's name appears on the cover and at least half the pages;</li>
+                <li>the last page starts "Seekh:";</li>
+                <li>every image prompt ends "No text, letters or speech bubbles.";</li>
+                <li>every speaker exists;</li>
+                <li>no word from a short blocked list appears.</li>
+              </ul>
+            </li>
+            <li>If the check fails, retry once, then fail with <code>GENERATION_INVALID</code>.</li>
+            <li>Whether to also pay for a classifier is decision D7.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>A mock returns an ending without "Seekh:". The app sends exactly 2 requests and then shows "The story came back incomplete", and no page is replaced.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G8 · cost</span> <strong>A local save in two steps can pay twice</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>"No lost edits".</dd>
+        <dt>Actually</dt><dd>The image is saved immediately, but the record that points to it is saved up to 400 ms later (test D3).</dd>
+        <dt>Spec change</dt><dd>When a version is added, <code>drawPage</code> and <code>drawSheet</code> write the story to IndexedDB <em>immediately</em>, not on the 400 ms timer. The same goes for any change of <code>status</code>.</dd>
+        <dt>Acceptance</dt><dd>With fake-indexeddb, once <code>drawPage</code> has finished, <code>db.listStories()</code> already shows the new version without moving the clock on.</dd>
+      </dl>
+    </div>
+
+    <div class="gap">
+      <p><span class="tag">G9 · permission</span> <strong>Unlocked keys can do anything the account can</strong></p>
+      <dl>
+        <dt>Claimed</dt><dd>The owner restricts the Gemini key, as agreed.</dd>
+        <dt>Actually</dt><dd>Nothing checks whether that was done.
+          <ul>
+            <li>The Anthropic key can do anything its workspace can.</li>
+            <li>A referrer restriction only stops casual misuse in browsers. Anyone outside a browser can fake the referrer.</li>
+          </ul>
+        </dd>
+        <dt>Spec change</dt><dd>
+          <ul>
+            <li>Add an owner checklist in Settings.
+              <ul>
+                <li>The Gemini key is limited to the Generative Language API and the <code>https://ng-04.github.io/*</code> referrer, or the new origin from G4.</li>
+                <li>The Anthropic key sits in its own workspace with a monthly spend limit.</li>
+              </ul>
+            </li>
+            <li>Rotate both keys whenever someone who knew the passkey should lose access.</li>
+            <li>Phase 2 removes this gap, because the keys move to Secrets Manager.</li>
+          </ul>
+        </dd>
+        <dt>Acceptance</dt><dd>
+          <ul>
+            <li>A <code>curl</code> to the Gemini model endpoint with the key and no referrer returns 403.</li>
+            <li>The Anthropic Console shows a spend limit on that key's workspace.</li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="panel" id="correction" aria-labelledby="h-corr">
+    <h2 id="h-corr">7. A correction to the understanding check</h2>
+    <p>The <a href="./understanding-check.html">answer key</a> for question 6 says that the <code>online</code> listener is the only way to spend without a click. That is incomplete: <strong>opening the Pictures screen</strong> also starts any queued pages (Illustrate.tsx:21, <code>useEffect → pump</code>). That includes reopening the tab on that screen after <code>revive</code> has put pages back in the queue.</p>
+  </section>
+
+  <section class="panel" id="decide" aria-labelledby="h-decide">
+    <h2 id="h-decide">8. Open product decision</h2>
+    <p>Decisions are taken one at a time. Each answer changes the spec above before the next question is asked.</p>
+    <h3>D1 of 7: What happens when a book costs more than what's left of today's ₹100?</h3>
+    <p>A Simple 8-page book is about ₹26 in pictures. An Advanced grid book is ₹86–205 before any redraws. So the limit can stop a book partway through.</p>
+    <ul>
+      <li><strong>A. Check before drawing (recommended).</strong> "Draw the pictures" shows the book's estimated cost. If that is more than today's remaining amount, it won't start, and suggests fewer pages or single-scene pages. A book never stops halfway.</li>
+      <li><strong>B. Draw until the limit, then pause.</strong> The remaining pages show "Paused until tomorrow" and carry on the next day.</li>
+      <li><strong>C. Raise the limit.</strong> For example, ₹250 a day, so that any one book fits.</li>
+    </ul>
+    <div class="ok"><strong>Next, once D1 is decided:</strong>
+      <ul>
+        <li>D2: per-browser limit or one limit for everyone with the passkey;</li>
+        <li>D3: resume drawing on its own, or after a click;</li>
+        <li>D4: what to do with an out-of-date reply;</li>
+        <li>D5: its own domain, or stay on ng-04.github.io;</li>
+        <li>D6: children's photos and the Gemini paid tier, plus the consent wording;</li>
+        <li>D7: a paid safety classifier, or free rules only.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+</body>
+</html>
