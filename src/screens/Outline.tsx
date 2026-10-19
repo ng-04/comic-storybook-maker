@@ -108,7 +108,7 @@ export function Outline({ st }: { st: Story }) {
       <div className="panel stack gap-12" style={{ padding: 28, alignItems: 'flex-start', maxWidth: 560 }}>
         <h1 className="h1">No outline yet</h1>
         <p className="m0">Finish the setup, then press Write my katha.</p>
-        <button className="btn btn-primary" onClick={() => nav(`/s/${st.id}/katha`)}>Go to Katha</button>
+        <button className="btn btn-primary" onClick={() => nav(`/s/${st.id}/katha`)}>Go to Story Plot and Lesson</button>
       </div>
     );
   }

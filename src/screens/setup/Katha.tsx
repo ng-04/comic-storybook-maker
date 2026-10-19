@@ -49,7 +49,7 @@ export function Katha({ st }: { st: Story }) {
   return (
     <div className="stack gap-24" style={{ maxWidth: 900 }}>
       <div>
-        <p className="kicker">Step 5 · Katha</p>
+        <p className="kicker">Step 5 · Story Plot and Lesson</p>
         <h1 className="h1">The story and its lesson</h1>
         <p className="muted" style={{ margin: '8px 0 0', maxWidth: '62ch' }}>Claude writes a page-by-page outline from everything you've set up. You can change any page before pictures are drawn.</p>
       </div>

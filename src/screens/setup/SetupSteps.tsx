@@ -127,7 +127,7 @@ export function Paristhiti({ st }: { st: Story }) {
       </div>
       <div className="row gap-12 between">
         <button className="btn" onClick={() => nav(`/s/${st.id}/paatra`)}>Back</button>
-        <button className="btn btn-primary btn-lg" onClick={() => nav(`/s/${st.id}/katha`)}>Next: Katha</button>
+        <button className="btn btn-primary btn-lg" onClick={() => nav(`/s/${st.id}/katha`)}>Next: Story Plot and Lesson</button>
       </div>
     </div>
   );

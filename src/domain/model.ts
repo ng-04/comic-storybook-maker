@@ -157,7 +157,7 @@ export function missingForWriting(st: Story): string[] {
   const m: string[] = [];
   if (!clean(st.setup.desh.main)) m.push('the main place (Desh)');
   if (!st.characters.some((c) => c.role === 'nayak' && c.name.trim())) m.push('a named nayak (Paatra)');
-  if (!clean(st.setup.katha)) m.push('the main plot (Katha)');
+  if (!clean(st.setup.katha)) m.push('the main plot (in Story Plot and Lesson)');
   return m;
 }
 
